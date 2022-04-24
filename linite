@@ -1,0 +1,361 @@
+#!/usr/bin/env bash
+
+# ============================================================================ #
+##########                                                                     #
+# Linite # =================================================================== #
+##########                                                                     #
+#                                                           ####################
+# ========================================================= # By Jose Humberto #
+#                                                           ####################
+# ============================================================================ #
+
+# Variaveis Globais
+export processname=0; export validmail=0; export process=0; export status=0; export pkg=0
+export password=0; export password1=0; export password2=0; export password3=0
+export report=0
+
+function pkg {
+REQUIRED_PKG="$1"
+PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $REQUIRED_PKG|grep "install ok installed")
+echo "Verificando pelo pacote $REQUIRED_PKG:" $PKG_OK
+if [ "" = "$PKG_OK" ]; then
+  echo "$REQUIRED_PKG nao encontrado. Instalando... Digite sua senha!"
+  sudo apt update; sudo apt install $REQUIRED_PKG -y
+fi
+}
+
+function menuA {
+apt purge cloud-init snapd unattended-upgrades blueman bluetooth -y
+apt autoremove -y
+apt update
+apt upgrade -y
+}
+
+function menuB {
+while true; do
+  var0=$(dialog --title 'Linite' --backtitle "L I N I T E" --menu " " 0 0 0 \
+  A 'Virtual' \
+  B 'Essentials' \
+  C 'Server' \
+  D 'Desktop' \
+  E 'Multimedia' \
+  F 'Games' \
+  X 'SAIR' 2>&1 > /dev/tty )
+
+  case "$var0" in
+
+  A) virtual ;;
+  B) essentials ;;
+  C) servers ;;
+  D) desktop ;;
+  E) multim ;;
+  F) games ;;
+  X) echo "Saindo..." && exit && break ;;
+  esac
+done
+}
+
+# ============================================================================ #
+
+function installer {
+  apt install $1 --no-install-recommends -y
+}
+
+# ============================================================================ #
+
+export list00="qemu-kvm libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf" # Virtual
+export list01="whois net-tools haveged arp-scan cifs-utils netdiscover w3m w3m-img iotop htop lm-sensors samba sshpass speedtest-cli traceroute" # Essentials
+export list02="$list00 $list01 xinit xorg epiphany-browser build-essential libatasmart-bin btrfs-progs" # Server
+export list03="$list02 scrcpy printer-driver-all rdesktop terminator qbittorrent fillezilla thunderbird rss-glx xscreensaver" # Desktop
+export list04="$list03 k3b drawing drawing blender gimp audacity kodi vlc obs-studio cheese" # Multi
+export list05="$list04 aisleriot gnome-mines gnome-mahjongg kpat fluidsynth steam wine winetricks cmatrix" # Games
+
+function virtual {
+dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
+$list00" 25 40
+  if [ $? = 0 ]; then
+    installer "$list00"
+    usr1=$(dialog --title 'Usuário LibVirt' --backtitle "Usuário com permissoes LibVirt" --inputbox "Quem vai acessar o LibVirt?" 10 40 2>&1 > /dev/tty)
+    usermod -aG libvirt $usr1
+    usermod -aG libvirt-qemu $usr1
+    journal1
+  fi
+}
+
+function essentials {
+dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
+$list01" 25 40
+  if [ $? = 0 ]; then
+    installer "$list01"
+    sysctl1
+    samba1
+fi
+}
+
+function servers {
+dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
+$list02" 25 40
+  if [ $? = 0 ]; then
+    installer "$list02"
+    systemctl1
+    sysctl1
+    journal1
+    netplan1
+    samba1
+  fi
+}
+
+function desktop {
+dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
+$list03" 25 40
+  if [ $? = 0 ]; then
+    dialog1 "$list03"
+    installer "$list03"
+    ppa1
+    systemctl1
+    sysctl1
+    tmpfs1
+    samba1
+  fi
+}
+
+function multim {
+dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
+$list04" 25 40
+  if [ $? = 0 ]; then
+    installer "$list04"
+    ppa1
+    systemctl1
+    sysctl1
+    tmpfs1
+  fi
+}
+
+function games {
+dialog --title "Menu" --yesno "Deseja adicionar a arquitetura i386?" 8 40
+if [ $? = 0 ]; then
+  dpkg --add-architecture i386
+fi
+apt update
+dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
+$list05" 25 40
+if [ $? = 0 ]; then
+  installer "$list05"
+  ppa1
+  systemctl1
+  profile1
+  sysctl1
+  tmpfs1
+fi
+}
+
+################################################################################
+#                                                                              #
+################################################################################
+
+function ppa1 {
+xorg1=`ls /tmp/.X11-unix | wc -l`
+
+if [ "$xorg1" = "0" ]; then
+  dialog --title "Erro" --msgbox "XOrg nao encontrado! Abortando..." 6 40
+else
+  dialog --title "Menu" --yesno "Deseja adicionar os repositórios tv-lite e LinuxUprising/Java?" 10 40
+  if [ $? = 0 ]; then
+    add-apt-repository ppa:tv-lite/ppa-git
+    apt install tv-lite
+    add-apt-repository ppa:linuxuprising/java
+  fi
+fi
+}
+
+# ============================================================================ #
+
+function systemctl1 {
+dialog --title "Menu" --yesno "Deseja desativar os processos NetworkManager-wait-online e bluetooth?" 10 40
+if [ $? = 0 ]; then
+  systemctl disable NetworkManager-wait-online.service
+  systemctl mask NetworkManager-wait-online.service
+  systemctl disable bluetooth.service
+  systemctl mask bluetooth.service
+fi
+}
+
+################################################################################
+#                                                                              #
+################################################################################
+
+function profile1 {
+dialog --title "Menu" --yesno "Deseja modificar o arquivo .profile?" 10 40
+if [ $? = 0 ]; then
+echo -e "#STAGING_RT_PRIORITY_SERVER=90
+#STAGING_RT_PRIORITY_BASE=90
+#WINE_RT=15
+#WINE_SRV_RT=10
+#STAGING_WRITECOPY=1
+#STAGING_SHARED_MEMORY=1
+#WINE_ENABLE_PIPE_SYNC_FOR_APP=1
+#export __GL_MaxFramesAllowed=1" >> /home/$USER/.profile
+fi
+}
+
+function sysctl1 {
+dialog --title "Menu" --yesno "Deseja modificar o arquivo sysctl.conf?" 10 40
+if [ $? = 0 ]; then
+echo -e "kernel.sysrq=1
+vm.swappiness=10" >> /etc/sysctl.conf
+fi
+}
+
+function journal1 {
+dialog --title "Menu" --yesno "Deseja modificar o arquivo journald.conf?" 10 40
+if [ $? = 0 ]; then
+  echo "$password" | sudo -S echo -e "Storage=persistent
+SystemMaxUse=5G
+SystemKeepFree=10G" >> /etc/systemd/journald.conf
+fi
+}
+
+function tmpfs1 {
+dialog --title "Menu" --yesno "Deseja modificar o arquivo fstab.conf?" 10 40
+if [ $? = 0 ]; then
+echo "$password" | sudo -S echo -e "# temp to ram!
+tmpfs /tmp tmpfs defaults 0 0
+tmpfs /var/tmp tmpfs defaults 0 0" >> /etc/fstab
+fi
+}
+
+function netplan1 {
+dialog --title "Menu" --yesno "Deseja modificar o arquivo netplan.yaml?" 10 40
+if [ $? = 0 ]; then
+echo -e "#network:
+#    ethernets:
+#        enp4s0:
+#            addresses: [192.168.250.10/24]
+#            gateway4: 192.168.250.1
+#            dhcp4: no
+##           optional: true
+#            nameservers:
+#              addresses: [192.168.250.1]
+#              #addresses: [200.225.197.34, 200.225.197.37] 
+#              #addresses: [200.175.89.139, 200.175.5.139]
+#              #addresses: [8.8.4.4, 8.8.8.8]
+#              #addresses: [1.1.1.1, 1.0.0.1]
+#    version: 2" >> /etc/netplan/00-installer-config.yaml
+
+echo -e "#network:
+#  ethernets:
+#    eth0:
+#      dhcp4: true
+#      optional: true
+
+#    eth1: # THIS!
+#      dhcp4: no
+#      optional: true
+#      addresses: [172.16.1.2/24]
+#  version: 2" >> /etc/netplan/00-installer-config.yaml
+fi
+}
+
+function samba1 {
+dialog --title "Menu" --yesno "Deseja modificar o arquivo samba.conf?" 10 40
+if [ $? = 0 ]; then
+mv /etc/samba/smb.conf /etc/samba/smb.BKP
+
+echo -e "[global]
+#client min protocol = SMB2
+#client max protocol = SMB3
+
+server string = NOVO
+netbios name = novo
+workgroup = WORKGROUP
+
+security = user
+map to guest = bad user
+dns proxy = no
+
+#domain master = yes
+#local master = yes
+#preferred master = yes
+#os level = 255
+
+# dos charset = CP850
+unix charset = UTF-8
+dos charset = ISO8859-1
+# unix charset = ISO8859-1
+# display charset = ISO8859-1
+mangled names = no
+read raw = Yes
+write raw = Yes
+# socket options = TCP_NODELAY IPTOS_LOWDELAY SO_RCVBUF=8192 SO_SNDBUF=8192
+#socket options = TCP_NODELAY IPTOS_LOWDELAY SO_RCVBUF=131072 SO_SNDBUF=131072
+min receivefile size = 16384
+use sendfile = true
+aio read size = 16384
+aio write size = 16384
+
+# Auditory and Recycle Bin!
+
+vfs objects = recycle, full_audit 
+audit:failure = none
+full_audit:success = unlinkat renameat
+#pwrite pwrite_send pwrite_recv write renameat unlinkat mkdir
+#open, opendir, write, unlinkat, renameat, mkdir, rmdir, chmod, chown
+full_audit:prefix = IP=%I|USER=%u|MACHINE=%m|VOLUME=%S
+# vfs:0 Make Directory, Remove Directory, Unlink
+# vfs:1 Open Directory, Rename File, Change Permissions/ACLs
+# vfs:2 Open & Close File
+# vfs:10 Maximum Debug Level
+log level = 0 vfs:0
+syslog = 0
+recycle:repository = /PATH/%U
+recycle:keeptree = yes
+recycle:versions = yes
+recycle:touch = Yes
+recycle:noversions = *.tmp,*.temp,*.o,*.obj,*.TMP,*.TEMP
+recycle:exclude = *.tmp,*.temp,*.o,*.obj,*.TMP,*.TEMP
+recycle:excludedir = /PATH/recycle,/recycle,/tmp,/temp,/TMP,/TEMP
+
+# COMPARTILHAMENTOS #
+
+[TI]
+path = /mnt/
+valid users = $USER
+admin users = $USER
+guest ok = no
+writable = yes
+browsable = no
+create mask = 0777
+force create mode = 0777
+directory mask = 0777
+force directory mode = 0777" > /etc/samba/smb.conf
+fi
+}
+
+################################################################################
+#                                                                              #
+################################################################################
+
+# CONTROLE #
+
+# Checagem Obrigatória de Dependências:
+pkg dialog
+pkg curl
+
+# Início do Sistema:
+if [ "$EUID" -ne 0 ]
+  then echo "Execute esse script como Root!"
+  exit
+else
+  dialog --title "Menu" --yesno "Deseja remover pacotes pré definidos e atualizar o sistema? \n \n
+Os pacotes são: cloud-init snapd unattended-upgrades blueman bluetooth" 10 40
+  if [ $? = 0 ]; then
+    dpkg --configure -a
+    apt install -f
+    menuA
+    menuB
+  else
+    dpkg --configure -a 
+    apt install -f
+    menuB
+  fi
+fi
