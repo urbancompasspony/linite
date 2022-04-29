@@ -60,8 +60,7 @@ esac
 # ============================================================================ #
 
 function installer {
-apt install $1 --no-install-recommends -y
-menuB
+  apt install $1 --no-install-recommends -y
 }
 
 # ============================================================================ #
