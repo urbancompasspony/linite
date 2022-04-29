@@ -152,9 +152,9 @@ fi
 }
 
 function menu {
-echo -e "/home/$USER/.configuracoes/init
-alias menu='/home/$USER/.configuracoes/init'
-alias menug='wget https://raw.githubusercontent.com/urbancompasspony/server/main/init -O /home/$USER/.configuracoes/init'" >> /home/$USER/.bashrc
+echo -e "/home/administrador/.configuracoes/init
+alias menu='/home/administrador/.configuracoes/init'
+alias menug='wget https://raw.githubusercontent.com/urbancompasspony/server/main/init -O /home/administrador/.configuracoes/init'" >> /home/$USER/.bashrc
 
 }
 
