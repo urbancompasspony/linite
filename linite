@@ -32,37 +32,36 @@ apt upgrade -y
 }
 
 function menuB {
-while true; do
-  var0=$(dialog --title 'Linite' --backtitle "L I N I T E" --menu " " 0 0 0 \
-  A 'Virtual' \
-  B 'Essentials' \
-  C 'Server' \
-  D 'to VM' \
-  E 'Desktop' \
-  F 'Multimedia' \
-  G 'Games' \
-  H 'NOROOT Menu' \
-  X 'SAIR' 2>&1 > /dev/tty )
-
-  case "$var0" in
-
-  A) virtual ;;
-  B) essentials ;;
-  C) servers ;;
-  D) vm ;;
-  E) desktop ;;
-  F) multim ;;
-  G) games ;;
-  H) menu ;;
-  X) echo "Saindo..." && exit && break ;;
-  esac
-done
+var0=$(dialog --title 'Linite' --backtitle "L I N I T E" --menu " " 0 0 0 \
+A 'Virtual' \
+B 'Essentials' \
+C 'Server' \
+D 'to VM' \
+E 'Desktop' \
+F 'Multimedia' \
+G 'Games' \
+H 'Instalar PiHole' \
+I 'NOROOT Menu' \
+X 'SAIR' 2>&1 > /dev/tty )
+case "$var0" in
+A) virtual ;;
+B) essentials ;;
+C) servers ;;
+D) vm ;;
+E) desktop ;;
+F) multim ;;
+G) games ;;
+H) curl -sSL https://install.pi-hole.net | bash ;;
+I) menu ;;
+X) echo "Saindo..." && exit && break ;;
+esac
 }
 
 # ============================================================================ #
 
 function installer {
-  apt install $1 --no-install-recommends -y
+apt install $1 --no-install-recommends -y
+menuB
 }
 
 # ============================================================================ #
@@ -84,7 +83,9 @@ $list00" 25 40
     usermod -aG libvirt $usr1
     usermod -aG libvirt-qemu $usr1
     journal1
+    menuB
   fi
+menuB
 }
 
 function essentials {
@@ -94,7 +95,9 @@ $list01" 25 40
     installer "$list01"
     sysctl1
     samba1
+    menuB
 fi
+menuB
 }
 
 function servers {
@@ -107,7 +110,9 @@ $list02" 25 40
     journal1
     netplan1
     samba1
+    menuB
   fi
+menuB
 }
 
 function desktop {
@@ -121,7 +126,9 @@ $list03" 25 40
     sysctl1
     tmpfs1
     samba1
+    menuB
   fi
+menuB
 }
 
 function multim {
@@ -133,7 +140,9 @@ $list04" 25 40
     systemctl1
     sysctl1
     tmpfs1
+    menuB
   fi
+menuB
 }
 
 function games {
@@ -151,7 +160,9 @@ if [ $? = 0 ]; then
   profile1
   sysctl1
   tmpfs1
+  menuB
 fi
+menuB
 }
 
 function menu {
@@ -160,7 +171,9 @@ if [ $? = 0 ]; then
   echo -e "/home/administrador/.configuracoes/init
   alias menu='/home/administrador/.configuracoes/init'
   alias menug='wget https://raw.githubusercontent.com/urbancompasspony/server/main/init -O /home/administrador/.configuracoes/init'" >> /home/$USER/.bashrc
+  menuB
 fi
+menuB
 }
 
 function vm {
@@ -173,7 +186,9 @@ if [ $? = 0 ]; then
   journal1
   netplan1
   samba1
+  menuB
 fi
+menuB
 }
 
 ################################################################################
@@ -185,6 +200,7 @@ xorg1=`ls /tmp/.X11-unix | wc -l`
 
 if [ "$xorg1" = "0" ]; then
   dialog --title "Erro" --msgbox "XOrg nao encontrado! Abortando..." 6 40
+  menuB
 else
   dialog --title "Menu" --yesno "Deseja adicionar os repositórios tv-lite e LinuxUprising/Java?" 10 40
   if [ $? = 0 ]; then
