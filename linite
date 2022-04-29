@@ -40,6 +40,7 @@ while true; do
   D 'Desktop' \
   E 'Multimedia' \
   F 'Games' \
+  G 'NOROOT Menu' \
   X 'SAIR' 2>&1 > /dev/tty )
 
   case "$var0" in
@@ -50,6 +51,7 @@ while true; do
   D) desktop ;;
   E) multim ;;
   F) games ;;
+  G) menu ;;
   X) echo "Saindo..." && exit && break ;;
   esac
 done
@@ -147,6 +149,13 @@ if [ $? = 0 ]; then
   sysctl1
   tmpfs1
 fi
+}
+
+function menu {
+echo -e "/home/$USER/.configuracoes/init
+alias menu='/home/$USER/.configuracoes/init'
+alias menug='wget https://raw.githubusercontent.com/urbancompasspony/server/main/init -O /home/$USER/.configuracoes/init'" >> /home/$USER/.bashrc
+
 }
 
 ################################################################################
