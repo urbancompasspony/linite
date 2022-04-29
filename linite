@@ -37,10 +37,11 @@ while true; do
   A 'Virtual' \
   B 'Essentials' \
   C 'Server' \
-  D 'Desktop' \
-  E 'Multimedia' \
-  F 'Games' \
-  G 'NOROOT Menu' \
+  D 'to VM' \
+  E 'Desktop' \
+  F 'Multimedia' \
+  G 'Games' \
+  H 'NOROOT Menu' \
   X 'SAIR' 2>&1 > /dev/tty )
 
   case "$var0" in
@@ -48,10 +49,11 @@ while true; do
   A) virtual ;;
   B) essentials ;;
   C) servers ;;
-  D) desktop ;;
-  E) multim ;;
-  F) games ;;
-  G) menu ;;
+  D) vm ;;
+  E) desktop ;;
+  F) multim ;;
+  G) games ;;
+  H) menu ;;
   X) echo "Saindo..." && exit && break ;;
   esac
 done
@@ -68,6 +70,7 @@ function installer {
 export list00="qemu-kvm libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf" # Virtual
 export list01="whois net-tools haveged arp-scan cifs-utils netdiscover w3m w3m-img iotop htop lm-sensors samba sshpass speedtest-cli traceroute" # Essentials
 export list02="$list00 $list01 gpm xinit xorg epiphany-browser build-essential libatasmart-bin btrfs-progs" # Server
+export list021="$list01 gpm build-essential libatasmart-bin btrfs-progs" # Server Virtual
 export list03="$list02 scrcpy printer-driver-all rdesktop terminator qbittorrent fillezilla thunderbird rss-glx xscreensaver" # Desktop
 export list04="$list03 k3b drawing drawing blender gimp audacity kodi vlc obs-studio cheese" # Multi
 export list05="$list04 aisleriot gnome-mines gnome-mahjongg kpat fluidsynth steam wine winetricks cmatrix" # Games
@@ -152,10 +155,25 @@ fi
 }
 
 function menu {
-echo -e "/home/administrador/.configuracoes/init
-alias menu='/home/administrador/.configuracoes/init'
-alias menug='wget https://raw.githubusercontent.com/urbancompasspony/server/main/init -O /home/administrador/.configuracoes/init'" >> /home/$USER/.bashrc
+dialog --title "Menu" --yesno "Deseja configurar o arquivo .bashrc?" 25 40
+if [ $? = 0 ]; then
+  echo -e "/home/administrador/.configuracoes/init
+  alias menu='/home/administrador/.configuracoes/init'
+  alias menug='wget https://raw.githubusercontent.com/urbancompasspony/server/main/init -O /home/administrador/.configuracoes/init'" >> /home/$USER/.bashrc
+fi
+}
 
+function vm {
+dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
+$list021" 25 40
+if [ $? = 0 ]; then
+  installer "$list021"
+  systemctl1
+  sysctl1
+  journal1
+  netplan1
+  samba1
+fi
 }
 
 ################################################################################
