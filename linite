@@ -69,7 +69,7 @@ menuB
 export list00="qemu-kvm libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf" # Virtual
 export list01="whois net-tools haveged arp-scan cifs-utils netdiscover w3m w3m-img iotop htop lm-sensors samba sshpass speedtest-cli traceroute" # Essentials
 export list02="$list00 $list01 gpm xinit xorg epiphany-browser build-essential libatasmart-bin btrfs-progs" # Server
-export list021="$list01 gpm build-essential libatasmart-bin btrfs-progs" # Server Virtual
+export list021="$list01 build-essential libatasmart-bin btrfs-progs" # Server Virtual
 export list03="$list02 scrcpy printer-driver-all rdesktop terminator qbittorrent fillezilla thunderbird rss-glx xscreensaver" # Desktop
 export list04="$list03 k3b drawing drawing blender gimp audacity kodi vlc obs-studio cheese" # Multi
 export list05="$list04 aisleriot gnome-mines gnome-mahjongg kpat fluidsynth steam wine winetricks cmatrix" # Games
