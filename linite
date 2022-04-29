@@ -171,12 +171,14 @@ fi
 # ============================================================================ #
 
 function systemctl1 {
-dialog --title "Menu" --yesno "Deseja desativar os processos NetworkManager-wait-online e bluetooth?" 10 40
+dialog --title "Menu" --yesno "Deseja desativar os processos *-wait-online?" 10 40
 if [ $? = 0 ]; then
   systemctl disable NetworkManager-wait-online.service
   systemctl mask NetworkManager-wait-online.service
-  systemctl disable bluetooth.service
-  systemctl mask bluetooth.service
+  systemctl disable systemd-networkd-wait-online.service
+  systemctl mask systemd-networkd-wait-online.service
+  #systemctl disable bluetooth.service
+  #systemctl mask bluetooth.service
 fi
 }
 
