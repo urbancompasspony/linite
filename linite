@@ -66,7 +66,7 @@ function installer {
 # ============================================================================ #
 
 export list00="qemu-kvm libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq" # Virtual
-export list01="whois net-tools haveged arp-scan cifs-utils netdiscover w3m w3m-img iotop htop lm-sensors samba samba-dsdb-modules samba-vfs-modules sshpass speedtest-cli traceroute" # Essentials
+export list01="whois rsnapshot rclone net-tools haveged arp-scan cifs-utils netdiscover w3m w3m-img iotop htop lm-sensors samba samba-dsdb-modules samba-vfs-modules sshpass speedtest-cli traceroute" # Essentials
 export list02="$list00 $list01 gpm xinit xorg epiphany-browser build-essential libatasmart-bin btrfs-progs" # Server
 export list021="$list01 build-essential libatasmart-bin btrfs-progs" # Server Virtual
 export list03="$list02 scrcpy printer-driver-all rdesktop terminator qbittorrent fillezilla thunderbird rss-glx xscreensaver" # Desktop
