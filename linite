@@ -18,10 +18,10 @@ function pkg {
 REQUIRED_PKG="$1"
 PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $REQUIRED_PKG|grep "install ok installed")
 echo "Verificando pelo pacote $REQUIRED_PKG:" $PKG_OK
-if [ "" = "$PKG_OK" ]; then
+[ "" = "$PKG_OK" ] && {
   echo "$REQUIRED_PKG nao encontrado. Instalando... Digite sua senha!"
   sudo apt update; sudo apt install $REQUIRED_PKG -y
-fi
+  }
 }
 
 function menuA {
@@ -76,33 +76,33 @@ export list05="$list04 aisleriot gnome-mines gnome-mahjongg kpat fluidsynth stea
 function virtual {
 dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
 $list00" 25 40
-  if [ $? = 0 ]; then
+  [ $? = 0 ] && {
     installer "$list00"
     usr1=$(dialog --title 'Usuário LibVirt' --backtitle "Usuário com permissoes LibVirt" --inputbox "Quem vai acessar o LibVirt?" 10 40 2>&1 > /dev/tty)
     usermod -aG libvirt $usr1
     usermod -aG libvirt-qemu $usr1
     journal1
     menuB
-  fi
+  }
 menuB
 }
 
 function essentials {
 dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
 $list01" 25 40
-  if [ $? = 0 ]; then
+  [ $? = 0 ] && {
     installer "$list01"
     sysctl1
     samba1
     menuB
-fi
+  }
 menuB
 }
 
 function servers {
 dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
 $list02" 25 40
-  if [ $? = 0 ]; then
+  [ $? = 0 ] && {
     installer "$list02"
     systemctl1
     sysctl1
@@ -110,14 +110,14 @@ $list02" 25 40
     netplan1
     samba1
     menuB
-  fi
+  }
 menuB
 }
 
 function desktop {
 dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
 $list03" 25 40
-  if [ $? = 0 ]; then
+  [ $? = 0 ] && {
     dialog1 "$list03"
     installer "$list03"
     ppa1
@@ -126,33 +126,33 @@ $list03" 25 40
     tmpfs1
     samba1
     menuB
-  fi
+  }
 menuB
 }
 
 function multim {
 dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
 $list04" 25 40
-  if [ $? = 0 ]; then
+  [ $? = 0 ] && {
     installer "$list04"
     ppa1
     systemctl1
     sysctl1
     tmpfs1
     menuB
-  fi
+  }
 menuB
 }
 
 function games {
 dialog --title "Menu" --yesno "Deseja adicionar a arquitetura i386?" 8 40
-if [ $? = 0 ]; then
+[ $? = 0 ] && {
   dpkg --add-architecture i386
-fi
+}
 apt update
 dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
 $list05" 25 40
-if [ $? = 0 ]; then
+[ $? = 0 ] && {
   installer "$list05"
   ppa1
   systemctl1
@@ -160,25 +160,25 @@ if [ $? = 0 ]; then
   sysctl1
   tmpfs1
   menuB
-fi
+  }
 menuB
 }
 
 function menu {
 dialog --title "Menu" --yesno "Deseja configurar o arquivo .bashrc?" 25 40
-if [ $? = 0 ]; then
+[ $? = 0 ] && {
   echo -e "/home/administrador/.configuracoes/init
   alias menu='/home/administrador/.configuracoes/init'
   alias menug='wget https://raw.githubusercontent.com/urbancompasspony/server/main/init -O /home/administrador/.configuracoes/init'" >> /home/$USER/.bashrc
   menuB
-fi
+  }
 menuB
 }
 
 function vm {
 dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
 $list021" 25 40
-if [ $? = 0 ]; then
+[ $? = 0 ] && {
   installer "$list021"
   systemctl1
   sysctl1
@@ -186,7 +186,7 @@ if [ $? = 0 ]; then
   netplan1
   samba1
   menuB
-fi
+  }
 menuB
 }
 
@@ -197,31 +197,31 @@ menuB
 function ppa1 {
 xorg1=`ls /tmp/.X11-unix | wc -l`
 
-if [ "$xorg1" = "0" ]; then
+[ "$xorg1" = "0" ] && {
   dialog --title "Erro" --msgbox "XOrg nao encontrado! Abortando..." 6 40
   menuB
-else
-  dialog --title "Menu" --yesno "Deseja adicionar os repositórios tv-lite e LinuxUprising/Java?" 10 40
-  if [ $? = 0 ]; then
-    add-apt-repository ppa:tv-lite/ppa-git
-    apt install tv-lite
-    add-apt-repository ppa:linuxuprising/java
-  fi
-fi
+  }
+
+dialog --title "Menu" --yesno "Deseja adicionar os repositórios tv-lite e LinuxUprising/Java?" 10 40
+[ $? = 0 ] && {
+  add-apt-repository ppa:tv-lite/ppa-git
+  apt install tv-lite
+  add-apt-repository ppa:linuxuprising/java
+  }
 }
 
 # ============================================================================ #
 
 function systemctl1 {
 dialog --title "Menu" --yesno "Deseja desativar os processos *-wait-online?" 10 40
-if [ $? = 0 ]; then
+[ $? = 0 ] && {
   systemctl disable NetworkManager-wait-online.service
   systemctl mask NetworkManager-wait-online.service
   systemctl disable systemd-networkd-wait-online.service
   systemctl mask systemd-networkd-wait-online.service
   #systemctl disable bluetooth.service
   #systemctl mask bluetooth.service
-fi
+  }
 }
 
 ################################################################################
@@ -230,47 +230,47 @@ fi
 
 function profile1 {
 dialog --title "Menu" --yesno "Deseja modificar o arquivo .profile?" 10 40
-if [ $? = 0 ]; then
-echo -e "#STAGING_RT_PRIORITY_SERVER=90
-#STAGING_RT_PRIORITY_BASE=90
-#WINE_RT=15
-#WINE_SRV_RT=10
-#STAGING_WRITECOPY=1
-#STAGING_SHARED_MEMORY=1
-#WINE_ENABLE_PIPE_SYNC_FOR_APP=1
-#export __GL_MaxFramesAllowed=1" >> /home/$USER/.profile
-fi
+[ $? = 0 ] && {
+  echo -e "#STAGING_RT_PRIORITY_SERVER=90
+  #STAGING_RT_PRIORITY_BASE=90
+  #WINE_RT=15
+  #WINE_SRV_RT=10
+  #STAGING_WRITECOPY=1
+  #STAGING_SHARED_MEMORY=1
+  #WINE_ENABLE_PIPE_SYNC_FOR_APP=1
+  #export __GL_MaxFramesAllowed=1" >> /home/$USER/.profile
+  }
 }
 
 function sysctl1 {
 dialog --title "Menu" --yesno "Deseja modificar o arquivo sysctl.conf?" 10 40
-if [ $? = 0 ]; then
+[ $? = 0 ] && {
 echo -e "kernel.sysrq=1
 vm.swappiness=10" >> /etc/sysctl.conf
-fi
+  }
 }
 
 function journal1 {
 dialog --title "Menu" --yesno "Deseja modificar o arquivo journald.conf?" 10 40
-if [ $? = 0 ]; then
+[ $? = 0 ] && {
   echo "$password" | sudo -S echo -e "Storage=persistent
 SystemMaxUse=5G
 SystemKeepFree=10G" >> /etc/systemd/journald.conf
-fi
+  }
 }
 
 function tmpfs1 {
 dialog --title "Menu" --yesno "Deseja modificar o arquivo fstab.conf?" 10 40
-if [ $? = 0 ]; then
+[ $? = 0 ] && {
 echo "$password" | sudo -S echo -e "# temp to ram!
 tmpfs /tmp tmpfs defaults 0 0
 tmpfs /var/tmp tmpfs defaults 0 0" >> /etc/fstab
-fi
+  }
 }
 
 function netplan1 {
 dialog --title "Menu" --yesno "Deseja modificar o arquivo netplan.yaml?" 10 40
-if [ $? = 0 ]; then
+[ $? = 0 ] && {
 echo -e "#network:
 #    ethernets:
 #        enp4s0:
@@ -297,12 +297,12 @@ echo -e "#network:
 #      optional: true
 #      addresses: [172.16.1.2/24]
 #  version: 2" >> /etc/netplan/00-installer-config.yaml
-fi
+  }
 }
 
 function samba1 {
 dialog --title "Menu" --yesno "Deseja modificar o arquivo samba.conf?" 10 40
-if [ $? = 0 ]; then
+[ $? = 0 ] && {
 mv /etc/samba/smb.conf /etc/samba/smb.BKP
 
 echo -e "[global]
@@ -372,7 +372,7 @@ create mask = 0777
 force create mode = 0777
 directory mask = 0777
 force directory mode = 0777" > /etc/samba/smb.conf
-fi
+  }
 }
 
 ################################################################################
@@ -386,20 +386,22 @@ pkg dialog
 pkg curl
 
 # Início do Sistema:
-if [ "$EUID" -ne 0 ]
-  then echo "Execute esse script como Root!"
+[ "$EUID" -ne 0 ] && {
+  echo "Execute esse script como Root!"
   exit
-else
-  dialog --title "Menu" --yesno "Deseja remover pacotes pré definidos e atualizar o sistema? \n \n
+}
+
+dialog --title "Menu" --yesno "Deseja remover pacotes pré definidos e atualizar o sistema? \n \n
 Os pacotes são: cloud-init snapd unattended-upgrades blueman bluetooth" 10 40
-  if [ $? = 0 ]; then
-    dpkg --configure -a
-    apt install -f
-    menuA
-    menuB
-  else
-    dpkg --configure -a 
-    apt install -f
-    menuB
-  fi
-fi
+[ $? = 0 ] && {
+  dpkg --configure -a
+  apt install -f
+  menuA
+  menuB
+}
+
+[ $? = 1 ] && {
+  dpkg --configure -a 
+  apt install -f
+  menuB
+}
