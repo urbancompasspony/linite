@@ -195,7 +195,7 @@ menuB
 ################################################################################
 
 function ppa1 {
-xorg1=`ls /tmp/.X11-unix | wc -l`
+xorg1=$(ls /tmp/.X11-unix | wc -l)
 
 [ "$xorg1" = "0" ] && {
   dialog --title "Erro" --msgbox "XOrg nao encontrado! Abortando..." 6 40
