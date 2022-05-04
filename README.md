@@ -8,7 +8,7 @@ An alternative to NINITE® but for Linux, debian-based machines!
 
 To use it, boot your linux system and run this:
 
-# curl -sSL https://linite.linuxuniverse.com.br | sudo bash
+## curl -sSL https://linite.linuxuniverse.com.br | sudo bash
 
 # Configuring
 
