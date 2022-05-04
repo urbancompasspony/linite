@@ -6,7 +6,7 @@ For now only in Brazillian Portuguese!
 
 An alternative to NINITE® but for Linux, debian-based machines!
 
-# Instalation
+# How to Use it
 
 To use it, boot your linux system and run this:
 
