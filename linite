@@ -186,9 +186,10 @@ menuB
 function menu {
 dialog --title "Menu" --yesno "Deseja configurar o arquivo .bashrc?" 25 40
 [ $? = 0 ] && {
-  echo -e "/home/administrador/.configuracoes/init
-  alias menu='/home/administrador/.configuracoes/init'
-  alias menug='wget https://raw.githubusercontent.com/urbancompasspony/server/main/init -O /home/administrador/.configuracoes/init'" >> /home/$USER/.bashrc
+  echo -e "/home/administrador/.init
+  alias menu='/home/administrador/.init'
+  alias menug='wget https://raw.githubusercontent.com/urbancompasspony/server/main/init -O /home/administrador/.init'" >> /home/administrador/.bashrc
+  cat <(crontab -l) <(echo '0,30 * * * * wget https://raw.githubusercontent.com/urbancompasspony/server/main/init -O /home/administrador/.init') | crontab -
   menuB
   }
 menuB
