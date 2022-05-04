@@ -2,6 +2,8 @@
 
 # What is it?
 
+For now only in Brazillian Portuguese!
+
 An alternative to NINITE® but for Linux, debian-based machines!
 
 # Instalation
