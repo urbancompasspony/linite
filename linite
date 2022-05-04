@@ -15,13 +15,33 @@ export password=0; export password1=0; export password2=0; export password3=0
 export report=0
 
 function pkg {
-REQUIRED_PKG="$1"
-PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $REQUIRED_PKG|grep "install ok installed")
-echo "Verificando pelo pacote $REQUIRED_PKG:" $PKG_OK
-[ "" = "$PKG_OK" ] && {
-  echo "$REQUIRED_PKG nao encontrado. Instalando... Digite sua senha!"
-  sudo apt update; sudo apt install $REQUIRED_PKG -y
+APT_CMD=$(which apt 1> /dev/null 2> /dev/null && echo "sim" || echo "nao")
+YUM_CMD=$(which yum 1> /dev/null 2> /dev/null && echo "sim" || echo "nao")
+
+[ "$APT_CMD" = "sim" ] && {
+  pkg1="apt"
+  REQUIRED_PKG="$1"
+  PKG_OK=$(dpkg-query -W 1> /dev/null 2> /dev/null $REQUIRED_PKG && echo "sim" || echo "nao")
+
+  [ "$PKG_OK" = "nao" ] && {
+    echo "$REQUIRED_PKG não encontrado. Instalando..."
+    echo "Digite sua senha!"
+    sudo apt update; sudo apt install $REQUIRED_PKG -y
+    mkdir -p ~/.mutt/cache/headers && mkdir ~/.mutt/cache/bodies && touch ~/.mutt/certificates && touch ~/.mutt/muttrc
+    echo -e "$TEXTAO07" > ~/.mutt/muttrc
+    } || {
+      echo "ok" > /dev/null
+      }
+} || {
+  [ "$YUM_CMD" = "sim" ] && {
+    pkg1="yum"
+    echo "Sistema YUM detectado. Ignorando."
+  } || {
+    pkg1="pkg"
+    echo "Sistema desconhecido."
   }
+}
+
 }
 
 function menuA {
@@ -61,7 +81,7 @@ esac
 
 function installer {
   apt install $1 --no-install-recommends -y
-}
+  }
 
 # ============================================================================ #
 
@@ -83,18 +103,18 @@ $list00" 25 40
     usermod -aG libvirt-qemu $usr1
     journal1
     menuB
-  }
+    }
 menuB
 }
 
 function essentials {
 dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
 $list01" 25 40
-  [ $? = 0 ] && {
-    installer "$list01"
-    sysctl1
-    samba1
-    menuB
+[ $? = 0 ] && {
+  installer "$list01"
+  sysctl1
+  samba1
+  menuB
   }
 menuB
 }
@@ -102,14 +122,14 @@ menuB
 function servers {
 dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
 $list02" 25 40
-  [ $? = 0 ] && {
-    installer "$list02"
-    systemctl1
-    sysctl1
-    journal1
-    netplan1
-    samba1
-    menuB
+[ $? = 0 ] && {
+  installer "$list02"
+  systemctl1
+  sysctl1
+  journal1
+  netplan1
+  samba1
+  menuB
   }
 menuB
 }
@@ -117,30 +137,30 @@ menuB
 function desktop {
 dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
 $list03" 25 40
-  [ $? = 0 ] && {
-    dialog1 "$list03"
-    installer "$list03"
-    ppa1
-    systemctl1
-    sysctl1
-    tmpfs1
-    samba1
-    menuB
-  }
+[ $? = 0 ] && {
+  dialog1 "$list03"
+  installer "$list03"
+  ppa1
+  systemctl1
+  sysctl1
+  tmpfs1
+  samba1
+  menuB
+}
 menuB
 }
 
 function multim {
 dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
 $list04" 25 40
-  [ $? = 0 ] && {
-    installer "$list04"
-    ppa1
-    systemctl1
-    sysctl1
-    tmpfs1
-    menuB
-  }
+[ $? = 0 ] && {
+  installer "$list04"
+  ppa1
+  systemctl1
+  sysctl1
+  tmpfs1
+  menuB
+}
 menuB
 }
 
@@ -245,8 +265,8 @@ dialog --title "Menu" --yesno "Deseja modificar o arquivo .profile?" 10 40
 function sysctl1 {
 dialog --title "Menu" --yesno "Deseja modificar o arquivo sysctl.conf?" 10 40
 [ $? = 0 ] && {
-echo -e "kernel.sysrq=1
-vm.swappiness=10" >> /etc/sysctl.conf
+  echo -e "kernel.sysrq=1
+  vm.swappiness=10" >> /etc/sysctl.conf
   }
 }
 
@@ -254,17 +274,17 @@ function journal1 {
 dialog --title "Menu" --yesno "Deseja modificar o arquivo journald.conf?" 10 40
 [ $? = 0 ] && {
   echo "$password" | sudo -S echo -e "Storage=persistent
-SystemMaxUse=5G
-SystemKeepFree=10G" >> /etc/systemd/journald.conf
+  SystemMaxUse=5G
+  SystemKeepFree=10G" >> /etc/systemd/journald.conf
   }
 }
 
 function tmpfs1 {
 dialog --title "Menu" --yesno "Deseja modificar o arquivo fstab.conf?" 10 40
 [ $? = 0 ] && {
-echo "$password" | sudo -S echo -e "# temp to ram!
-tmpfs /tmp tmpfs defaults 0 0
-tmpfs /var/tmp tmpfs defaults 0 0" >> /etc/fstab
+  echo "$password" | sudo -S echo -e "# temp to ram!
+  tmpfs /tmp tmpfs defaults 0 0
+  tmpfs /var/tmp tmpfs defaults 0 0" >> /etc/fstab
   }
 }
 
@@ -389,7 +409,7 @@ pkg curl
 [ "$EUID" -ne 0 ] && {
   echo "Execute esse script como Root!"
   exit
-}
+  }
 
 dialog --title "Menu" --yesno "Deseja remover pacotes pré definidos e atualizar o sistema? \n \n
 Os pacotes são: cloud-init snapd unattended-upgrades blueman bluetooth" 10 40
@@ -398,10 +418,10 @@ Os pacotes são: cloud-init snapd unattended-upgrades blueman bluetooth" 10 40
   apt install -f
   menuA
   menuB
-}
+  }
 
 [ $? = 1 ] && {
   dpkg --configure -a 
   apt install -f
   menuB
-}
+  }
