@@ -186,10 +186,10 @@ menuB
 function menu {
 dialog --title "Menu" --yesno "Deseja configurar o arquivo .bashrc?" 25 40
 [ $? = 0 ] && {
-  echo -e "/home/administrador/.init
-  alias menu='/home/administrador/.init'
-  alias menug='wget https://raw.githubusercontent.com/urbancompasspony/server/main/init -O /home/administrador/.init'" >> /home/administrador/.bashrc
-  cat <(crontab -l) <(echo '0,30 * * * * wget https://raw.githubusercontent.com/urbancompasspony/server/main/init -O /home/administrador/.init') | crontab -
+  echo -e "/home/$USER/.init
+  alias menu='/home/$USER/.init'
+  alias menug='wget https://raw.githubusercontent.com/urbancompasspony/server/main/init -O /home/administrador/.init'" >> /home/$USER/.bashrc
+  cat <(crontab -l) <(echo '0,30 * * * * wget https://raw.githubusercontent.com/urbancompasspony/server/main/init -O /home/$USER/.init') | crontab -
   menuB
   }
 menuB
@@ -266,7 +266,9 @@ function sysctl1 {
 dialog --title "Menu" --yesno "Deseja modificar o arquivo sysctl.conf?" 10 40
 [ $? = 0 ] && {
   echo -e "kernel.sysrq=1
-  vm.swappiness=10" >> /etc/sysctl.conf
+  vm.swappiness=10
+  vm.panic_on_oom=1
+  kernel.panic=5" >> /etc/sysctl.conf
   }
 }
 
