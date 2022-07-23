@@ -55,23 +55,25 @@ var0=$(dialog --title 'Linite' --backtitle "L I N I T E" --menu " " 0 0 0 \
 A 'Virtual' \
 B 'Essentials' \
 C 'Server' \
-D 'to VM' \
-E 'Desktop' \
-F 'Multimedia' \
-G 'Games' \
-H 'Instalar PiHole' \
-I 'NOROOT Menu' \
+D 'Server SoC' \
+E 'to VM' \
+F 'Desktop' \
+G 'Multimedia' \
+H 'Games' \
+I 'Instalar PiHole' \
+J 'NOROOT Menu' \
 X 'SAIR' 2>&1 > /dev/tty )
 case "$var0" in
 A) virtual ;;
 B) essentials ;;
 C) servers ;;
-D) vm ;;
-E) desktop ;;
-F) multim ;;
-G) games ;;
-H) curl -sSL https://install.pi-hole.net | bash ;;
-I) menu ;;
+D) vmsoc ;;
+E) vm ;;
+F) desktop ;;
+G) multim ;;
+H) games ;;
+I) curl -sSL https://install.pi-hole.net | bash ;;
+J) menu ;;
 X) echo "Saindo..." && exit && break ;;
 esac
 }
@@ -84,10 +86,10 @@ function installer {
 
 # ============================================================================ #
 
-export list00="qemu-kvm libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq" # Virtual
+export list00="qemu-kvm qemu-guest-agent libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq" # Virtual
 export list01="whois rsnapshot rclone openssh-server net-tools haveged arp-scan cifs-utils netdiscover w3m w3m-img iotop htop lm-sensors samba samba-dsdb-modules samba-vfs-modules sshpass speedtest-cli traceroute" # Essentials
 export list02="$list00 $list01 gpm xinit xorg epiphany-browser build-essential libatasmart-bin btrfs-progs" # Server
-export list021="$list01 qemu-guest-agent build-essential libatasmart-bin btrfs-progs" # Server Virtual
+export list021="$list01 build-essential libatasmart-bin btrfs-progs" # Server Virtual
 export list03="$list02 scrcpy printer-driver-all rdesktop terminator gnome-disk-utility qbittorrent dconf-editor fillezilla thunderbird rss-glx xscreensaver" # Desktop
 export list04="$list03 k3b drawing drawing blender gimp audacity kodi vlc obs-studio cheese" # Multi
 export list05="$list04 aisleriot gnome-mines gnome-mahjongg kpat fluidsynth steam wine winetricks cmatrix" # Games
@@ -200,6 +202,21 @@ dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
 $list021" 25 40
 [ $? = 0 ] && {
   installer "$list021"
+  systemctl1
+  sysctl1
+  journal1
+  netplan1
+  samba1
+  menuB
+  }
+menuB
+}
+
+function vmsoc {
+dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
+$list01" 25 40
+[ $? = 0 ] && {
+  installer "$list01"
   systemctl1
   sysctl1
   journal1
