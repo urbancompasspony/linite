@@ -22,24 +22,18 @@ YUM_CMD=$(which yum 1> /dev/null 2> /dev/null && echo "sim" || echo "nao")
   pkg1="apt"
   REQUIRED_PKG="$1"
   PKG_OK=$(dpkg-query -W 1> /dev/null 2> /dev/null $REQUIRED_PKG && echo "sim" || echo "nao")
-
   [ "$PKG_OK" = "nao" ] && {
     echo "$REQUIRED_PKG não encontrado. Instalando..."
     echo "Digite sua senha!"
-    sudo apt update; sudo apt install $REQUIRED_PKG -y
+    sudo apt update; sudo apt install $REQUIRED_PKG $2 -y
     mkdir -p ~/.mutt/cache/headers && mkdir ~/.mutt/cache/bodies && touch ~/.mutt/certificates && touch ~/.mutt/muttrc
-    } || {
-      echo "ok" > /dev/null
-      }
-} || {
-  [ "$YUM_CMD" = "sim" ] && {
-    pkg1="yum"
-    echo "Sistema YUM detectado. Ignorando."
+    echo -e "$TEXTAO07" > ~/.mutt/muttrc
   } || {
-    pkg1="pkg"
-    echo "Sistema desconhecido."
+    echo "ok" > /dev/null
+    }
+} || {
+  echo "Sistema desconhecido."
   }
-}
 
 }
 
