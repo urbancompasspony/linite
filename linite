@@ -26,8 +26,6 @@ YUM_CMD=$(which yum 1> /dev/null 2> /dev/null && echo "sim" || echo "nao")
     echo "$REQUIRED_PKG não encontrado. Instalando..."
     echo "Digite sua senha!"
     sudo apt update; sudo apt install $REQUIRED_PKG $2 -y
-    mkdir -p ~/.mutt/cache/headers && mkdir ~/.mutt/cache/bodies && touch ~/.mutt/certificates && touch ~/.mutt/muttrc
-    echo -e "$TEXTAO07" > ~/.mutt/muttrc
   } || {
     echo "ok" > /dev/null
     }
