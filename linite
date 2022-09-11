@@ -52,8 +52,8 @@ E 'to VM Guest' \
 F 'Desktop' \
 G 'Multimedia' \
 H 'Games' \
-I 'Instalar PiHole' \
-J 'NOROOT Menu' \
+I 'Docker Menu' \
+J 'Dcoker Orchestration' \
 X 'SAIR' 2>&1 > /dev/tty )
 case "$var0" in
 A) virtual ;;
@@ -64,8 +64,8 @@ E) vm ;;
 F) desktop ;;
 G) multim ;;
 H) games ;;
-I) curl -sSL https://install.pi-hole.net | bash ;;
-J) menu ;;
+I) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | bash ;;
+J) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash ;;
 X) echo "Saindo..." && exit && break ;;
 esac
 }
