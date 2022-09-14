@@ -437,7 +437,8 @@ Os pacotes são: cloud-init snapd unattended-upgrades blueman bluetooth" 10 40
 }
 
 # Checagem Obrigatória de Dependências:
-pkg dialog
+apt install dialog
+
 pkg curl
 
 start
