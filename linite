@@ -52,8 +52,7 @@ E 'to VM Guest' \
 F 'Desktop' \
 G 'Multimedia' \
 H 'Games' \
-I 'Docker Menu' \
-J 'Docker Orchestration' \
+I 'Docker Orchestration' \
 X 'SAIR' 2>&1 > /dev/tty )
 case "$var0" in
 A) virtual ;;
@@ -64,8 +63,7 @@ E) vm ;;
 F) desktop ;;
 G) multim ;;
 H) games ;;
-I) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/docker | bash ;;
-J) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash ;;
+I) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/orchestration | bash ;;
 X) echo "Saindo..." && exit && break ;;
 esac
 }
