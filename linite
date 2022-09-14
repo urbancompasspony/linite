@@ -412,9 +412,7 @@ force directory mode = 0777" > /etc/samba/smb.conf
 
 # CONTROLE #
 
-# Checagem Obrigatória de Dependências:
-pkg dialog
-pkg curl
+function start {
 
 # Início do Sistema:
 [ "$EUID" -ne 0 ] && {
@@ -436,3 +434,10 @@ Os pacotes são: cloud-init snapd unattended-upgrades blueman bluetooth" 10 40
   apt install -f
   menuB
   }
+}
+
+# Checagem Obrigatória de Dependências:
+pkg dialog
+pkg curl
+
+start
