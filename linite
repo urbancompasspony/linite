@@ -53,7 +53,7 @@ F 'Desktop' \
 G 'Multimedia' \
 H 'Games' \
 I 'Docker Menu' \
-J 'Dcoker Orchestration' \
+J 'Docker Orchestration' \
 X 'SAIR' 2>&1 > /dev/tty )
 case "$var0" in
 A) virtual ;;
