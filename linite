@@ -52,7 +52,7 @@ E 'to VM Guest' \
 F 'Desktop' \
 G 'Multimedia' \
 H 'Games' \
-I 'Docker Orchestration' \
+I 'Containers' \
 X 'SAIR' 2>&1 > /dev/tty )
 case "$var0" in
 A) virtual ;;
