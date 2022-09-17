@@ -89,9 +89,10 @@ dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
 $list00" 25 40
   [ $? = 0 ] && {
     installer "$list00"
-    usr1=$(dialog --title 'Usuário LibVirt' --backtitle "Usuário com permissoes LibVirt" --inputbox "Quem vai acessar o LibVirt?" 10 40 2>&1 > /dev/tty)
+    usr1=$(dialog --title 'Usuário LibVirt/Docker' --backtitle "Usuário com permissoes LibVirt/Docker" --inputbox "Quem vai acessar o LibVirt?" 10 40 2>&1 > /dev/tty)
     usermod -aG libvirt $usr1
     usermod -aG libvirt-qemu $usr1
+    usermod -aG docker $usr1
     journal1
     menuB
     }
@@ -103,6 +104,10 @@ dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
 $list01" 25 40
 [ $? = 0 ] && {
   installer "$list01"
+  usr1=$(dialog --title 'Usuário LibVirt/Docker' --backtitle "Usuário com permissoes LibVirt/Docker" --inputbox "Quem vai acessar o LibVirt?" 10 40 2>&1 > /dev/tty)
+  usermod -aG libvirt $usr1
+  usermod -aG libvirt-qemu $usr1
+  usermod -aG docker $usr1
   sysctl1
   samba1
   menuB
@@ -115,6 +120,10 @@ dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
 $list02" 25 40
 [ $? = 0 ] && {
   installer "$list02"
+  usr1=$(dialog --title 'Usuário LibVirt/Docker' --backtitle "Usuário com permissoes LibVirt/Docker" --inputbox "Quem vai acessar o LibVirt?" 10 40 2>&1 > /dev/tty)
+  usermod -aG libvirt $usr1
+  usermod -aG libvirt-qemu $usr1
+  usermod -aG docker $usr1
   systemctl1
   sysctl1
   journal1
@@ -131,6 +140,10 @@ $list03" 25 40
 [ $? = 0 ] && {
   dialog1 "$list03"
   installer "$list03"
+  usr1=$(dialog --title 'Usuário LibVirt/Docker' --backtitle "Usuário com permissoes LibVirt/Docker" --inputbox "Quem vai acessar o LibVirt?" 10 40 2>&1 > /dev/tty)
+  usermod -aG libvirt $usr1
+  usermod -aG libvirt-qemu $usr1
+  usermod -aG docker $usr1
   ppa1
   systemctl1
   sysctl1
@@ -146,6 +159,10 @@ dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
 $list04" 25 40
 [ $? = 0 ] && {
   installer "$list04"
+  usr1=$(dialog --title 'Usuário LibVirt/Docker' --backtitle "Usuário com permissoes LibVirt/Docker" --inputbox "Quem vai acessar o LibVirt?" 10 40 2>&1 > /dev/tty)
+  usermod -aG libvirt $usr1
+  usermod -aG libvirt-qemu $usr1
+  usermod -aG docker $usr1
   ppa1
   systemctl1
   sysctl1
@@ -165,6 +182,10 @@ dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
 $list05" 25 40
 [ $? = 0 ] && {
   installer "$list05"
+  usr1=$(dialog --title 'Usuário LibVirt/Docker' --backtitle "Usuário com permissoes LibVirt/Docker" --inputbox "Quem vai acessar o LibVirt?" 10 40 2>&1 > /dev/tty)
+  usermod -aG libvirt $usr1
+  usermod -aG libvirt-qemu $usr1
+  usermod -aG docker $usr1
   ppa1
   systemctl1
   profile1
@@ -192,6 +213,10 @@ dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
 $list021" 25 40
 [ $? = 0 ] && {
   installer "$list021"
+  usr1=$(dialog --title 'Usuário LibVirt/Docker' --backtitle "Usuário com permissoes LibVirt/Docker" --inputbox "Quem vai acessar o LibVirt?" 10 40 2>&1 > /dev/tty)
+  usermod -aG libvirt $usr1
+  usermod -aG libvirt-qemu $usr1
+  usermod -aG docker $usr1
   systemctl1
   sysctl1
   journal1
@@ -207,6 +232,10 @@ dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
 $list01" 25 40
 [ $? = 0 ] && {
   installer "$list01"
+  usr1=$(dialog --title 'Usuário LibVirt/Docker' --backtitle "Usuário com permissoes LibVirt/Docker" --inputbox "Quem vai acessar o LibVirt?" 10 40 2>&1 > /dev/tty)
+  usermod -aG libvirt $usr1
+  usermod -aG libvirt-qemu $usr1
+  usermod -aG docker $usr1
   systemctl1
   sysctl1
   journal1
