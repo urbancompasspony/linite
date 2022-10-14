@@ -56,10 +56,10 @@ A 'SMB Client' \
 X 'Sair' 2>&1 > /dev/tty )
 
 case "$var0" in
-A) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/init | sudo bash ; start ;;
+A) sambaclient ; start ;;
 X) echo "Saindo..." ;;
 esac
 }
 
-apt install dialog
+apt install dialog cifs-utils smbclient
 start
