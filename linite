@@ -40,7 +40,7 @@ YUM_CMD=$(which yum 1> /dev/null 2> /dev/null && echo "sim" || echo "nao")
 }
 
 function menuA {
-apt purge cloud-init snapd unattended-upgrades blueman bluetooth -y
+apt purge needrestart cloud-init snapd unattended-upgrades blueman bluetooth -y
 apt autoremove -y
 apt update
 apt upgrade -y
