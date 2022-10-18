@@ -52,6 +52,7 @@ E 'to VM Guest' \
 F 'Desktop' \
 G 'Multimedia' \
 H 'Games' \
+I 'Tools' \
 X 'SAIR' 2>&1 > /dev/tty )
 case "$var0" in
 A) virtual ;;
@@ -62,6 +63,7 @@ E) vm ;;
 F) desktop ;;
 G) multim ;;
 H) games ;;
+I) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ;; 
 X) echo "Saindo..." && exit && break ;;
 esac
 }
