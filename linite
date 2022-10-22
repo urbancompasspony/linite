@@ -84,7 +84,7 @@ export list00="qemu-kvm qemu-guest-agent libvirt-clients libvirt-daemon-system b
 export list01="whois btop rsnapshot rclone openssh-server net-tools haveged arp-scan cifs-utils netdiscover w3m w3m-img iotop htop lm-sensors samba samba-dsdb-modules samba-vfs-modules sshpass speedtest-cli traceroute docker.io" # Essentials
 export list02="$list00 $list01 gpm xinit xorg epiphany-browser build-essential libatasmart-bin btrfs-progs" # Server
 export list021="$list01 build-essential libatasmart-bin btrfs-progs" # Server Virtual
-export list03="scrcpy printer-driver-all rdesktop terminator gnome-disk-utility cpu-x qbittorrent dconf-editor fillezilla thunderbird rss-glx xscreensaver" # Desktop
+export list03="scrcpy printer-driver-all rdesktop terminator gnome-disk-utility cpu-x qbittorrent dconf-editor filezilla thunderbird rss-glx xscreensaver" # Desktop
 export list04="k3b drawing drawing blender gimp audacity kodi vlc" # Multi
 export list05="aisleriot gnome-mines gnome-mahjongg kpat fluidsynth steam wine winetricks cmatrix" # Games
 
