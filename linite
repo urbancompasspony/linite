@@ -76,7 +76,7 @@ function installer {
 
 export list00="qemu-kvm qemu-guest-agent libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq" # Virtual
 export list01="inxi curl dialog udpcast traceroute arp-scan net-tools netdiscover rdesktop scrcpy speedtest-cli whois btop rsnapshot rclone openssh-server net-tools haveged arp-scan cifs-utils netdiscover w3m w3m-img iotop htop lm-sensors samba samba-dsdb-modules samba-vfs-modules sshpass speedtest-cli traceroute docker.io build-essential libatasmart-bin btrfs-progs" # Essentials
-export list02="$list00 $list01 gpm xinit xorg epiphany-browser" # Server
+export list02="$list00 $list01 gpm xinit xorg openbox epiphany-browser" # Server
 export list03="$list01 scrcpy printer-driver-all rdesktop terminator hardinfo gparted gnome-disk-utility cpu-x qbittorrent dconf-editor filezilla thunderbird-locale-pt-br thunderbird rss-glx xscreensaver xscreensaver-data xscreensaver-data-extra xscreensaver-gl-extra xscreensaver-gl k3b drawing blender gimp audacity kodi vlc aisleriot gnome-mines gnome-mahjongg kpat fluidsynth steam cmatrix" # Desktop
 
 function alpha {
@@ -144,15 +144,6 @@ $list03" 25 40
   samba1
   menuB
 }
-menuB
-}
-
-function menu {
-dialog --title "Menu" --yesno "Deseja configurar o arquivo .bashrc?" 25 40
-[ $? = 0 ] && {
-  echo -e "alias menu='curl -sSL https://srv.linuxuniverse.com.br | bash'" >> /home/$USER/.bashrc
-  menuB
-  }
 menuB
 }
 
