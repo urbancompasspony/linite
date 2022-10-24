@@ -56,11 +56,11 @@ E 'Personal Desktop' \
 F 'Tools' \
 X 'SAIR' 2>&1 > /dev/tty )
 case "$var0" in
-A) virtual ;;
-B) essentials ;;
-C) servers ;;
-D) vmsoc ;;
-E) desktop ;;
+A) alpha ;;
+B) beta ;;
+C) gamma ;;
+D) teta ;;
+E) delta ;;
 F) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ;; 
 X) echo "Saindo..." && exit && break ;;
 esac
@@ -79,7 +79,7 @@ export list01="inxi curl dialog udpcast traceroute arp-scan net-tools netdiscove
 export list02="$list00 $list01 gpm xinit xorg epiphany-browser" # Server
 export list03="$list01 scrcpy printer-driver-all rdesktop terminator hardinfo gparted gnome-disk-utility cpu-x qbittorrent dconf-editor filezilla thunderbird-locale-pt-br thunderbird rss-glx xscreensaver xscreensaver-data xscreensaver-data-extra xscreensaver-gl-extra xscreensaver-gl k3b drawing blender gimp audacity kodi vlc aisleriot gnome-mines gnome-mahjongg kpat fluidsynth steam cmatrix" # Desktop
 
-function virtual {
+function alpha {
 dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
 $list00" 25 40
   [ $? = 0 ] && {
@@ -94,7 +94,7 @@ $list00" 25 40
 menuB
 }
 
-function essentials {
+function beta {
 dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
 $list01" 25 40
 [ $? = 0 ] && {
@@ -110,7 +110,7 @@ $list01" 25 40
 menuB
 }
 
-function servers {
+function gamma {
 dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
 $list02" 25 40
 [ $? = 0 ] && {
@@ -129,7 +129,7 @@ $list02" 25 40
 menuB
 }
 
-function desktop {
+function delta {
 dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
 $list03" 25 40
 [ $? = 0 ] && {
@@ -156,7 +156,7 @@ dialog --title "Menu" --yesno "Deseja configurar o arquivo .bashrc?" 25 40
 menuB
 }
 
-function vmsoc {
+function teta {
 dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
 $list01" 25 40
 [ $? = 0 ] && {
@@ -194,8 +194,6 @@ dialog --title "Menu" --yesno "Deseja adicionar os repositórios tv-lite e Linux
   add-apt-repository ppa:linuxuprising/java
   }
 }
-
-# ============================================================================ #
 
 function systemctl1 {
 dialog --title "Menu" --yesno "Deseja desativar os processos *-wait-online?" 10 40
