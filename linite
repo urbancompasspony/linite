@@ -383,7 +383,7 @@ Os pacotes são: cloud-init snapd unattended-upgrades blueman bluetooth" 10 40
 
 # Checagem Obrigatória de Dependências:
 apt install dialog
-
+timedatectl set-timezone America/Bahia
 pkg curl
 
 start
