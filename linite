@@ -18,27 +18,6 @@ export processname=0; export validmail=0; export process=0; export status=0; exp
 export password=0; export password1=0; export password2=0; export password3=0
 export report=0
 
-function pkg {
-APT_CMD=$(which apt 1> /dev/null 2> /dev/null && echo "sim" || echo "nao")
-YUM_CMD=$(which yum 1> /dev/null 2> /dev/null && echo "sim" || echo "nao")
-
-[ "$APT_CMD" = "sim" ] && {
-  pkg1="apt"
-  REQUIRED_PKG="$1"
-  PKG_OK=$(dpkg-query -W 1> /dev/null 2> /dev/null $REQUIRED_PKG && echo "sim" || echo "nao")
-  [ "$PKG_OK" = "nao" ] && {
-    echo "$REQUIRED_PKG não encontrado. Instalando..."
-    echo "Digite sua senha!"
-    sudo apt update; sudo apt install $REQUIRED_PKG $2 -y
-  } || {
-    echo "ok" > /dev/null
-    }
-} || {
-  echo "Sistema desconhecido."
-  }
-
-}
-
 function menuA {
 apt purge needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolution-data-server blueman bluetooth -y
 apt autoremove -y
@@ -197,10 +176,6 @@ dialog --title "Menu" --yesno "Deseja desativar os processos *-wait-online?" 10 
   #systemctl mask bluetooth.service
   }
 }
-
-################################################################################
-#                                                                              #
-################################################################################
 
 function profile1 {
 dialog --title "Menu" --yesno "Deseja modificar o arquivo .profile?" 10 40
@@ -384,6 +359,5 @@ Os pacotes são: cloud-init snapd unattended-upgrades blueman bluetooth" 10 40
 # Checagem Obrigatória de Dependências:
 apt install dialog
 timedatectl set-timezone America/Bahia
-pkg curl
 
 start
