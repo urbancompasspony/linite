@@ -35,12 +35,9 @@ apt purge needrestart cloud-init snapd unattended-upgrades plank deja-dup evolut
 apt autoremove -y
 apt update
 apt upgrade -y
-rm -rf /var/lib/apt/lists/*
 }
 
 function menuB {
-apt update
-
 var0=$(dialog --title 'Linite' --backtitle "L I N I T E" --menu " " 0 0 0 \
 A 'Virtual Machine' \
 B 'Essentials [All]' \
