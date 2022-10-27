@@ -39,6 +39,8 @@ rm -rf /var/lib/apt/lists/*
 }
 
 function menuB {
+apt update
+
 var0=$(dialog --title 'Linite' --backtitle "L I N I T E" --menu " " 0 0 0 \
 A 'Virtual Machine' \
 B 'Essentials [All]' \
