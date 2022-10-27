@@ -1,15 +1,27 @@
 #!/usr/bin/env bash
 
 # ============================================================================ #
-##########                                                                     #
-# Linite # =================================================================== #
-##########                                                                     #
-#                                                           ####################
-# ========================================================= # By Urban Compass #
-#                                                           ####################
+
+# Packages #
+
+# Virtual M. and Docker
+export list00="qemu-kvm qemu-guest-agent libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq docker.io"
+
+# Essentials [+VM/SoC]
+export list01="inxi curl dialog udpcast traceroute arp-scan net-tools netdiscover rdesktop scrcpy speedtest-cli whois btop rsnapshot rclone openssh-server net-tools haveged arp-scan cifs-utils netdiscover w3m w3m-img iotop htop lm-sensors samba samba-dsdb-modules samba-vfs-modules sshpass speedtest-cli traceroute docker.io build-essential libatasmart-bin btrfs-progs"
+
+# Server [No VM/SoC]
+export list02="$list00 $list01 gpm xinit xorg openbox epiphany-browser gparted gnome-disk-utility terminator cmatrix"
+
+# Desktop
+export list03="$list01 scrcpy printer-driver-all rdesktop terminator hardinfo cpu-x qbittorrent dconf-editor filezilla thunderbird thunderbird-locale-pt-br rss-glx xscreensaver xscreensaver-data xscreensaver-data-extra xscreensaver-gl-extra xscreensaver-gl k3b drawing blender gimp audacity kodi vlc aisleriot gnome-mines gnome-mahjongg kpat fluidsynth cmatrix"
+
+# Games
+export list04="steam winehq-staging winetricks"
+
 # ============================================================================ #
 
-# For Ubuntu 22.04!
+# For Ubuntu 22.04 and beyond!
 export NEEDRESTART_MODE=a
 export DEBIAN_FRONTEND=noninteractive
 
@@ -19,30 +31,109 @@ export password=0; export password1=0; export password2=0; export password3=0
 export report=0
 
 function menuA {
-apt purge needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolution-data-server blueman bluetooth -y
+apt purge needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolution-data-server bluez blueman bluetooth -y
 apt autoremove -y
 apt update
 apt upgrade -y
+rm -rf /var/lib/apt/lists/*
 }
 
 function menuB {
 var0=$(dialog --title 'Linite' --backtitle "L I N I T E" --menu " " 0 0 0 \
-A 'Virtual' \
-B 'All Systems [VM Too]' \
-C 'Server' \
-D 'Server (Pi)' \
-E 'Personal Desktop' \
-F 'Tools' \
-X 'SAIR' 2>&1 > /dev/tty )
+A 'Virtual Machine' \
+B 'Essentials [All]' \
+C 'Server [No VM/SoC]' \
+D 'Desktop [No VM/SoC]' \
+E 'Games [No VM/SoC]' \
+F 'Tools [All]' \
+X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
 A) alpha ;;
 B) beta ;;
 C) gamma ;;
-D) teta ;;
-E) delta ;;
-F) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ;; 
-X) echo "Saindo..." && exit && break ;;
+D) delta ;;
+E) games ;;
+F) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; menuB ;; 
+X) echo "Saindo..." && exit ;;
 esac
+}
+
+# ============================================================================ #
+
+# Virtual M. and Docker
+function alpha {
+dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
+$list00" 25 40
+[ $? = 0 ] && {
+  installer "$list00"
+  user0
+  menuB
+  }
+menuB
+}
+
+# Essentials [+VM/SoC]
+function beta {
+dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
+$list01" 25 40
+[ $? = 0 ] && {
+  installer "$list01"
+  user0
+  servicesoff
+  sysctlconf
+  journaladjust
+  netplan1
+  smbconfig
+  menuB
+  }
+menuB
+}
+
+# Server [No VM/SoC]
+function gamma {
+dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
+$list02" 25 40
+[ $? = 0 ] && {
+  installer "$list02"
+  user0
+  servicesoff
+  sysctlconf
+  netplan1
+  smbconfig
+  menuB
+  }
+menuB
+}
+
+# Desktop
+function delta {
+dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
+$list03" 25 40
+[ $? = 0 ] && {
+  installer "$list03"
+  user0
+  servicesoff
+  sysctlconf
+  journaladjust
+  smbconfig
+  ppa1
+  tmpfstab
+  menuB
+}
+menuB
+}
+
+# Games
+function games {
+dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
+$list04" 25 40
+[ $? = 0 ] && {
+  perfil
+  wineinstall
+  installer "$list04"
+  menuB
+}
+menuB
 }
 
 # ============================================================================ #
@@ -51,103 +142,15 @@ function installer {
   apt install $1 --no-install-recommends -y
   }
 
+function user0 {
+  export usr1
+  usr1=$(dialog --title 'Grupos de Usuário' --backtitle " " --inputbox "Quem vai acessar o LibVirt / Docker?" 10 40 2>&1 > /dev/tty)
+  usermod -aG libvirt $usr1
+  usermod -aG libvirt-qemu $usr1
+  usermod -aG docker $usr1
+  }
+
 # ============================================================================ #
-
-export list00="qemu-kvm qemu-guest-agent libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq" # Virtual
-export list01="inxi curl dialog udpcast traceroute arp-scan net-tools netdiscover rdesktop scrcpy speedtest-cli whois btop rsnapshot rclone openssh-server net-tools haveged arp-scan cifs-utils netdiscover w3m w3m-img iotop htop lm-sensors samba samba-dsdb-modules samba-vfs-modules sshpass speedtest-cli traceroute docker.io build-essential libatasmart-bin btrfs-progs" # Essentials
-export list02="$list00 $list01 gpm xinit xorg openbox epiphany-browser gparted gnome-disk-utility terminator cmatrix" # Server
-export list03="$list01 scrcpy printer-driver-all rdesktop terminator hardinfo cpu-x qbittorrent dconf-editor filezilla thunderbird-locale-pt-br thunderbird rss-glx xscreensaver xscreensaver-data xscreensaver-data-extra xscreensaver-gl-extra xscreensaver-gl k3b drawing blender gimp audacity kodi vlc aisleriot gnome-mines gnome-mahjongg kpat fluidsynth steam cmatrix" # Desktop
-
-function alpha {
-dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
-$list00" 25 40
-  [ $? = 0 ] && {
-    installer "$list00"
-    usr1=$(dialog --title 'Usuário LibVirt/Docker' --backtitle "Usuario com permissoes LibVirt/Docker" --inputbox "Quem vai acessar o LibVirt/Docker?" 10 40 2>&1 > /dev/tty)
-    usermod -aG libvirt $usr1
-    usermod -aG libvirt-qemu $usr1
-    usermod -aG docker $usr1
-    journal1
-    menuB
-    }
-menuB
-}
-
-function beta {
-dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
-$list01" 25 40
-[ $? = 0 ] && {
-  installer "$list01"
-  usr1=$(dialog --title 'Usuário LibVirt/Docker' --backtitle "Usuário com permissoes LibVirt/Docker" --inputbox "Quem vai acessar o LibVirt/Docker?" 10 40 2>&1 > /dev/tty)
-  usermod -aG libvirt $usr1
-  usermod -aG libvirt-qemu $usr1
-  usermod -aG docker $usr1
-  sysctl1
-  samba1
-  menuB
-  }
-menuB
-}
-
-function gamma {
-dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
-$list02" 25 40
-[ $? = 0 ] && {
-  installer "$list02"
-  usr1=$(dialog --title 'Usuário LibVirt/Docker' --backtitle "Usuário com permissoes LibVirt/Docker" --inputbox "Quem vai acessar o LibVirt?" 10 40 2>&1 > /dev/tty)
-  usermod -aG libvirt $usr1
-  usermod -aG libvirt-qemu $usr1
-  usermod -aG docker $usr1
-  systemctl1
-  sysctl1
-  journal1
-  netplan1
-  samba1
-  menuB
-  }
-menuB
-}
-
-function delta {
-dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
-$list03" 25 40
-[ $? = 0 ] && {
-  dialog1 "$list03"
-  installer "$list03"
-  installer "$list04"
-  usr1=$(dialog --title 'Usuário LibVirt/Docker' --backtitle "Usuário com permissoes LibVirt/Docker" --inputbox "Quem vai acessar o LibVirt?" 10 40 2>&1 > /dev/tty)
-  ppa1
-  systemctl1
-  sysctl1
-  tmpfs1
-  samba1
-  menuB
-}
-menuB
-}
-
-function teta {
-dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
-$list01" 25 40
-[ $? = 0 ] && {
-  installer "$list01"
-  usr1=$(dialog --title 'Usuário LibVirt/Docker' --backtitle "Usuário com permissoes LibVirt/Docker" --inputbox "Quem vai acessar o LibVirt?" 10 40 2>&1 > /dev/tty)
-  usermod -aG libvirt $usr1
-  usermod -aG libvirt-qemu $usr1
-  usermod -aG docker $usr1
-  systemctl1
-  sysctl1
-  journal1
-  netplan1
-  samba1
-  menuB
-  }
-menuB
-}
-
-################################################################################
-#                                                                              #
-################################################################################
 
 function ppa1 {
 xorg1=$(ls /tmp/.X11-unix | wc -l)
@@ -157,7 +160,7 @@ xorg1=$(ls /tmp/.X11-unix | wc -l)
   menuB
   }
 
-dialog --title "Menu" --yesno "Deseja adicionar os repositórios tv-lite e LinuxUprising/Java?" 10 40
+dialog --title "Menu" --yesno "Deseja adicionar os repositórios do TVLite e LinuxUprising/Java?" 10 40
 [ $? = 0 ] && {
   add-apt-repository ppa:tv-lite/ppa-git
   apt install tv-lite
@@ -165,64 +168,63 @@ dialog --title "Menu" --yesno "Deseja adicionar os repositórios tv-lite e Linux
   }
 }
 
-function systemctl1 {
+function servicesoff {
 dialog --title "Menu" --yesno "Deseja desativar os processos *-wait-online?" 10 40
 [ $? = 0 ] && {
   systemctl disable NetworkManager-wait-online.service
   systemctl mask NetworkManager-wait-online.service
   systemctl disable systemd-networkd-wait-online.service
   systemctl mask systemd-networkd-wait-online.service
-  #systemctl disable bluetooth.service
-  #systemctl mask bluetooth.service
   }
 }
 
-function profile1 {
+function perfil {
 dialog --title "Menu" --yesno "Deseja modificar o arquivo .profile?" 10 40
 [ $? = 0 ] && {
-  echo -e "#STAGING_RT_PRIORITY_SERVER=90
-  #STAGING_RT_PRIORITY_BASE=90
-  #WINE_RT=15
-  #WINE_SRV_RT=10
-  #STAGING_WRITECOPY=1
-  #STAGING_SHARED_MEMORY=1
-  #WINE_ENABLE_PIPE_SYNC_FOR_APP=1
-  #export __GL_MaxFramesAllowed=1" >> /home/$USER/.profile
+  echo -e "STAGING_RT_PRIORITY_SERVER=90
+STAGING_RT_PRIORITY_BASE=90
+WINE_RT=15
+WINE_SRV_RT=10
+STAGING_WRITECOPY=1
+STAGING_SHARED_MEMORY=1
+WINE_ENABLE_PIPE_SYNC_FOR_APP=1
+export __GL_MaxFramesAllowed=1" >> /home/$USER/.profile
   }
 }
 
-function sysctl1 {
+function sysctlconf {
 dialog --title "Menu" --yesno "Deseja modificar o arquivo sysctl.conf?" 10 40
 [ $? = 0 ] && {
   echo -e "kernel.sysrq=1
-  vm.swappiness=10
-  vm.panic_on_oom=1
-  kernel.panic=5" >> /etc/sysctl.conf
+vm.swappiness=10
+vm.panic_on_oom=1
+kernel.panic=5" >> /etc/sysctl.conf
   }
 }
 
-function journal1 {
+function journaladjust {
 dialog --title "Menu" --yesno "Deseja modificar o arquivo journald.conf?" 10 40
 [ $? = 0 ] && {
   echo "$password" | sudo -S echo -e "Storage=persistent
-  SystemMaxUse=5G
-  SystemKeepFree=10G" >> /etc/systemd/journald.conf
+SystemMaxUse=5G
+SystemKeepFree=10G" >> /etc/systemd/journald.conf
   }
 }
 
-function tmpfs1 {
+function tmpfstab {
 dialog --title "Menu" --yesno "Deseja modificar o arquivo fstab.conf?" 10 40
 [ $? = 0 ] && {
-  echo "$password" | sudo -S echo -e "# temp to ram!
-  tmpfs /tmp tmpfs defaults 0 0
-  tmpfs /var/tmp tmpfs defaults 0 0" >> /etc/fstab
+  echo "$password" | sudo -S echo -e "# Temp to ram!
+tmpfs /tmp tmpfs defaults 0 0
+tmpfs /var/tmp tmpfs defaults 0 0" >> /etc/fstab
   }
 }
 
 function netplan1 {
 dialog --title "Menu" --yesno "Deseja modificar o arquivo netplan.yaml?" 10 40
 [ $? = 0 ] && {
-echo -e "#network:
+echo -e "
+#network:
 #    ethernets:
 #        enp4s0:
 #            addresses: [192.168.250.10/24]
@@ -237,7 +239,8 @@ echo -e "#network:
 #              #addresses: [1.1.1.1, 1.0.0.1]
 #    version: 2" >> /etc/netplan/00-installer-config.yaml
 
-echo -e "#network:
+echo -e "
+#network:
 #  ethernets:
 #    eth0:
 #      dhcp4: true
@@ -251,12 +254,14 @@ echo -e "#network:
   }
 }
 
-function samba1 {
+function smbconfig {
 dialog --title "Menu" --yesno "Deseja modificar o arquivo samba.conf?" 10 40
 [ $? = 0 ] && {
+
 mv /etc/samba/smb.conf /etc/samba/smb.BKP
 
-echo -e "[global]
+echo -e "
+[global]
 #client min protocol = SMB2
 #client max protocol = SMB3
 
@@ -326,25 +331,27 @@ force directory mode = 0777" > /etc/samba/smb.conf
   }
 }
 
-################################################################################
-#                                                                              #
-################################################################################
+function wineinstall {
+echo "deb https://download.opensuse.org/repositories/Emulators:/Wine:/Debian/xUbuntu_22.04 ./" | sudo tee /etc/apt/sources.list.d/wine-obs.list
+wget -O- -q https://download.opensuse.org/repositories/Emulators:/Wine:/Debian/xUbuntu_22.04/Release.key | sudo apt-key add -
+apt update
+}
 
-# CONTROLE #
+# ============================================================================ #
 
 function start {
-
-# Início do Sistema:
 [ "$EUID" -ne 0 ] && {
   echo "Execute esse script como Root!"
   exit
   }
 
-dialog --title "Menu" --yesno "Deseja remover pacotes pré definidos e atualizar o sistema? \n \n
-Os pacotes são: cloud-init snapd unattended-upgrades blueman bluetooth" 10 40
+dialog --title "Menu" --yesno "Deseja remover pacotes abaixo e atualizar o sistema? \n \n
+needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolution-data-server blueman bluetooth" 12 40
+
 [ $? = 0 ] && {
   dpkg --configure -a
   apt install -f
+
   menuA
   menuB
   }
@@ -352,6 +359,7 @@ Os pacotes são: cloud-init snapd unattended-upgrades blueman bluetooth" 10 40
 [ $? = 1 ] && {
   dpkg --configure -a 
   apt install -f
+
   menuB
   }
 }
