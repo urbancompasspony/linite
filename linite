@@ -291,7 +291,7 @@ write raw = Yes
 # Audit Modules #
 #################
 
-vfs objects = recycle, full_audit
+vfs objects = recycle, full_audit, acl_xattr
 store dos attributes = yes
 map acl inherit = yes
 
