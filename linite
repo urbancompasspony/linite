@@ -260,12 +260,16 @@ dialog --title "Menu" --yesno "Deseja modificar o arquivo samba.conf?" 10 40
 mv /etc/samba/smb.conf /etc/samba/smb.BKP
 
 echo -e "
+##########
+# Global #
+##########
+
 [global]
 #client min protocol = SMB2
 #client max protocol = SMB3
 
-server string = NOVO
-netbios name = novo
+server string = Shared
+netbios name = shared
 workgroup = WORKGROUP
 
 security = user
@@ -277,52 +281,46 @@ dns proxy = no
 #preferred master = yes
 #os level = 255
 
-# dos charset = CP850
 unix charset = UTF-8
 dos charset = ISO8859-1
-# unix charset = ISO8859-1
-# display charset = ISO8859-1
 mangled names = no
 read raw = Yes
 write raw = Yes
-# socket options = TCP_NODELAY IPTOS_LOWDELAY SO_RCVBUF=8192 SO_SNDBUF=8192
-#socket options = TCP_NODELAY IPTOS_LOWDELAY SO_RCVBUF=131072 SO_SNDBUF=131072
-min receivefile size = 16384
-use sendfile = true
-aio read size = 16384
-aio write size = 16384
 
-# Auditory and Recycle Bin!
+#################
+# Audit Modules #
+#################
 
-vfs objects = recycle, full_audit 
+vfs objects = recycle, full_audit
+store dos attributes = yes
+map acl inherit = yes
+
 audit:failure = none
 full_audit:success = unlinkat renameat
-#pwrite pwrite_send pwrite_recv write renameat unlinkat mkdir
-#open, opendir, write, unlinkat, renameat, mkdir, rmdir, chmod, chown
 full_audit:prefix = IP=%I|USER=%u|MACHINE=%m|VOLUME=%S
-# vfs:0 Make Directory, Remove Directory, Unlink
-# vfs:1 Open Directory, Rename File, Change Permissions/ACLs
-# vfs:2 Open & Close File
-# vfs:10 Maximum Debug Level
 log level = 0 vfs:0
-syslog = 0
-recycle:repository = /PATH/%U
+
+#syslog = 0
+recycle:repository = /mnt/shared/Lixeira/%U
 recycle:keeptree = yes
 recycle:versions = yes
 recycle:touch = Yes
+recycle:touch_mtime = yes
 recycle:noversions = *.tmp,*.temp,*.o,*.obj,*.TMP,*.TEMP
 recycle:exclude = *.tmp,*.temp,*.o,*.obj,*.TMP,*.TEMP
-recycle:excludedir = /PATH/recycle,/recycle,/tmp,/temp,/TMP,/TEMP
+recycle:excludedir = /mnt/shared/Lixeira,/recycle,/tmp,/temp,/TMP,/TEMP
 
-# COMPARTILHAMENTOS #
+##################
+# Shared Folders #
+##################
 
-[TI]
-path = /mnt/
-valid users = $USER
-admin users = $USER
+[TEMP]
+path = /mnt/shared
+valid users = administrador
+admin users = administrador
 guest ok = no
 writable = yes
-browsable = no
+browsable = yes
 create mask = 0777
 force create mode = 0777
 directory mask = 0777
