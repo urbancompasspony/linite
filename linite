@@ -14,10 +14,10 @@ export list01="inxi curl nmap parallel tmux zip unzip dialog udpcast traceroute 
 export list02="$list00 $list01 gpm xinit xorg openbox caja epiphany-browser gparted gnome-disk-utility terminator cmatrix"
 
 # Desktop
-export list03="$list01 scrcpy printer-driver-all rdesktop terminator hardinfo cpu-x qbittorrent dconf-editor filezilla thunderbird thunderbird-locale-pt-br rss-glx xscreensaver xscreensaver-data xscreensaver-data-extra xscreensaver-gl-extra xscreensaver-gl k3b drawing blender gimp audacity kodi vlc aisleriot gnome-mines gnome-mahjongg kpat fluidsynth cmatrix"
+export list03="$list01 scrcpy printer-driver-all rdesktop terminator hardinfo cpu-x qbittorrent dconf-editor filezilla thunderbird thunderbird-locale-pt-br rss-glx xscreensaver xscreensaver-data xscreensaver-data-extra xscreensaver-gl-extra xscreensaver-gl k3b drawing mypaint blender gimp audacity kodi vlc aisleriot gnome-mines gnome-mahjongg kpat fluidsynth cmatrix"
 
-# Games
-export list04="steam winehq-staging winetricks"
+# WINE
+export list04="winehq-staging winetricks"
 
 # ============================================================================ #
 
@@ -43,7 +43,7 @@ A 'Virtual Machine' \
 B 'Essentials [All]' \
 C 'Server [No VM/SoC]' \
 D 'Desktop [No VM/SoC]' \
-E 'Games [No VM/SoC]' \
+E 'WINE [No VM/SoC]' \
 F 'Tools [All]' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
