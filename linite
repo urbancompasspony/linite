@@ -122,7 +122,7 @@ $list03" 25 40
 menuB
 }
 
-# Games
+# WINE
 function games {
 dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
 $list04" 25 40
@@ -330,7 +330,7 @@ force directory mode = 0777" > /etc/samba/smb.conf
 
 function wineinstall {
 echo "deb https://download.opensuse.org/repositories/Emulators:/Wine:/Debian/xUbuntu_22.04 ./" | sudo tee /etc/apt/sources.list.d/wine-obs.list
-wget -O- -q https://download.opensuse.org/repositories/Emulators:/Wine:/Debian/xUbuntu_22.04/Release.key | sudo apt-key add -
+wget -qO- https://download.opensuse.org/repositories/Emulators:/Wine:/Debian/xUbuntu_22.04/Release.key | sudo tee /etc/apt/trusted.gpg.d/winehq.asc
 apt update
 }
 
