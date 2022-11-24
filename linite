@@ -14,7 +14,7 @@ export list01="inxi curl nmap parallel smartmontools tmux zip unzip dialog udpca
 export list02="$list00 $list01 gpm xinit xorg openbox caja epiphany-browser gparted gnome-disk-utility terminator cmatrix"
 
 # Desktop
-export list03="$list01 scrcpy printer-driver-all rdesktop terminator hardinfo cpu-x qbittorrent dconf-editor filezilla thunderbird thunderbird-locale-pt-br rss-glx xscreensaver xscreensaver-data xscreensaver-data-extra xscreensaver-gl-extra xscreensaver-gl k3b drawing mypaint blender gimp audacity kodi vlc aisleriot gnome-mines gnome-mahjongg kpat fluidsynth cmatrix"
+export list03="$list01 ubuntu-restricted-extras scrcpy printer-driver-all rdesktop terminator hardinfo cpu-x qbittorrent dconf-editor filezilla thunderbird thunderbird-locale-pt-br rss-glx xscreensaver xscreensaver-data xscreensaver-data-extra xscreensaver-gl-extra xscreensaver-gl k3b drawing mypaint blender gimp audacity kodi vlc aisleriot gnome-mines gnome-mahjongg kpat fluidsynth cmatrix"
 
 # WINE
 export list04="winehq-staging winetricks"
