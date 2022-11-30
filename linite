@@ -45,6 +45,7 @@ C 'Server [No VM/SoC]' \
 D 'Desktop [No VM/SoC]' \
 E 'WINE [No VM/SoC]' \
 F 'Tools [All]' \
+G 'Beep!' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
 A) alpha ;;
@@ -52,7 +53,8 @@ B) beta ;;
 C) gamma ;;
 D) delta ;;
 E) games ;;
-F) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; menuB ;; 
+F) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; menuB ;;
+G) wget https://raw.githubusercontent.com/urbancompasspony/beep/main/beep -O /home/administrador/.beep.sh ; beep ; start ;;
 X) echo "Saindo..." && exit ;;
 esac
 }
@@ -332,6 +334,12 @@ function wineinstall {
 echo "deb https://download.opensuse.org/repositories/Emulators:/Wine:/Debian/xUbuntu_22.04 ./" | sudo tee /etc/apt/sources.list.d/wine-obs.list
 wget -qO- https://download.opensuse.org/repositories/Emulators:/Wine:/Debian/xUbuntu_22.04/Release.key | sudo tee /etc/apt/trusted.gpg.d/winehq.asc
 apt update
+}
+
+function beep {
+  sudo bash /home/administrador/.beep.sh
+  echo "@reboot sleep 60; bash /home/administrador/.beep.sh" >> /tmp/crontab_new
+  sudo crontab -l | cat - /tmp/crontab_new > crontab.txt && sudo crontab crontab.txt
 }
 
 # ============================================================================ #
