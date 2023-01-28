@@ -112,6 +112,7 @@ dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
 $list03" 25 40
 [ $? = 0 ] && {
   installer "$list03"
+  dpkg --add-architecture i386
   user0
   servicesoff
   sysctlconf
