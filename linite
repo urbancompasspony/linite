@@ -11,10 +11,10 @@ export list00="qemu-kvm qemu-guest-agent libvirt-clients libvirt-daemon-system b
 export list01="beep inxi curl nmap parallel smartmontools tmux zip unzip dialog udpcast traceroute arp-scan net-tools netdiscover rdesktop scrcpy speedtest-cli whois btop rsnapshot rclone openssh-server net-tools haveged arp-scan cifs-utils netdiscover w3m w3m-img iotop htop lm-sensors samba samba-dsdb-modules samba-vfs-modules sshpass speedtest-cli traceroute docker.io build-essential libatasmart-bin btrfs-progs"
 
 # Server [No VM/SoC]
-export list02="$list00 $list01 gpm xinit xorg openbox caja epiphany-browser gparted gnome-disk-utility terminator cmatrix"
+export list02="$list00 $list01 gpm xinit xorg openbox pavucontrol caja epiphany-browser gparted gnome-disk-utility terminator cmatrix"
 
 # Desktop
-export list03="$list01 ubuntu-restricted-extras scrcpy adb printer-driver-all rdesktop terminator hardinfo cpu-x qbittorrent dconf-editor filezilla thunderbird thunderbird-locale-pt-br rss-glx xscreensaver xscreensaver-data xscreensaver-data-extra xscreensaver-gl-extra xscreensaver-gl k3b drawing mypaint gimp audacity kodi vlc aisleriot gnome-mines gnome-mahjongg kpat fluidsynth cmatrix"
+export list03="$list01 ubuntu-restricted-extras scrcpy adb pavucontrol printer-driver-all rdesktop terminator hardinfo cpu-x qbittorrent dconf-editor filezilla thunderbird thunderbird-locale-pt-br rss-glx xscreensaver xscreensaver-data xscreensaver-data-extra xscreensaver-gl-extra xscreensaver-gl k3b drawing mypaint gimp audacity kodi vlc aisleriot gnome-mines gnome-mahjongg kpat fluidsynth cmatrix"
 
 # WINE
 export list04="winehq-staging winetricks"
