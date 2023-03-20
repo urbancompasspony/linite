@@ -44,8 +44,9 @@ B 'Essentials [All]' \
 C 'Server [No VM/SoC]' \
 D 'Desktop [No VM/SoC]' \
 E 'WINE [No VM/SoC]' \
-F 'Tools [All]' \
-G 'Beep!' \
+F 'Flatpak' \
+G 'Tools [All]' \
+H 'Beep!' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
 A) alpha ;;
@@ -53,8 +54,9 @@ B) beta ;;
 C) gamma ;;
 D) delta ;;
 E) games ;;
-F) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; menuB ;;
-G) wget https://raw.githubusercontent.com/urbancompasspony/beep/main/beep -O /home/administrador/.beep.sh ; beep ; start ;;
+F) flatpakhub ;;
+G) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; menuB ;;
+H) wget https://raw.githubusercontent.com/urbancompasspony/beep/main/beep -O /home/administrador/.beep.sh ; beep ; menuB ;;
 X) echo "Saindo..." && exit ;;
 esac
 }
@@ -341,6 +343,12 @@ function beep {
   sudo bash /home/administrador/.beep.sh
   echo "@reboot sleep 60; bash /home/administrador/.beep.sh" >> /tmp/crontab_new
   sudo crontab -l | cat - /tmp/crontab_new > crontab.txt && sudo crontab crontab.txt
+}
+
+function flatpakhub {
+  sudo apt install flatpak
+  flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+  menuB
 }
 
 # ============================================================================ #
