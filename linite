@@ -39,18 +39,18 @@ apt upgrade -y
 
 function menuB {
 var0=$(dialog --title 'Linite' --backtitle "L I N I T E" --menu " " 0 0 0 \
-A 'Virtual Machine' \
-B 'Essentials [All]' \
+A 'Essentials [All]' \
+B 'Virtual Machine [No VM/SoC]' \
 C 'Server [No VM/SoC]' \
 D 'Desktop [No VM/SoC]' \
 E 'WINE [No VM/SoC]' \
-F 'Flatpak' \
+F 'Flatpak [No Server]' \
 G 'Tools [All]' \
 H 'Beep!' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
-A) alpha ;;
-B) beta ;;
+A) beta  ;;
+B) alpha ;;
 C) gamma ;;
 D) delta ;;
 E) games ;;
