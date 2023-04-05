@@ -19,6 +19,9 @@ export list03="$list01 shotcut ubuntu-restricted-extras scrcpy adb pavucontrol p
 # WINE
 export list04="winehq-staging winetricks libvulkan1:i386 libgl1-mesa-glx:i386 libglu1-mesa:i386"
 
+# Raspbian
+export list05="curl nmap parallel zip unzip dialog udpcast traceroute arp-scan net-tools netdiscover speedtest-cli iotop"
+
 # ============================================================================ #
 
 # For Ubuntu 22.04 and beyond!
@@ -45,8 +48,9 @@ C 'Server [No VM/SoC]' \
 D 'Desktop [No VM/SoC]' \
 E 'WINE [No VM/SoC]' \
 F 'Flatpak [No Server]' \
-G 'Tools [All]' \
-H 'Beep!' \
+G 'Raspbian' \
+H 'Tools [All]' \
+I 'Beep!' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
 A) beta  ;;
@@ -55,8 +59,9 @@ C) gamma ;;
 D) delta ;;
 E) games ;;
 F) flatpakhub ;;
-G) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; menuB ;;
-H) wget https://raw.githubusercontent.com/urbancompasspony/beep/main/beep -O /home/administrador/.beep.sh ; beep ; menuB ;;
+G) raspbian ;;
+H) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; menuB ;;
+I) wget https://raw.githubusercontent.com/urbancompasspony/beep/main/beep -O /home/administrador/.beep.sh ; beep ; menuB ;;
 X) echo "Saindo..." && exit ;;
 esac
 }
@@ -135,6 +140,17 @@ $list04" 25 40
   perfil
   wineinstall
   installer "$list04"
+  menuB
+}
+menuB
+}
+
+# raspbian
+function raspbian {
+dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
+$list05" 25 40
+[ $? = 0 ] && {
+  installer "$list05"
   menuB
 }
 menuB
