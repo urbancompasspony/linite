@@ -20,7 +20,7 @@ export list03="$list01 shotcut ubuntu-restricted-extras scrcpy adb pavucontrol p
 export list04="winehq-staging winetricks libvulkan1:i386 libgl1-mesa-glx:i386 libglu1-mesa:i386"
 
 # Raspbian & Tools
-export list05="curl nmap parallel zip unzip dialog udpcast traceroute arp-scan net-tools netdiscover speedtest-cli iotop whois"
+export list05="openvpn curl nmap parallel zip unzip dialog udpcast traceroute arp-scan net-tools netdiscover speedtest-cli iotop whois"
 
 # ============================================================================ #
 
