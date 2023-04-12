@@ -23,7 +23,7 @@ export list04="winehq-staging winetricks libvulkan1:i386 libgl1-mesa-glx:i386 li
 export list05="openvpn curl nmap parallel zip unzip dialog udpcast traceroute arp-scan net-tools netdiscover speedtest-cli iotop whois"
 
 # For ArchLinux:
-export listpac="gparted beep inxi curl nmap parallel smartmontools tmux zip unzip dialog traceroute arp-scan net-tools rdesktop scrcpy speedtest-cli whois btop rsnapshot rclone net-tools haveged cifs-utils w3m iotop htop samba sshpass speedtest-cli traceroute docker btrfs-progs virt-manager terminator docker wine-staging openvpn btop scrcpy libatasmart k3b audacity rdesktop qbittorrent dconf-editor filezilla thunderbird libreoffice libreoffice-fresh-pt-br thunderbird-i18n-pt-br nmap drawing kodi vlc kpat gimp fluidsynth cmatrix ettercap-gtk wireshark-qt blender dconf-editor "
+export listpac="gparted beep dconf-editor inxi curl nmap parallel smartmontools tmux zip unzip dialog traceroute arp-scan net-tools rdesktop scrcpy speedtest-cli whois btop rsnapshot rclone net-tools haveged cifs-utils w3m iotop htop samba sshpass speedtest-cli traceroute docker btrfs-progs virt-manager terminator docker wine-staging openvpn btop scrcpy libatasmart k3b audacity rdesktop qbittorrent dconf-editor filezilla thunderbird libreoffice libreoffice-fresh-pt-br thunderbird-i18n-pt-br nmap drawing kodi vlc kpat gimp fluidsynth cmatrix ettercap-gtk wireshark-qt blender dconf-editor "
 
 export listyay="gnome-disk-utility serpro-signer mate-tweak rpi-imager visual-studio-code-bin anydesk-bin google-earth-pro microsoft-edge-stable-bin google-chrome opera adb"
 
@@ -56,8 +56,9 @@ F 'Flatpak [DEB - No Server!]' \
 G 'Raspbian & Tools [SoC Only]' \
 H 'Tools [All]' \
 I 'Beep!' \
-W 'EndeavourOS' \
-X 'Sair' 2>&1 > /dev/tty )
+X 'EndeavourOS - Packages' \
+Y 'EndeavourOS - Configs' \
+Z 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
 A) beta  ;;
 B) alpha ;;
@@ -68,8 +69,9 @@ F) flatpakhub ;;
 G) raspbian ;;
 H) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; menuB ;;
 I) wget https://raw.githubusercontent.com/urbancompasspony/beep/main/beep -O /home/administrador/.beep.sh ; beep ; menuB ;;
-W) endeavour ;;
-X) echo "Saindo..." && exit ;;
+X) endeavour00 ;;
+Y) endeavour01 ;;
+Z) echo "Saindo..." && exit ;;
 esac
 }
 
@@ -163,14 +165,22 @@ $list05" 25 40
 menuB
 }
 
-# for EndeavourOS
-function endeavour {
-  installer "$listpac"
+# for EndeavourOS 1
+function endeavour00 {
+  echo "Install with PACMAN: $listpac"
+  sleep 15
   echo "Install with YAY: $listyay"
   sleep 10
+}
+
+# for EndeavourOS 2
+function endeavour01 {
   user0
+  perfil
   servicesoff
   sysctlconf
+  sysctltweaks
+  smbconfig
 }
 
 # ============================================================================ #
@@ -237,9 +247,21 @@ function sysctlconf {
 dialog --title "Menu" --yesno "Deseja modificar o arquivo sysctl.conf?" 10 40
 [ $? = 0 ] && {
   echo -e "kernel.sysrq=1
-vm.swappiness=10
 vm.panic_on_oom=1
 kernel.panic=5" >> /etc/sysctl.conf
+  }
+}
+
+function sysctltweaks {
+dialog --title "Menu" --yesno "Deseja criar o arquivo gaming.conf?" 10 40
+[ $? = 0 ] && {
+  echo -e "#    Path                  Mode UID  GID  Age Argument
+w /proc/sys/vm/compaction_proactiveness - - - - 0
+w /sys/kernel/mm/transparent_hugepage/khugepaged/defrag - - - - 0
+w /sys/kernel/mm/transparent_hugepage/enabled - - - - aways
+w /proc/sys/vm/page_lock_unfairness - - - - 1
+w /sys/kernel/mm/transparent_hugepage/shmem_enabled - - - - advise
+w /proc/sys/vm/swappiness - - - - 1" >> /etc/tmpfiles.d/gaming.conf
   }
 }
 
