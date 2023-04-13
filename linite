@@ -171,6 +171,7 @@ function endeavour00 {
   sleep 15
   echo "Install with YAY: $listyay"
   sleep 10
+  echo "ENABLE these services: cronie, sshd"
 }
 
 # for EndeavourOS 2
