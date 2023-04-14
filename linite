@@ -259,7 +259,7 @@ dialog --title "Menu" --yesno "Deseja criar o arquivo gaming.conf?" 10 40
   echo -e "#    Path                  Mode UID  GID  Age Argument
 w /proc/sys/vm/compaction_proactiveness - - - - 0
 w /sys/kernel/mm/transparent_hugepage/khugepaged/defrag - - - - 0
-w /sys/kernel/mm/transparent_hugepage/enabled - - - - aways
+#w /sys/kernel/mm/transparent_hugepage/enabled - - - - aways
 w /proc/sys/vm/page_lock_unfairness - - - - 1
 w /sys/kernel/mm/transparent_hugepage/shmem_enabled - - - - advise
 w /proc/sys/vm/swappiness - - - - 1" >> /etc/tmpfiles.d/gaming.conf
