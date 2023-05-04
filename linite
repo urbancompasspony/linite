@@ -5,7 +5,7 @@
 # Packages #
 
 # Virtual M. and Docker
-export list00="qemu-kvm qemu-guest-agent libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq docker.io"
+export list00="qemu-hw-display-qxl qemu-kvm qemu-guest-agent libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq docker.io"
 
 # Essentials [+VM/SoC]
 export list01="beep inxi curl nmap parallel smartmontools tmux zip unzip dialog udpcast traceroute arp-scan net-tools netdiscover rdesktop scrcpy speedtest-cli whois btop rsnapshot rclone openssh-server net-tools haveged cifs-utils w3m w3m-img iotop htop lm-sensors samba samba-dsdb-modules samba-vfs-modules sshpass speedtest-cli traceroute docker.io build-essential libatasmart-bin btrfs-progs"
