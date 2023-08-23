@@ -290,6 +290,7 @@ dialog --title "Menu" --yesno "Deseja modificar o arquivo netplan.yaml?" 10 40
 echo -e "
 #network:
 #    ethernets:
+#        renderer: NetworkManager - Use apt install network-manager and delete this comment!
 #        enp4s0:
 #            addresses: [192.168.250.10/24]
 #            gateway4: 192.168.250.1
