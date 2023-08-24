@@ -249,6 +249,7 @@ dialog --title "Menu" --yesno "Deseja modificar o arquivo sysctl.conf?" 10 40
 [ $? = 0 ] && {
   echo -e "kernel.sysrq=1
 vm.panic_on_oom=1
+vm.swappiness=10
 kernel.panic=5" >> /etc/sysctl.conf
   }
 }
