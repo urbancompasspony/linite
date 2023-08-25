@@ -58,7 +58,7 @@ H 'Tools [All]' \
 I 'Beep!' \
 X 'EndeavourOS - Packages' \
 Y 'EndeavourOS - Configs' \
-Z 'Sair' 2>&1 > /dev/tty )
+Z '<' 2>&1 > /dev/tty )
 case "$var0" in
 A) beta  ;;
 B) alpha ;;
@@ -69,9 +69,9 @@ F) flatpakhub ;;
 G) raspbian ;;
 H) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; menuB ;;
 I) wget https://raw.githubusercontent.com/urbancompasspony/beep/main/beep -O /home/administrador/.beep.sh ; beep ; menuB ;;
-X) endeavour00 ;;
-Y) endeavour01 ;;
-Z) echo "Saindo..." && exit ;;
+J) endeavour00 ;;
+K) endeavour01 ;;
+X) echo "Saindo..." && exit ;;
 esac
 }
 
