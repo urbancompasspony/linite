@@ -20,7 +20,7 @@ export list03="$list01 shotcut ubuntu-restricted-extras scrcpy adb pavucontrol p
 export list04="winehq-staging winetricks libvulkan1:i386 libgl1-mesa-glx:i386 libglu1-mesa:i386 lib32-libxcomposite"
 
 # Raspbian & Tools
-export list05="openvpn curl nmap parallel zip unzip dialog udpcast traceroute arp-scan net-tools netdiscover speedtest-cli iotop whois"
+export list05="linux-modules-extra-raspi openvpn curl nmap parallel zip unzip dialog udpcast traceroute arp-scan net-tools netdiscover speedtest-cli iotop whois docker.io"
 
 # For ArchLinux:
 export listpac="lib32-libxcomposite lib32-pipewire redshift cronie gparted beep dconf-editor inxi curl nmap parallel smartmontools tmux zip unzip dialog traceroute arp-scan net-tools rdesktop scrcpy speedtest-cli whois btop rsnapshot rclone net-tools haveged cifs-utils w3m iotop htop samba sshpass speedtest-cli traceroute docker btrfs-progs virt-manager terminator docker wine-staging openvpn btop scrcpy libatasmart k3b audacity rdesktop qbittorrent dconf-editor filezilla thunderbird libreoffice libreoffice-fresh-pt-br thunderbird-i18n-pt-br nmap drawing kodi vlc kpat gimp fluidsynth cmatrix ettercap-gtk wireshark-qt blender dconf-editor "
@@ -48,29 +48,19 @@ apt upgrade -y
 function menuB {
 var0=$(dialog --title 'Linite' --backtitle "L I N I T E" --menu " " 0 0 0 \
 A 'Essentials [All]' \
-B 'Virtual Machine [No VM & SoC]' \
-C 'Server [No VM & SoC]' \
-D 'Desktop [No VM & SoC]' \
-E 'WINE [No VM & SoC]' \
-F 'Flatpak [DEB - No Server!]' \
-G 'Raspbian & Tools [SoC Only]' \
-H 'Tools [All]' \
-I 'Beep!' \
-X 'EndeavourOS - Packages' \
-Y 'EndeavourOS - Configs' \
+B 'Server [No VM & SoC]' \
+C 'RaspbberryPi & Tools [SoC Only]' \
+D 'Tools [All]' \
+E 'Beep!' \
+F 'Virtual Machine [No VM & SoC]' \
 Z '<' 2>&1 > /dev/tty )
 case "$var0" in
 A) beta  ;;
-B) alpha ;;
-C) gamma ;;
-D) delta ;;
-E) games ;;
-F) flatpakhub ;;
-G) raspbian ;;
-H) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; menuB ;;
-I) wget https://raw.githubusercontent.com/urbancompasspony/beep/main/beep -O /home/administrador/.beep.sh ; beep ; menuB ;;
-J) endeavour00 ;;
-K) endeavour01 ;;
+B) gamma ;;
+C) raspbian ;;
+D) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; menuB ;;
+E) wget https://raw.githubusercontent.com/urbancompasspony/beep/main/beep -O /home/administrador/.beep.sh ; beep ; menuB ;;
+F) alpha ;;
 X) echo "Saindo..." && exit ;;
 esac
 }
