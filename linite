@@ -53,7 +53,7 @@ C 'RaspbberryPi & Tools [SoC Only]' \
 D 'Tools [All]' \
 E 'Beep!' \
 F 'Virtual Machine [No VM & SoC]' \
-Z '<' 2>&1 > /dev/tty )
+X '<' 2>&1 > /dev/tty )
 case "$var0" in
 A) beta  ;;
 B) gamma ;;
