@@ -59,7 +59,7 @@ A) beta  ;;
 B) gamma ;;
 C) raspbian ;;
 D) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; menuB ;;
-E) wget https://raw.githubusercontent.com/urbancompasspony/beep/main/beep -O /home/administrador/.beep.sh ; beep ; menuB ;;
+E) wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh -O /home/administrador/.beep.sh ; beep ; menuB ;;
 F) alpha ;;
 X) echo "Saindo..." && exit ;;
 esac
