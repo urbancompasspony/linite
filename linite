@@ -149,6 +149,9 @@ function raspbian {
 dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
 $list05" 25 40
 [ $? = 0 ] && {
+  servicesoff
+  sysctlconf
+  netplan1
   installer "$list05"
   menuB
 }
