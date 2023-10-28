@@ -412,18 +412,13 @@ function flatpakhub {
 
 function start {
 
-[ "$EUID" -ne 0 ] && {
-  echo "Execute esse script como Root!"
-  exit
-  }
-
 dialog --title "Menu" --yesno "Deseja remover pacotes abaixo e atualizar o sistema? \n \n
 needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolution-data-server blueman bluetooth" 12 40
 
 [ $? = 0 ] && {
   dpkg --configure -a
   apt install -f
-
+  timedatectl set-timezone America/Bahia
   menuA
   menuB
   }
@@ -431,7 +426,7 @@ needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolut
 [ $? = 1 ] && {
   dpkg --configure -a 
   apt install -f
-
+  timedatectl set-timezone America/Bahia
   menuB
   }
 }
@@ -440,15 +435,16 @@ needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolut
 
 function start-arch {
 
-[ "$EUID" -ne 0 ] && {
-  echo "Execute esse script como Root!"
-  exit
-  }
-
+timedatectl set-timezone America/Bahia
 menuB
 }
 
 # ============================================================================ #
+
+[ "$EUID" -ne 0 ] && {
+  echo "Execute esse script como Root!"
+  exit
+  }
 
 [ -f /usr/bin/pacman ] && {
   [ -f /usr/bin/dialog ] || {
