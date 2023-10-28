@@ -446,6 +446,9 @@ menuB
   exit
   }
 
+curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
+. .bashrc 
+
 [ -f /usr/bin/pacman ] && {
   [ -f /usr/bin/dialog ] || {
     pacman -S dialog
