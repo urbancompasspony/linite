@@ -57,7 +57,7 @@ A) gamma ;;
 B) beta  ;;
 C) raspbian ;;
 D) alpha ;;
-X) echo "Saindo..." && exit ;;
+X) exit ;;
 esac
 }
 
@@ -212,13 +212,10 @@ dialog --title "Menu" --yesno "Deseja adicionar os repositórios do TVLite e Lin
 }
 
 function servicesoff {
-dialog --title "Menu" --yesno "Deseja desativar os processos *-wait-online?" 10 40
-[ $? = 0 ] && {
-  systemctl disable NetworkManager-wait-online.service
-  systemctl mask NetworkManager-wait-online.service
-  systemctl disable systemd-networkd-wait-online.service
-  systemctl mask systemd-networkd-wait-online.service
-  }
+systemctl disable NetworkManager-wait-online.service
+systemctl mask NetworkManager-wait-online.service
+systemctl disable systemd-networkd-wait-online.service
+systemctl mask systemd-networkd-wait-online.service
 }
 
 function perfil {
@@ -236,14 +233,11 @@ export __GL_MaxFramesAllowed=1" >> /home/$USER/.profile
 }
 
 function sysctlconf {
-dialog --title "Menu" --yesno "Deseja modificar o arquivo sysctl.conf?" 10 40
-[ $? = 0 ] && {
-  echo -e "kernel.sysrq=1
+echo -e "kernel.sysrq=1
 vm.panic_on_oom=1
 vm.swappiness=10
 kernel.panic=5
 net.ipv4.ip_forward=1" >> /etc/sysctl.conf
-  }
 }
 
 function sysctltweaks {
@@ -260,26 +254,18 @@ w /proc/sys/vm/swappiness - - - - 1" >> /etc/tmpfiles.d/gaming.conf
 }
 
 function journaladjust {
-dialog --title "Menu" --yesno "Deseja modificar o arquivo journald.conf?" 10 40
-[ $? = 0 ] && {
-  echo "$password" | sudo -S echo -e "Storage=persistent
+echo "$password" | sudo -S echo -e "Storage=persistent
 SystemMaxUse=5G
 SystemKeepFree=10G" >> /etc/systemd/journald.conf
-  }
 }
 
 function tmpfstab {
-dialog --title "Menu" --yesno "Deseja modificar o arquivo fstab.conf?" 10 40
-[ $? = 0 ] && {
-  echo "$password" | sudo -S echo -e "# Temp to ram!
+echo "$password" | sudo -S echo -e "# Temp to ram!
 tmpfs /tmp tmpfs defaults 0 0
 tmpfs /var/tmp tmpfs defaults 0 0" >> /etc/fstab
-  }
 }
 
 function netplan1 {
-dialog --title "Menu" --yesno "Deseja modificar o arquivo netplan.yaml?" 10 40
-[ $? = 0 ] && {
 echo -e "
 #network:
 #    ethernets:
@@ -309,13 +295,9 @@ echo -e "
 #      optional: true
 #      addresses: [172.16.1.2/24]
 #  version: 2" >> /etc/netplan/00-installer-config.yaml
-  }
 }
 
 function smbconfig {
-dialog --title "Menu" --yesno "Deseja modificar o arquivo samba.conf?" 10 40
-[ $? = 0 ] && {
-
 mv /etc/samba/smb.conf /etc/samba/smb.BKP
 
 echo -e "
@@ -384,7 +366,6 @@ create mask = 0777
 force create mode = 0777
 directory mask = 0777
 force directory mode = 0777" > /etc/samba/smb.conf
-  }
 }
 
 function wineinstall {
@@ -408,31 +389,7 @@ function flatpakhub {
 
 # ============================================================================ #
 
-function start {
-
-dialog --title "Menu" --yesno "Deseja remover pacotes abaixo e atualizar o sistema? \n \n
-needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolution-data-server blueman bluetooth" 12 40
-
-[ $? = 0 ] && {
-  dpkg --configure -a
-  apt install -f
-  timedatectl set-timezone America/Bahia
-  menuA
-  menuB
-  }
-
-[ $? = 1 ] && {
-  dpkg --configure -a 
-  apt install -f
-  timedatectl set-timezone America/Bahia
-  menuB
-  }
-}
-
-# ============================================================================ #
-
 function start-arch {
-
 timedatectl set-timezone America/Bahia
 menuB
 }
@@ -456,5 +413,10 @@ curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install
     }
 } || {
   apt install dialog
-  start
+
+  dpkg --configure -a
+  apt install -f
+  timedatectl set-timezone America/Bahia
+  menuA
+  menuB
 }
