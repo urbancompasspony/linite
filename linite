@@ -47,20 +47,16 @@ apt upgrade -y
 
 function menuB {
 var0=$(dialog --title 'Linite' --backtitle "L I N I T E" --menu " " 0 0 0 \
-A 'Essentials [All]' \
-B 'Server [No VM & SoC]' \
+A 'Server [No VM nor SoC]' \
+B 'Just Essentials [All]' \
 C 'RaspbberryPi & Tools [SoC Only]' \
-D 'Tools [All]' \
-E 'Beep!' \
-F 'Virtual Machine [No VM & SoC]' \
+D 'Virtual Machine [No VM nor SoC]' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
-A) beta  ;;
-B) gamma ;;
+A) gamma ;;
+B) beta  ;;
 C) raspbian ;;
-D) curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/tools | sudo bash ; menuB ;;
-E) wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh -O /home/administrador/.beep.sh ; beep ; menuB ;;
-F) alpha ;;
+D) alpha ;;
 X) echo "Saindo..." && exit ;;
 esac
 }
@@ -91,6 +87,7 @@ $list01" 25 40
   journaladjust
   netplan1
   smbconfig
+  wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh -O /home/administrador/.beep.sh ; beep
   menuB
   }
 menuB
@@ -107,6 +104,7 @@ $list02" 25 40
   sysctlconf
   netplan1
   smbconfig
+  wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh -O /home/administrador/.beep.sh ; beep
   menuB
   }
 menuB
