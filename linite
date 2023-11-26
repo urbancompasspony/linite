@@ -87,7 +87,7 @@ $list01" 25 40
   journaladjust
   netplan1
   smbconfig
-  wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh -O /home/administrador/.beep.sh ; beep
+  beep
   menuB
   }
 menuB
@@ -104,7 +104,7 @@ $list02" 25 40
   sysctlconf
   netplan1
   smbconfig
-  wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh -O /home/administrador/.beep.sh ; beep
+  beep
   menuB
   }
 menuB
@@ -378,8 +378,9 @@ dpkg --add-architecture i386
 }
 
 function beep {
-  sudo bash /home/administrador/.beep.sh
-  echo "@reboot sleep 60; bash /home/administrador/.beep.sh" >> /tmp/crontab_new
+  wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh -O /home/$USER/.beep.sh
+  sudo bash /home/$USER/.beep.sh
+  echo "@reboot sleep 15; bash /home/$USER/.beep.sh" >> /tmp/crontab_new
   sudo crontab -l | cat - /tmp/crontab_new > crontab.txt && sudo crontab crontab.txt
 }
 
