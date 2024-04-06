@@ -188,11 +188,19 @@ function installer {
 }
 
 function user0 {
-  export usr1
-  usr1=$(dialog --title 'Grupos de Usuário' --backtitle " " --inputbox "Quem vai acessar o LibVirt / Docker?" 10 40 2>&1 > /dev/tty)
-  usermod -aG libvirt $usr1
-  usermod -aG libvirt-qemu $usr1
-  usermod -aG docker $usr1
+  VALUE1="administrador"
+
+  VALUE0=$(dialog --ok-label "Definir" --title "Definindo Permissao" --form "Quem vai acessar o LibVirt / Docker?" 0 0 0 \
+"Usuario:" 1 1 "$VALUE1" 1 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+  [ $? -ne 0 ] && exit
+
+  var1=$(echo "$VALUE0" | sed -n 1p)
+
+  usermod -aG libvirt $var1
+  usermod -aG libvirt-qemu $var1
+  usermod -aG docker $var1
   }
 
 # ============================================================================ #
