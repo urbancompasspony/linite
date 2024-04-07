@@ -49,21 +49,73 @@ apt upgrade -y
 
 function menuB {
 var0=$(dialog --title 'Linite' --backtitle "L I N I T E" --menu " " 0 0 0 \
-A 'Server [No VM nor SoC]' \
-B 'Just Essentials [All]' \
-C 'RaspbberryPi & Tools [SoC Only]' \
-D 'Virtual Machine [No VM nor SoC]' \
+0 'Server Default (Ubuntu>=2204)' \
+1 'Server [No VM nor SoC]' \
+2 'Just Essentials [All]' \
+3 'RaspbberryPi & Tools [SoC Only]' \
+4 'Virtual Machine [No VM nor SoC]' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
-A) gamma ;;
-B) beta  ;;
-C) raspbian ;;
-D) alpha ;;
+0) default0 ;;
+1) gamma ;;
+2) beta  ;;
+3) raspbian ;;
+4) alpha ;;
 X) exit ;;
 esac
 }
 
 # ============================================================================ #
+
+# Server Default
+function default0 {
+dialog --title "Menu" --yesno "Deseja mandar ver?" 25 40
+[ $? = 0 ] && {
+  clear; echo "Instalando pacotes essenciais."
+  installer "$list02"
+
+  clear; echo "Validando usuario Administrador para libvirt e docker"
+  usermod -aG libvirt administrador
+  usermod -aG libvirt-qemu administrador
+  usermod -aG docker administrador
+
+  clear; echo "Desativando serviços inuteis."
+  servicesoff
+
+  clear; echo "Aplicando recursos extras ao SYSCTL"
+  sysctlconf
+
+  clear; echo "Adicionando modelo NETPLAN"
+  netplan1
+
+  clear; echo "Adicionando modelo SAMBA AD"
+  smbconfig
+
+  clear; echo "Criando um Beep bonitinho!"
+  beep
+
+  clear; echo "Instalação concluida!"
+  menuB
+  }
+menuB
+}
+
+# Server [No VM/SoC]
+function gamma {
+dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
+$list02" 25 40
+[ $? = 0 ] && {
+  installer "$list02"
+  user0
+  servicesoff
+  sysctlconf
+  netplan1
+  smbconfig
+  beep
+  menuB
+  }
+menuB
+}
 
 # Virtual M. and Docker
 function alpha {
@@ -87,23 +139,6 @@ $list01" 25 40
   servicesoff
   sysctlconf
   journaladjust
-  netplan1
-  smbconfig
-  beep
-  menuB
-  }
-menuB
-}
-
-# Server [No VM/SoC]
-function gamma {
-dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
-$list02" 25 40
-[ $? = 0 ] && {
-  installer "$list02"
-  user0
-  servicesoff
-  sysctlconf
   netplan1
   smbconfig
   beep
@@ -324,9 +359,9 @@ dpkg --add-architecture i386
 }
 
 function beep {
-  wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh -O /home/$USER/.beep.sh
-  sudo bash /home/$USER/.beep.sh
-  echo "@reboot sleep 15; bash /home/$USER/.beep.sh" >> /tmp/crontab_new
+  wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh -O /home/administrador/.beep.sh
+  sudo bash /home/administrador/.beep.sh
+  echo "@reboot sleep 60; bash /home/administrador/.beep.sh" >> /tmp/crontab_new
   sudo crontab -l | cat - /tmp/crontab_new > crontab.txt && sudo crontab crontab.txt
 }
 
@@ -349,9 +384,6 @@ menuB
   echo "Execute esse script como Root!"
   exit
   }
-
-curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
-. .bashrc 
 
 [ -f /usr/bin/pacman ] && {
   [ -f /usr/bin/dialog ] || {
