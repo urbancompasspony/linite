@@ -40,27 +40,20 @@ export processname=0; export validmail=0; export process=0; export status=0; exp
 export password=0; export password1=0; export password2=0; export password3=0
 export report=0
 
-function menuA {
-apt purge needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolution-data-server bluez blueman bluetooth -y
-apt autoremove -y
-apt update
-apt upgrade -y
-}
-
 function menuB {
 var0=$(dialog --title 'Linite' --backtitle "L I N I T E" --menu " " 0 0 0 \
-0 'Server Default (Ubuntu>=2204)' \
-1 'Server [No VM nor SoC]' \
-2 'Just Essentials [All]' \
+1 'Ubuntu Server (>= 22.04)' \
+2 'Linux Essentials [All]' \
 3 'RaspbberryPi & Tools [SoC Only]' \
-4 'Virtual Machine [No VM nor SoC]' \
+4 'Server [No VM nor SoC]' \
+5 'Virtual Machine [No VM nor SoC]' \
 X '<' 2>&1 > /dev/tty )
 case "$var0" in
-0) default0 ;;
-1) gamma ;;
+1) default0 ;;
 2) beta  ;;
 3) raspbian ;;
-4) alpha ;;
+4) gamma ;;
+5) alpha ;;
 X) exit ;;
 esac
 }
@@ -385,19 +378,27 @@ menuB
   exit
   }
 
-[ -f /usr/bin/pacman ] && {
-  [ -f /usr/bin/dialog ] || {
-    pacman -S dialog
-    start-arch
-  } && {
-    start-arch
-    }
+[ -f /home/$USER/.installed ] && {
+  clear
+  echo ""
+  echo "Sistema já Instalado."
+  menuB
 } || {
-  apt install dialog
-
-  dpkg --configure -a
-  apt install -f
+  clear
+  clear; echo "Sistema não configurado. Configurando..."; echo ""
+  sudo apt update
+  clear; echo "Instalando pacotes essenciais"; echo ""
+  sudo apt install dialog curl
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
+  . .bashrc
+  clear; echo "Removendo pacotes inuteis"; echo ""
+  sudo apt purge needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolution-data-server bluez blueman bluetooth -y
+  clear; echo "Atualizando o sistema"; echo ""
+  sudo apt upgrade -y
+  apt autoremove -y
+  clear; echo "Definindo timezone"; echo ""
   timedatectl set-timezone America/Bahia
-  menuA
+  touch /home/$USER/.installed
+  clear; echo "Concluido!"; echo ""; sleep 3
   menuB
 }
