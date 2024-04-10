@@ -11,7 +11,7 @@ export list00="qemu-system qemu-utils qemu-user qemu-kvm qemu-guest-agent libvir
 export list01="beep inxi curl nmap parallel smartmontools tmux zip unzip dialog udpcast traceroute arp-scan net-tools netdiscover rdesktop scrcpy speedtest-cli whois btop rsnapshot rclone openssh-server net-tools haveged cifs-utils w3m w3m-img iotop htop lm-sensors samba samba-dsdb-modules samba-vfs-modules sshpass speedtest-cli traceroute docker.io docker-buildx build-essential libatasmart-bin btrfs-progs"
 
 # Server [No VM/SoC]
-export list02="$list00 $list01 fail2ban gpm xinit xorg openbox pavucontrol caja epiphany-browser gparted gnome-disk-utility terminator cmatrix"
+export list02="$list00 $list01 dialog fail2ban gpm xinit xorg openbox pavucontrol caja epiphany-browser gparted gnome-disk-utility terminator cmatrix"
 
 # Desktop
 export list03="$list01 shotcut ubuntu-restricted-extras scrcpy adb pavucontrol printer-driver-all rdesktop terminator hardinfo cpu-x qbittorrent dconf-editor filezilla thunderbird thunderbird-locale-pt-br rss-glx xscreensaver xscreensaver-data xscreensaver-data-extra xscreensaver-gl-extra xscreensaver-gl k3b drawing mypaint gimp audacity kodi vlc aisleriot gnome-mines gnome-mahjongg kpat fluidsynth cmatrix"
@@ -62,7 +62,7 @@ esac
 
 # Server Default
 function default0 {
-dialog --title "Menu" --yesno "Deseja mandar ver?" 25 40
+dialog --title "Menu" --yesno "Deseja mandar ver?" 0 0 
 [ $? = 0 ] && {
   clear; echo "Instalando pacotes essenciais."
   installer "$list02"
@@ -373,8 +373,8 @@ menuB
 
 # ============================================================================ #
 
-[ "$EUID" -ne 0 ] && {
-  echo "Execute esse script como Root!"
+[ "$EUID" -ne 0 ] || {
+  echo "Não execute esse script como Root! Ainda. Insira a senha quando solicitado."
   exit
   }
 
@@ -386,14 +386,14 @@ menuB
 } || {
   clear
   clear; echo "Sistema não configurado. Configurando..."; echo ""
-  sudo apt update
-  clear; echo "Instalando pacotes essenciais"; echo ""
-  sudo apt install dialog curl
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
   . .bashrc
   clear; echo "Removendo pacotes inuteis"; echo ""
   sudo apt purge needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolution-data-server bluez blueman bluetooth -y
   clear; echo "Atualizando o sistema"; echo ""
+  clear; echo "Instalando pacotes essenciais"; echo ""
+  sudo apt update
+  sudo apt install dialog curl
   sudo apt upgrade -y
   apt autoremove -y
   clear; echo "Definindo timezone"; echo ""
