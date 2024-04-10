@@ -390,10 +390,10 @@ menuB
   . .bashrc
   clear; echo "Removendo pacotes inuteis"; echo ""
   sudo apt purge needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolution-data-server bluez blueman bluetooth -y
-  clear; echo "Atualizando o sistema"; echo ""
   clear; echo "Instalando pacotes essenciais"; echo ""
   sudo apt update
   sudo apt install dialog curl
+  clear; echo "Atualizando o sistema"; echo ""
   sudo apt upgrade -y
   apt autoremove -y
   clear; echo "Definindo timezone"; echo ""
