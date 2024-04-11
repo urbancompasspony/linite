@@ -105,11 +105,12 @@ function installer {
   echo "Bem vindo ao Preparo de Sistema - v1.0"
   echo "Insira a senha de Administrador quando solicitado!"
   echo "Senha padrao: ubuntu"
-  echo "5"
-  echo "4"
-  echo "3"
-  echo "2"
-  echo "1"
+  sleep 1
+  echo "5"; sleep 1
+  echo "4"; sleep 1
+  echo "3"; sleep 1
+  echo "2"; sleep 1
+  echo "1"; sleep 1
   clear; echo "Preparando sistema...."; echo ""
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
   . .bashrc
