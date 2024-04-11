@@ -62,7 +62,7 @@ function default0 {
   beep
   sleep 3
   clear; echo "Instalação concluida!"
-  exit
+  reboot
 }
 
 # ============================================================================ #
