@@ -71,11 +71,6 @@ function default0 {
 function dwservice0 {
   wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/administrador/dwagent_generic.sh
   chmod +x dwagent_generic.sh
-  #bash dwagent_generic.sh
-}
-
-function installer {
-  apt install $1 --no-install-recommends -y  
 }
 
 function sysctlconf {
@@ -144,6 +139,10 @@ function beep {
   sudo crontab -l | cat - /tmp/crontab_new > crontab.txt && sudo crontab crontab.txt
 }
 
+function installer {
+  apt install $1 --no-install-recommends -y  
+}
+
 # ============================================================================ #
 
 [ "$EUID" -ne 0 ] || {
@@ -151,11 +150,9 @@ function beep {
   exit
   }
 
-[ -f /home/$USER/.installed ] && {
-  clear
-  echo ""
-  echo "Sistema já Instalado."
-  menuB
+[ -f /home/administrador/.installed ] && {
+  clear; echo ""; echo "Sistema já configurado. Saindo..."; echo ""; sleep 3
+  exit
 } || {
   clear
   clear; echo "Preparando sistema...."; echo ""
@@ -163,12 +160,11 @@ function beep {
   . .bashrc
   clear; echo "Removendo pacotes inuteis"; echo ""
   sudo apt purge needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolution-data-server bluez blueman bluetooth -y
-  clear; echo "Instalando pacotes essenciais"; echo ""
-  sudo apt update
   clear; echo "Atualizando o sistema"; echo ""
+  sudo apt update
   sudo apt upgrade -y
   apt autoremove -y
-  touch /home/$USER/.installed
+  touch /home/administrador/.installed
   clear; echo "Concluido!"; echo ""; sleep 3
   default0
 }
