@@ -40,9 +40,6 @@ function default0 {
   sudo systemctl disable systemd-networkd-wait-online.service
   sudo systemctl mask systemd-networkd-wait-online.service
   sleep 3
-  clear; echo "Pegando a versão mais nova do DW Service"
-  dwservice0
-  sleep 3
   clear; echo "Aplicando recursos extras ao SYSCTL"
   sysctlconf
   sleep 3
@@ -66,11 +63,6 @@ function default0 {
 }
 
 # ============================================================================ #
-
-function dwservice0 {
-  wget https://www.dwservice.net/download/dwagent_generic.sh -O /home/administrador/dwagent_generic.sh
-  chmod +x dwagent_generic.sh
-}
 
 function sysctlconf {
 echo -e "kernel.sysrq=1
