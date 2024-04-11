@@ -83,6 +83,7 @@ function beep {
   sudo bash /home/administrador/.beep.sh
   echo "@reboot sleep 60; bash /home/administrador/.beep.sh" | tee /tmp/crontab_new
   sudo crontab -l | cat - /tmp/crontab_new | tee crontab.txt && sudo crontab crontab.txt
+  rm /home/administrador/crontab.txt
 }
 
 function installer {
