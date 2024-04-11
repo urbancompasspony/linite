@@ -74,7 +74,7 @@ echo -e "
 }
 
 function smbconfig {
-mkdir -p /etc/samba/
+sudo mkdir -p /etc/samba/
 curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/SAMBA_Model/smbAD.conf | sudo tee /etc/samba/SMB-AD-Model.conf
 }
 
@@ -105,7 +105,7 @@ function installer {
   echo "Bem vindo ao Preparo de Sistema - v1.0"
   echo "Insira a senha de Administrador quando solicitado!"
   echo "Senha padrao: ubuntu"
-  sleep 1
+  sleep 5
   echo "5"; sleep 1
   echo "4"; sleep 1
   echo "3"; sleep 1
@@ -128,7 +128,7 @@ function installer {
   sudo usermod -aG libvirt-qemu administrador
   sudo usermod -aG docker administrador
   sleep 3
-  clear; echo "Desativando serviços inuteis."
+  clear; echo "Desativando serviços inuteis"
   sudo systemctl disable NetworkManager-wait-online.service
   sudo systemctl mask NetworkManager-wait-online.service
   sudo systemctl disable systemd-networkd-wait-online.service
@@ -140,16 +140,16 @@ function installer {
   clear; echo "Ajustando JOURNAL"
   journaladjust
   sleep 3
-  clear; echo "Adicionando modelo NETPLAN"
+  clear; echo "Adicionando modelo Netplan"
   netplan1
   sleep 3
-  clear; echo "Criando novos /tmp paths"
+  clear; echo "Criando novos /tmp"
   tmpfstab
   sleep 3
   clear; echo "Adicionando modelo SAMBA AD"
   smbconfig
   sleep 3
-  clear; echo "Criando um Beep bonitinho!"
+  clear; echo "Criando um Beep bonitinho se tiver speaker no servidor!"
   beep
   sleep 3
   clear; echo "Instalação concluida!"
