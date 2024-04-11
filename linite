@@ -28,42 +28,42 @@ export report=0
 function default0 {
   clear; echo "Instalando pacotes essenciais."
   installer "$list02"
-
+  sleep 3
   clear; echo "Validando usuario Administrador para libvirt e docker"
   usermod -aG libvirt administrador
   usermod -aG libvirt-qemu administrador
   usermod -aG docker administrador
-
+  sleep 3
   clear; echo "Desativando serviços inuteis."
   systemctl disable NetworkManager-wait-online.service
   systemctl mask NetworkManager-wait-online.service
   systemctl disable systemd-networkd-wait-online.service
   systemctl mask systemd-networkd-wait-online.service
-
+  sleep 3
   clear; echo "Pegando a versão mais nova do DW Service"
   dwservice0
-
+  sleep 3
   clear; echo "Aplicando recursos extras ao SYSCTL"
   sysctlconf
-
+  sleep 3
   clear; echo "Ajustando JOURNAL"
   journaladjust
-
+  sleep 3
   clear; echo "Adicionando modelo NETPLAN"
   netplan1
-
+  sleep 3
   clear; echo "Criando novos /tmp paths"
   tmpfstab
-
+  sleep 3
   clear; echo "Adicionando modelo SAMBA AD"
   smbconfig
-
+  sleep 3
   clear; echo "Criando um Beep bonitinho!"
   beep
-
+  sleep 3
   clear; echo "Instalação concluida!"
 
-  menuB
+  exit
 }
 
 # ============================================================================ #
@@ -140,21 +140,24 @@ function beep {
 }
 
 function installer {
-  apt install $1 --no-install-recommends -y  
+  sudo apt install $1 --no-install-recommends -y
 }
 
 # ============================================================================ #
 
 [ "$EUID" -ne 0 ] || {
-  echo "Não execute esse script como Root! Ainda. Insira a senha quando solicitado."
+  echo "Não execute esse script como Root agora, ou vai quebrar o bashrc. Insira a senha quando solicitado."
   exit
   }
 
 [ -f /home/administrador/.installed ] && {
-  clear; echo ""; echo "Sistema já configurado. Saindo..."; echo ""; sleep 3
-  exit
+  clear; echo ""; echo "Sistema já configurado. Rechecando pacotes..."; echo ""; sleep 3
+  default0
 } || {
   clear
+  echo "Bem vindo ao Preparo de Sistema - v1.0"
+  echo "Insira a senha de Administrador (senha: ubuntu) quando solicitado!"
+  sleep 5
   clear; echo "Preparando sistema...."; echo ""
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
   . .bashrc
