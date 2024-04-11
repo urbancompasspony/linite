@@ -30,15 +30,15 @@ function default0 {
   installer "$list02"
   sleep 3
   clear; echo "Validando usuario Administrador para libvirt e docker"
-  usermod -aG libvirt administrador
-  usermod -aG libvirt-qemu administrador
-  usermod -aG docker administrador
+  sudo usermod -aG libvirt administrador
+  sudo usermod -aG libvirt-qemu administrador
+  sudo usermod -aG docker administrador
   sleep 3
   clear; echo "Desativando serviços inuteis."
-  systemctl disable NetworkManager-wait-online.service
-  systemctl mask NetworkManager-wait-online.service
-  systemctl disable systemd-networkd-wait-online.service
-  systemctl mask systemd-networkd-wait-online.service
+  sudo systemctl disable NetworkManager-wait-online.service
+  sudo systemctl mask NetworkManager-wait-online.service
+  sudo systemctl disable systemd-networkd-wait-online.service
+  sudo systemctl mask systemd-networkd-wait-online.service
   sleep 3
   clear; echo "Pegando a versão mais nova do DW Service"
   dwservice0
@@ -62,7 +62,6 @@ function default0 {
   beep
   sleep 3
   clear; echo "Instalação concluida!"
-
   exit
 }
 
@@ -80,19 +79,19 @@ vm.swappiness=10
 kernel.panic=5
 #net.ipv4.ip_forward=1
 #net.ipv6.conf.all.disable_ipv6=1
-#net.ipv6.conf.default.disable_ipv6=1" >> /etc/sysctl.conf
+#net.ipv6.conf.default.disable_ipv6=1" | sudo tee -a /etc/sysctl.conf
 }
 
 function journaladjust {
 echo "$password" | sudo -S echo -e "Storage=persistent
 SystemMaxUse=5G
-SystemKeepFree=10G" >> /etc/systemd/journald.conf
+SystemKeepFree=10G" | sudo tee -a /etc/systemd/journald.conf
 }
 
 function tmpfstab {
 echo "$password" | sudo -S echo -e "# Temp to ram!
 tmpfs /tmp tmpfs defaults 0 0
-tmpfs /var/tmp tmpfs defaults 0 0" >> /etc/fstab
+tmpfs /var/tmp tmpfs defaults 0 0" | sudo tee -a /etc/fstab
 }
 
 function netplan1 {
@@ -111,7 +110,7 @@ echo -e "
 #              #addresses: [200.175.89.139, 200.175.5.139]
 #              #addresses: [8.8.4.4, 8.8.8.8]
 #              #addresses: [1.1.1.1, 1.0.0.1]
-#    version: 2" >> /etc/netplan/00-installer-config.yaml
+#    version: 2" | sudo tee -a /etc/netplan/00-installer-config.yaml
 
 echo -e "
 #network:
@@ -124,7 +123,7 @@ echo -e "
 #      dhcp4: no
 #      optional: true
 #      addresses: [172.16.1.2/24]
-#  version: 2" >> /etc/netplan/00-installer-config.yaml
+#  version: 2" | sudo tee -a /etc/netplan/00-installer-config.yaml
 }
 
 function smbconfig {
@@ -166,7 +165,7 @@ function installer {
   clear; echo "Atualizando o sistema"; echo ""
   sudo apt update
   sudo apt upgrade -y
-  apt autoremove -y
+  sudo apt autoremove -y
   touch /home/administrador/.installed
   clear; echo "Concluido!"; echo ""; sleep 3
   default0
