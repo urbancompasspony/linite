@@ -1,66 +1,21 @@
 #!/usr/bin/env bash
 
-# ============================================================================ #
-
-# Packages #
-
-# Virtual M. and Docker
-export list00="qemu-system qemu-utils qemu-user qemu-kvm qemu-guest-agent libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq docker.io docker-buildx"
-
-# Essentials [+VM/SoC]
-export list01="beep inxi curl nmap parallel smartmontools tmux zip unzip dialog udpcast traceroute arp-scan net-tools netdiscover rdesktop scrcpy speedtest-cli whois btop rsnapshot rclone openssh-server net-tools haveged cifs-utils w3m w3m-img iotop htop lm-sensors samba samba-dsdb-modules samba-vfs-modules sshpass speedtest-cli traceroute docker.io docker-buildx build-essential libatasmart-bin btrfs-progs"
-
-# Server [No VM/SoC]
-export list02="$list00 $list01 dialog fail2ban gpm xinit xorg openbox pavucontrol caja epiphany-browser gparted gnome-disk-utility terminator cmatrix"
-
-# ============================================================================ #
-
-# For Ubuntu 22.04 and beyond!
+# For Ubuntu 22.04 and beyond!?
 export NEEDRESTART_MODE=a
 export DEBIAN_FRONTEND=noninteractive
 
-# Variaveis Globais
-export processname=0; export validmail=0; export process=0; export status=0; export pkg=0
-export password=0; export password1=0; export password2=0; export password3=0
-export report=0
+# ============================================================================ #
 
-# Server Default
-function default0 {
-  clear; echo "Instalando pacotes essenciais."
-  installer "$list02"
-  sleep 3
-  clear; echo "Validando usuario Administrador para libvirt e docker"
-  sudo usermod -aG libvirt administrador
-  sudo usermod -aG libvirt-qemu administrador
-  sudo usermod -aG docker administrador
-  sleep 3
-  clear; echo "Desativando serviços inuteis."
-  sudo systemctl disable NetworkManager-wait-online.service
-  sudo systemctl mask NetworkManager-wait-online.service
-  sudo systemctl disable systemd-networkd-wait-online.service
-  sudo systemctl mask systemd-networkd-wait-online.service
-  sleep 3
-  clear; echo "Aplicando recursos extras ao SYSCTL"
-  sysctlconf
-  sleep 3
-  clear; echo "Ajustando JOURNAL"
-  journaladjust
-  sleep 3
-  clear; echo "Adicionando modelo NETPLAN"
-  netplan1
-  sleep 3
-  clear; echo "Criando novos /tmp paths"
-  tmpfstab
-  sleep 3
-  clear; echo "Adicionando modelo SAMBA AD"
-  smbconfig
-  sleep 3
-  clear; echo "Criando um Beep bonitinho!"
-  beep
-  sleep 3
-  clear; echo "Instalação concluida!"
-  reboot
-}
+# All Packages! #
+
+export list00="docker.io docker-buildx \
+qemu-system qemu-utils qemu-user qemu-kvm qemu-guest-agent libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq \
+net-tools speedtest-cli whois w3m w3m-img netdiscover udpcast arp-scan traceroute sshpass fail2ban network-manager \
+libatasmart-bin smartmontools zip unzip p7zip-full 7zip p7zip cifs-utils btrfs-progs rsnapshot rclone iotop  \
+haveged beep lm-sensors cmatrix btop htop inxi \
+gpm tmux xinit xorg openbox pavucontrol caja epiphany-browser gparted gnome-disk-utility terminator rdesktop"
+
+# samba samba-dsdb-modules samba-vfs-modules 
 
 # ============================================================================ #
 
@@ -90,7 +45,7 @@ function netplan1 {
 echo -e "
 #network:
 #    ethernets:
-#        renderer: NetworkManager - Use apt install network-manager and delete this comment!
+#        renderer: NetworkManager
 #        enp4s0:
 #            addresses: [192.168.250.10/24]
 #            gateway4: 192.168.250.1
@@ -119,15 +74,15 @@ echo -e "
 }
 
 function smbconfig {
-mv /etc/samba/smb.conf /etc/samba/smb.BKP
-curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/SAMBA_Model/smbAD.conf | sudo tee /etc/samba/smb-AD-Model.conf
+mkdir -p /etc/samba/
+curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/SAMBA_Model/smbAD.conf | sudo tee /etc/samba/SMB-AD-Model.conf
 }
 
 function beep {
   wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh -O /home/administrador/.beep.sh
   sudo bash /home/administrador/.beep.sh
-  echo "@reboot sleep 60; bash /home/administrador/.beep.sh" >> /tmp/crontab_new
-  sudo crontab -l | cat - /tmp/crontab_new > crontab.txt && sudo crontab crontab.txt
+  echo "@reboot sleep 60; bash /home/administrador/.beep.sh" | tee /tmp/crontab_new
+  sudo crontab -l | cat - /tmp/crontab_new | tee crontab.txt && sudo crontab crontab.txt
 }
 
 function installer {
@@ -137,18 +92,24 @@ function installer {
 # ============================================================================ #
 
 [ "$EUID" -ne 0 ] || {
-  echo "Não execute esse script como Root agora, ou vai quebrar o bashrc. Insira a senha quando solicitado."
+  echo "Não execute esse script como Root agora, ou vai quebrar o bashrc."
   exit
   }
 
 [ -f /home/administrador/.installed ] && {
-  clear; echo ""; echo "Sistema já configurado. Rechecando pacotes..."; echo ""; sleep 3
-  default0
+  clear; echo ""; echo "Sistema já configurado. Saindo..."; echo ""; sleep 3
+  exit
 } || {
   clear
+  echo ""
   echo "Bem vindo ao Preparo de Sistema - v1.0"
-  echo "Insira a senha de Administrador (senha: ubuntu) quando solicitado!"
-  sleep 5
+  echo "Insira a senha de Administrador quando solicitado!"
+  echo "Senha padrao: ubuntu"
+  echo "5"
+  echo "4"
+  echo "3"
+  echo "2"
+  echo "1"
   clear; echo "Preparando sistema...."; echo ""
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
   . .bashrc
@@ -158,9 +119,42 @@ function installer {
   sudo apt update
   sudo apt upgrade -y
   sudo apt autoremove -y
+  clear; echo "Instalando pacotes...."
+  installer "$list00"
+  sleep 3
+  clear; echo "Validando usuario Administrador para XPRA e CONTAINERS"
+  sudo usermod -aG libvirt administrador
+  sudo usermod -aG libvirt-qemu administrador
+  sudo usermod -aG docker administrador
+  sleep 3
+  clear; echo "Desativando serviços inuteis."
+  sudo systemctl disable NetworkManager-wait-online.service
+  sudo systemctl mask NetworkManager-wait-online.service
+  sudo systemctl disable systemd-networkd-wait-online.service
+  sudo systemctl mask systemd-networkd-wait-online.service
+  sleep 3
+  clear; echo "Aplicando recursos extras ao SYSCTL"
+  sysctlconf
+  sleep 3
+  clear; echo "Ajustando JOURNAL"
+  journaladjust
+  sleep 3
+  clear; echo "Adicionando modelo NETPLAN"
+  netplan1
+  sleep 3
+  clear; echo "Criando novos /tmp paths"
+  tmpfstab
+  sleep 3
+  clear; echo "Adicionando modelo SAMBA AD"
+  smbconfig
+  sleep 3
+  clear; echo "Criando um Beep bonitinho!"
+  beep
+  sleep 3
+  clear; echo "Instalação concluida!"
+  sleep 5
   touch /home/administrador/.installed
-  clear; echo "Concluido!"; echo ""; sleep 3
-  default0
+  reboot
 }
 
 exit 1
