@@ -156,7 +156,7 @@ function installer {
   clear; echo "Instalação concluida!"
   sleep 5
   touch /home/administrador/.installed
-  reboot
+  sudo reboot
 }
 
 exit 1
