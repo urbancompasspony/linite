@@ -105,7 +105,6 @@ function installer {
   clear
   echo ""
   echo "Bem vindo ao Preparo de Sistema - v1.0"
-  echo "Insira a senha de Administrador quando solicitado!"
   echo "Senha padrao: ubuntu"
   sleep 5
   echo "5"; sleep 1
