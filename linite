@@ -39,7 +39,8 @@ SystemKeepFree=10G" | sudo tee -a /etc/systemd/journald.conf
 }
 
 function tmpfstab {
-echo "$password" | sudo -S echo -e "# Temp to ram!
+echo "$password" | sudo -S echo -e "
+# Temp to ram!
 tmpfs /tmp tmpfs defaults 0 0
 tmpfs /var/tmp tmpfs defaults 0 0" | sudo tee -a /etc/fstab
 }
@@ -94,7 +95,8 @@ function installer {
 }
 
 [ "$EUID" -ne 0 ] || {
-  echo "Não execute esse script como Root agora, ou vai quebrar o bashrc."
+  clear
+  echo "Não execute esse script como Root agora!"
   exit
   }
 
