@@ -149,6 +149,9 @@ function installer {
   clear; echo "Criando novos /tmp"
   tmpfstab
   sleep 3
+  clear; echo "Definindo permissoes ao LibVirt"
+  sudo chmod 777 /var/run/libvirt/libvirt-sock
+  sleep 3
   clear; echo "Adicionando modelo SAMBA AD"
   smbconfig
   sleep 3
