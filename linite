@@ -18,7 +18,7 @@ export list00="docker.io docker-buildx \
 qemu-system qemu-utils qemu-user qemu-kvm qemu-guest-agent libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq \
 net-tools speedtest-cli whois w3m w3m-img netdiscover udpcast arp-scan traceroute sshpass fail2ban network-manager \
 libatasmart-bin smartmontools zip unzip p7zip-full 7zip p7zip cifs-utils btrfs-progs rsnapshot rclone iotop  \
-haveged beep lm-sensors cmatrix btop htop inxi tree hwloc \
+haveged beep lm-sensors cmatrix btop htop inxi tree hwloc dialog \
 gpm tmux xinit xorg openbox pavucontrol caja epiphany-browser gparted gnome-disk-utility terminator rdesktop"
 # samba samba-dsdb-modules samba-vfs-modules 
 
