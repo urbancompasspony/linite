@@ -107,7 +107,7 @@ function installer {
   clear
   echo ""
   echo "Bem vindo ao Preparo de Sistema - v1.0"
-  echo "Senha padrao: ubuntu"
+  echo "Se esta executando esse comando apos instalar o Ubuntu Server AutoInstaller, a senha padrao eh: ubuntu"
   sleep 5
   echo "5"; sleep 1
   echo "4"; sleep 1
