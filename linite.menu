@@ -27,7 +27,7 @@ export listpac="qqc2-desktop-style iperf docker-buildx qemu-base torbrowser-laun
 dialog traceroute arp-scan net-tools rdesktop scrcpy speedtest-cli whois btop rsnapshot rclone net-tools haveged cifs-utils w3m iotop htop samba sshpass speedtest-cli traceroute docker.io docker-buildx btrfs-progs virt-manager terminator \
 wine openvpn btop scrcpy libatasmart k3b audacity rdesktop qbittorrent dconf-editor filezilla thunderbird libreoffice libreoffice-fresh-pt-br thunderbird-i18n-pt-br nmap drawing kodi vlc kpat gimp fluidsynth cmatrix ettercap-gtk wireshark-qt blender dconf-editor"
 
-export listyay="yaru-colors-gtk-theme yaru-colors-icon-theme yaru-gtk-theme yaru-icon-theme gnome-disk-utility serpro-signer mate-tweak rpi-imager anydesk-bin microsoft-edge-stable-bin google-chrome opera adb"
+export listyay="freetube-bin yaru-colors-gtk-theme yaru-colors-icon-theme yaru-gtk-theme yaru-icon-theme gnome-disk-utility serpro-signer mate-tweak rpi-imager anydesk-bin microsoft-edge-stable-bin google-chrome opera adb"
 
 # qqc2-desktop-style for kdenlive!
 
