@@ -92,6 +92,12 @@ function beep {
 
 function installer {
   sudo apt install $1 --no-install-recommends -y
+
+  [ $(arch) = "aarch64" ] && {
+    sudo apt install linux-modules-extra-raspi
+  } || {
+    echo "." >/dev/null
+  }
 }
 
 [ "$EUID" -ne 0 ] || {
