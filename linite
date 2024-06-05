@@ -90,6 +90,17 @@ function beep {
   rm /home/administrador/crontab.txt
 }
 
+function mkswap0 {
+  [ -f /swapfile ] && {
+    echo "." >/dev/zero
+  } || {
+    sudo dd if=/dev/zero of=/swapfile bs=1k count=1000000
+    sudo chmod 0600 /swapfile
+    sudo mkswap /swapfile; sudo swapon /swapfile
+    echo "/swapfile none swap sw 0 0" | sudo tee -a /etc/fstab
+  }
+}
+
 function installer {
   sudo apt install $1 --no-install-recommends -y
 
@@ -160,6 +171,8 @@ function installer {
   sleep 3
   clear; echo "Adicionando modelo SAMBA AD"
   smbconfig
+  clear; echo "Criando SWAP caso não exista"
+  mkswap0
   sleep 3
   clear; echo "Criando um Beep bonitinho se tiver speaker no servidor!"
   beep
