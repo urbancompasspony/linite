@@ -106,8 +106,10 @@ function installer {
 
   [ $(arch) = "aarch64" ] && {
     sudo apt install linux-modules-extra-raspi -y
+    return
   } || {
     sudo apt install qemu-system qemu-utils qemu-user qemu-kvm qemu-guest-agent libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq -y
+    return
   }
 }
 
