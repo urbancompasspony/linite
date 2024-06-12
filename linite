@@ -78,8 +78,8 @@ echo -e "
 }
 
 function smbconfig {
-sudo mkdir -p /etc/samba/
-curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/SAMBA_Model/smbAD.conf | sudo tee /etc/samba/SMB-AD-Model.conf
+  sudo mkdir -p /etc/samba/
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/SAMBA_Model/smbAD.conf | sudo tee /etc/samba/SMB-AD-Model.conf
 }
 
 function beep {
@@ -149,6 +149,8 @@ function installer {
   clear; echo "Preparando sistema...."; echo ""
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
   . .bashrc
+  clear; echo "Criando SWAP caso não exista"
+  mkswap0
   clear; echo "Removendo pacotes inuteis"; echo ""
   sudo apt purge needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolution-data-server bluez blueman bluetooth -y
   clear; echo "Atualizando o sistema"; echo ""
@@ -187,8 +189,6 @@ function installer {
   sleep 3
   clear; echo "Adicionando modelo SAMBA AD"
   smbconfig
-  clear; echo "Criando SWAP caso não exista"
-  mkswap0
   sleep 3
   clear; echo "Criando um Beep bonitinho se tiver speaker no servidor!"
   beep
