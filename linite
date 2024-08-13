@@ -7,6 +7,8 @@
 # O comando para usar este script é:
 # curl -sSL https://linite.linuxuniverse.com.br | bash
 
+export mainrelease="DISTRIB_RELEASE=22.04"
+
 # ============================================================================ #
 # ============================================================================ #
 # ============================================================================ #
@@ -131,6 +133,16 @@ function installer {
   echo "Não execute esse script como Root agora!"
   exit
   }
+
+sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print $1}')
+
+[ $sysversion = "$mainrelease" ] || {
+  clear; echo ""; echo "SISTEMA INADEQUADO. SAINDO...."
+  time 10
+  exit
+} && {
+  echo . > /dev/null
+}
 
 [ -f /home/administrador/.installed ] && {
   clear; echo ""; echo "Sistema já configurado. Saindo..."; echo ""; sleep 3
