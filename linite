@@ -136,12 +136,12 @@ function installer {
 
 sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print $1}')
 
-[ $sysversion = "$mainrelease" ] || {
+[ $sysversion = "$mainrelease" ] && {
+  echo . > /dev/null
+} || {
   clear; echo ""; echo "SISTEMA INADEQUADO. SAINDO...."
   time 10
   exit
-} && {
-  echo . > /dev/null
 }
 
 [ -f /home/administrador/.installed ] && {
