@@ -140,7 +140,7 @@ sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print
   echo . > /dev/null
 } || {
   clear; echo ""; echo "SISTEMA INADEQUADO. SAINDO...."
-  time 10
+  sleep 10
   exit
 }
 
