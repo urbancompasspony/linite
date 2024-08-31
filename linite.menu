@@ -20,7 +20,7 @@ export list03="$list01 shotcut ubuntu-restricted-extras scrcpy adb pavucontrol p
 export list04="winehq-staging winetricks libvulkan1:i386 libgl1-mesa-glx:i386 libglu1-mesa:i386 lib32-libxcomposite"
 
 # Raspbian & Tools
-export list05="linux-modules-extra-raspi openvpn curl nmap parallel zip unzip dialog iperf traceroute arp-scan net-tools netdiscover speedtest-cli iotop whois docker.io docker-buildx"
+export list05="openvpn curl nmap parallel zip unzip dialog iperf traceroute arp-scan net-tools netdiscover speedtest-cli iotop whois docker.io"
 
 # For ArchLinux:
 export listpac="qqc2-desktop-style iperf docker-buildx qemu-base torbrowser-launcher p7zip arch-install-scripts lib32-libxcomposite lib32-pipewire redshift cronie gparted beep dconf-editor inxi curl nmap parallel smartmontools tmux zip unzip \
@@ -149,6 +149,7 @@ $list05" 25 40
   netplan1
   smbconfig
   installer "$list05"
+  clear; echo "Install docker-buildx linux-modules-extra-raspi if using Ubuntu Server!"; sleep 5
   menuB
 }
 menuB
