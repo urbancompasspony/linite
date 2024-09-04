@@ -357,7 +357,7 @@ menuB
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
   . .bashrc
   clear; echo "Removendo pacotes inuteis"; echo ""
-  sudo apt purge needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolution-data-server bluez blueman bluetooth -y
+  sudo apt purge needrestart cloud-init cloud-initramfs-dyn-netconf snapd unattended-upgrades plank deja-dup evolution evolution-data-server bluez blueman bluetooth -y
   clear; echo "Instalando pacotes essenciais"; echo ""
   sudo apt update
   sudo apt install dialog curl
