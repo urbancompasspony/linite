@@ -1,1 +1,214 @@
+#!/usr/bin/env bash
 
+# ============================================================================ #
+# ============================================================================ #
+# ============================================================================ #
+
+# O comando para usar este script é:
+# curl -sSL https://linite.linuxuniverse.com.br | bash
+
+export mainrelease="DISTRIB_RELEASE=22.04"
+
+# ============================================================================ #
+# ============================================================================ #
+# ============================================================================ #
+
+export NEEDRESTART_MODE=a
+export DEBIAN_FRONTEND=noninteractive
+
+export list00="docker.io docker-buildx \
+net-tools speedtest-cli whois w3m w3m-img netdiscover iperf arp-scan traceroute sshpass fail2ban network-manager \
+libatasmart-bin smartmontools zip unzip p7zip-full 7zip p7zip cifs-utils rsnapshot rclone iotop \
+haveged beep stress lm-sensors cmatrix btop inxi tree hwloc figlet dialog \
+gpm tmux xinit xorg openbox pavucontrol caja epiphany-browser gparted gnome-disk-utility terminator rdesktop"
+
+# samba samba-dsdb-modules samba-vfs-modules 
+
+function sysctlconf {
+echo -e "kernel.sysrq=1
+vm.panic_on_oom=1
+vm.swappiness=10
+kernel.panic=5
+#net.ipv4.ip_forward=1
+#net.ipv6.conf.all.disable_ipv6=1
+#net.ipv6.conf.default.disable_ipv6=1" | sudo tee -a /etc/sysctl.conf
+}
+
+function journaladjust {
+echo "$password" | sudo -S echo -e "Storage=persistent
+SystemMaxUse=5G
+SystemKeepFree=10G" | sudo tee -a /etc/systemd/journald.conf
+}
+
+function tmpfstab {
+echo "$password" | sudo -S echo -e "
+# Temp to ram!
+tmpfs /tmp tmpfs defaults 0 0
+tmpfs /var/tmp tmpfs defaults 0 0" | sudo tee -a /etc/fstab
+}
+
+function netplan1 {
+echo -e "
+#network:
+#    ethernets:
+#        renderer: NetworkManager
+#        enp4s0:
+#            addresses: [192.168.250.10/24]
+#            gateway4: 192.168.250.1
+#            dhcp4: no
+##           optional: true
+#            nameservers:
+#              addresses: [192.168.250.1]
+#              #addresses: [200.225.197.34, 200.225.197.37] 
+#              #addresses: [200.175.89.139, 200.175.5.139]
+#              #addresses: [8.8.4.4, 8.8.8.8]
+#              #addresses: [1.1.1.1, 1.0.0.1]
+#    version: 2" | sudo tee -a /etc/netplan/00-installer-config.yaml
+
+echo -e "
+#network:
+#  ethernets:
+#    eth0:
+#      dhcp4: true
+#      optional: true
+
+#    eth1: # THIS!
+#      dhcp4: no
+#      optional: true
+#      addresses: [172.16.1.2/24]
+#  version: 2" | sudo tee -a /etc/netplan/00-installer-config.yaml
+}
+
+function smbconfig {
+  sudo mkdir -p /etc/samba/
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/SAMBA_Model/smbAD.conf | sudo tee /etc/samba/SMB-AD-Model.conf
+}
+
+function beep {
+  wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh -O /home/administrador/.beep.sh
+  sudo bash /home/administrador/.beep.sh
+  echo "@reboot sleep 60; bash /home/administrador/.beep.sh" | tee /tmp/crontab_new
+  sudo crontab -l | cat - /tmp/crontab_new | tee crontab.txt && sudo crontab crontab.txt
+  rm /home/administrador/crontab.txt
+}
+
+function mkswap0 {
+  [ -f /swapfile ] && {
+    echo "." >/dev/zero
+  } || {
+    sudo dd if=/dev/zero of=/swapfile bs=1k count=1000000
+    sudo chmod 0600 /swapfile
+    sudo mkswap /swapfile; sudo swapon /swapfile
+    echo "/swapfile none swap sw 0 0" | sudo tee -a /etc/fstab
+  }
+}
+
+function motd00 {
+  sudo apt update; sudo apt install figlet -y; sudo rm -R /etc/update-motd.d/*
+  sudo wget https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/00-header -O /etc/update-motd.d/00-header
+  sudo wget https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/20-sysinfo -O /etc/update-motd.d/20-sysinfo
+  sudo wget https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/90-dynamic-motd -O /etc/update-motd.d/90-dynamic-motd
+  sudo chmod +x /etc/update-motd.d/*
+}
+
+function installer {
+  sudo apt install $1 --no-install-recommends -y
+
+  mkdir -p /home/administrador/.config/openbox
+  wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/Wayland/LabWC/menu.xml -O .config/openbox/menu.xml
+
+  [ $(arch) = "aarch64" ] && {
+    sudo apt install linux-modules-extra-raspi -y
+    return
+  } || {
+    sudo apt install qemu-system qemu-utils qemu-user qemu-kvm qemu-guest-agent libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq genisoimage -y
+    sudo usermod -aG libvirt administrador
+    sudo usermod -aG libvirt-qemu administrador
+    return
+  }
+}
+
+[ "$EUID" -ne 0 ] || {
+  clear
+  echo "Não execute esse script como Root agora!"
+  exit
+  }
+
+sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print $1}')
+
+[ $sysversion = "$mainrelease" ] && {
+  echo . > /dev/null
+} || {
+  clear; echo ""; echo "SISTEMA INADEQUADO. SAINDO...."
+  sleep 10
+  exit
+}
+
+[ -f /home/administrador/.installed ] && {
+  clear; echo ""; echo "Sistema já configurado. Saindo..."; echo ""; sleep 3
+  exit
+} || {
+  clear
+  echo ""
+  echo "Bem vindo ao Preparo de Sistema - v1.0"
+  echo "Se esta executando esse comando apos instalar o Ubuntu Server AutoInstaller, a senha padrao eh: ubuntu"
+  sleep 5
+  echo "5"; sleep 1
+  echo "4"; sleep 1
+  echo "3"; sleep 1
+  echo "2"; sleep 1
+  echo "1"; sleep 1
+  clear; echo "Preparando sistema...."; echo ""
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
+  . .bashrc
+  clear; echo "Criando SWAP caso não exista"
+  mkswap0
+  clear; echo "Removendo pacotes inuteis"; echo ""
+  sudo apt purge needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolution-data-server bluez blueman bluetooth -y
+  clear; echo "Atualizando o sistema"; echo ""
+  sudo apt update
+  sudo apt upgrade -y
+  sudo apt autoremove -y
+  clear; echo "Instalando pacotes...."
+  installer "$list00"
+  sleep 3
+  clear; echo "Validando usuario Administrador para CONTAINERS"
+  sudo usermod -aG docker administrador
+  sleep 3
+  clear; echo "Desativando serviços inuteis"
+  sudo systemctl disable NetworkManager-wait-online.service
+  sudo systemctl mask NetworkManager-wait-online.service
+  sudo systemctl disable systemd-networkd-wait-online.service
+  sudo systemctl mask systemd-networkd-wait-online.service
+  sleep 3
+  clear; echo "Aplicando recursos extras ao SYSCTL"
+  sysctlconf
+  sleep 3
+  clear; echo "Ajustando MOTD"
+  motd00
+  sleep 3
+  clear; echo "Ajustando JOURNAL"
+  journaladjust
+  sleep 3
+  clear; echo "Adicionando modelo Netplan"
+  netplan1
+  sleep 3
+  clear; echo "Criando novos /tmp"
+  tmpfstab
+  sleep 3
+  clear; echo "Definindo permissoes ao LibVirt"
+  sudo chmod 777 /var/run/libvirt/libvirt-sock
+  sleep 3
+  clear; echo "Adicionando modelo SAMBA AD"
+  smbconfig
+  sleep 3
+  clear; echo "Criando um Beep bonitinho se tiver speaker no servidor!"
+  beep
+  sleep 3
+  clear; echo "Instalação concluida!"
+  sleep 5
+  touch /home/administrador/.installed
+  sudo reboot
+}
+
+exit 1
