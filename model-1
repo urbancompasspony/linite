@@ -1,18 +1,10 @@
 #!/usr/bin/env bash
 
 # ============================================================================ #
-# ============================================================================ #
-# ============================================================================ #
 
-# O comando para usar este script é:
-# curl -sSL https://linite.linuxuniverse.com.br | bash
+# curl -sSL https://m.linuxuniverse.com.br | bash
 
 export mainrelease="DISTRIB_RELEASE=22.04"
-
-# ============================================================================ #
-# ============================================================================ #
-# ============================================================================ #
-
 export NEEDRESTART_MODE=a
 export DEBIAN_FRONTEND=noninteractive
 
@@ -21,8 +13,28 @@ net-tools speedtest-cli whois w3m w3m-img netdiscover iperf arp-scan traceroute 
 libatasmart-bin smartmontools zip unzip p7zip-full 7zip p7zip cifs-utils rsnapshot rclone iotop \
 haveged beep stress lm-sensors cmatrix btop inxi tree hwloc figlet dialog \
 gpm tmux xinit xorg openbox pavucontrol caja epiphany-browser gparted gnome-disk-utility terminator rdesktop"
-
 # samba samba-dsdb-modules samba-vfs-modules 
+
+destpath="/var/lib/libvirt/images"
+serverip="172.20.0.22"
+lanhost="http://$serverip"
+wanhost="http://z.net-freaks.com:3434"
+usern4me="admin"
+passw0rd="isorulez"
+
+# ============================================================================ #
+
+sudo mkdir -p "$destpath"
+sudo chmod 777 -R "$destpath"
+
+# Check where get the .img file
+if ping -c 1 $serverip >/dev/null; then
+    webadress="$lanhost"
+else
+    webadress="$wanhost"
+fi
+
+# ============================================================================ #
 
 function sysctlconf {
 echo -e "kernel.sysrq=1
@@ -49,34 +61,26 @@ tmpfs /var/tmp tmpfs defaults 0 0" | sudo tee -a /etc/fstab
 
 function netplan1 {
 echo -e "
-#network:
-#    ethernets:
-#        renderer: NetworkManager
-#        enp4s0:
-#            addresses: [192.168.250.10/24]
-#            gateway4: 192.168.250.1
-#            dhcp4: no
-##           optional: true
-#            nameservers:
-#              addresses: [192.168.250.1]
-#              #addresses: [200.225.197.34, 200.225.197.37] 
-#              #addresses: [200.175.89.139, 200.175.5.139]
-#              #addresses: [8.8.4.4, 8.8.8.8]
-#              #addresses: [1.1.1.1, 1.0.0.1]
-#    version: 2" | sudo tee -a /etc/netplan/00-installer-config.yaml
-
-echo -e "
-#network:
-#  ethernets:
-#    eth0:
-#      dhcp4: true
-#      optional: true
-
-#    eth1: # THIS!
-#      dhcp4: no
-#      optional: true
-#      addresses: [172.16.1.2/24]
-#  version: 2" | sudo tee -a /etc/netplan/00-installer-config.yaml
+# This is the network config written by 'linite model 1'
+network:
+  ethernets:
+    enp1s0:
+      dhcp4: true
+      nameservers:
+        addresses: [1.0.0.1, 8.8.4.4]
+    enp2s0:
+      dhcp4: true
+      nameservers:
+        addresses: [1.0.0.1, 8.8.4.4]
+    enp3s0:
+      dhcp4: true
+      nameservers:
+        addresses: [1.0.0.1, 8.8.4.4]
+    enp4s0:
+      dhcp4: true
+      nameservers:
+        addresses: [1.0.0.1, 8.8.4.4]
+  version: 2" | sudo tee /etc/netplan/00-installer-config.yaml
 }
 
 function smbconfig {
@@ -127,6 +131,49 @@ function installer {
     return
   }
 }
+
+function create_pfsense {
+  virt-install --import \
+--name pfSense \
+--boot hd,cdrom,menu=on \
+--memory 2048 \
+--vcpus 2 \
+--cpu host \
+--network type=direct,source=enp2s0,source_mode=bridge,mac=52:54:00:55:ea:01 \
+--network type=direct,source=enp3s0,source_mode=bridge,mac=52:54:00:55:ea:02 \
+--network type=direct,source=enp4s0,source_mode=bridge,mac=52:54:00:55:ea:03 \
+--disk /var/lib/libvirt/images/pfsense.img \
+--os-variant=freebsd13.1 \
+--graphics vnc \
+--import \
+--autostart 1>/dev/null 2>/dev/null &
+
+dialog --title "Informação" --msgbox "Se a maquina virtual nao existia, ela sera criada e inicializada!" 6 40
+dialog --title "Informação" --msgbox "Verifique o status da maquina virtual pelo Virt-Manager, digitando o comando startx!" 6 60
+
+exit
+}
+
+function start {
+  [ -f /var/lib/libvirt/images/pfsense.img ] && {
+    setinter
+    echo "." >/dev/null
+  } || {
+    calling pfsense.img
+    setperma
+  }
+}
+
+function calling {
+  clear
+  sudo wget --user $usern4me --password $passw0rd $webadress/$1 -O $destpath/$1
+}
+
+function setperma {
+  sudo chmod 777 -R "$destpath"
+}
+
+# ============================================================================ #
 
 [ "$EUID" -ne 0 ] || {
   clear
@@ -192,6 +239,7 @@ sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print
   sleep 3
   clear; echo "Adicionando modelo Netplan"
   netplan1
+  sudo netplan apply
   sleep 3
   clear; echo "Criando novos /tmp"
   tmpfstab
@@ -204,6 +252,8 @@ sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print
   sleep 3
   clear; echo "Criando um Beep bonitinho se tiver speaker no servidor!"
   beep
+  clear; echo "Adicionando VM pfSense"
+  create_pfsense
   sleep 3
   clear; echo "Instalação concluida!"
   sleep 5
