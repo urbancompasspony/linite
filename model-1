@@ -5,6 +5,7 @@
 # curl -sSL https://m.linuxuniverse.com.br | bash
 
 export mainrelease="DISTRIB_RELEASE=22.04"
+export mainhard="J4125"
 export NEEDRESTART_MODE=a
 export DEBIAN_FRONTEND=noninteractive
 
@@ -12,8 +13,8 @@ export list00="docker.io docker-buildx \
 net-tools speedtest-cli whois w3m w3m-img netdiscover iperf arp-scan traceroute sshpass fail2ban network-manager \
 libatasmart-bin smartmontools zip unzip p7zip-full 7zip p7zip cifs-utils rsnapshot rclone iotop \
 haveged beep stress lm-sensors cmatrix btop inxi tree hwloc figlet dialog \
-gpm tmux xinit xorg openbox pavucontrol caja epiphany-browser gparted gnome-disk-utility terminator rdesktop"
-# samba samba-dsdb-modules samba-vfs-modules 
+gpm tmux xinit xorg openbox pavucontrol caja epiphany-browser gparted gnome-disk-utility terminator rdesktop \
+qemu-system qemu-utils qemu-user qemu-kvm qemu-guest-agent libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq genisoimage"
 
 destpath="/var/lib/libvirt/images"
 serverip="172.20.0.22"
@@ -84,8 +85,8 @@ network:
 }
 
 function smbconfig {
-  sudo mkdir -p /etc/samba/
-  curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/SAMBA_Model/smbAD.conf | sudo tee /etc/samba/SMB-AD-Model.conf
+  sudo mkdir -p /srv/containers/scripts/
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/SAMBA_Model/smbAD.conf | sudo tee /srv/containers/scripts/SMB-AD-Model.conf
 }
 
 function beep {
@@ -117,18 +118,19 @@ function motd00 {
 
 function installer {
   sudo apt install $1 --no-install-recommends -y
+  sudo usermod -aG libvirt administrador
+  sudo usermod -aG libvirt-qemu administrador
+  return
+}
 
-  mkdir -p /home/administrador/.config/openbox
-  wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/Wayland/LabWC/menu.xml -O .config/openbox/menu.xml
-
-  [ $(arch) = "aarch64" ] && {
-    sudo apt install linux-modules-extra-raspi -y
-    return
+function startvm {
+  [ -f /var/lib/libvirt/images/pfsense.img ] && {
+    create_pfsense
   } || {
-    sudo apt install qemu-system qemu-utils qemu-user qemu-kvm qemu-guest-agent libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq genisoimage -y
-    sudo usermod -aG libvirt administrador
-    sudo usermod -aG libvirt-qemu administrador
-    return
+    clear
+    sudo wget --user $usern4me --password $passw0rd $webadress/$1 -O $destpath/$1
+    sudo chmod 777 -R "$destpath"
+    create_pfsense
   }
 }
 
@@ -147,46 +149,38 @@ function create_pfsense {
 --graphics vnc \
 --import \
 --autostart 1>/dev/null 2>/dev/null &
-
-dialog --title "Informação" --msgbox "Se a maquina virtual nao existia, ela sera criada e inicializada!" 6 40
-dialog --title "Informação" --msgbox "Verifique o status da maquina virtual pelo Virt-Manager, digitando o comando startx!" 6 60
-
-exit
-}
-
-function start {
-  [ -f /var/lib/libvirt/images/pfsense.img ] && {
-    setinter
-    echo "." >/dev/null
-  } || {
-    calling pfsense.img
-    setperma
-  }
-}
-
-function calling {
-  clear
-  sudo wget --user $usern4me --password $passw0rd $webadress/$1 -O $destpath/$1
-}
-
-function setperma {
-  sudo chmod 777 -R "$destpath"
 }
 
 # ============================================================================ #
 
 [ "$EUID" -ne 0 ] || {
   clear
-  echo "Não execute esse script como Root agora!"
+  echo "Não execute esse script como Root!"
   exit
   }
 
-sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print $1}')
+hardversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print $1}')
+[ $hardversion = "$mainhard" ] && {
+  echo . > /dev/null
+} || {
+  clear
+  echo ""
+  echo "HARDWARE INADEQUADO DETECTADO!"
+  echo "Este sistema exige o hardware 'Appliance 4x Gigabit Celeron J4125' e voce esta usando o $hardversion"
+  echo "SAINDO...."
+  sleep 10
+  exit
+}
 
+sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print $1}')
 [ $sysversion = "$mainrelease" ] && {
   echo . > /dev/null
 } || {
-  clear; echo ""; echo "SISTEMA INADEQUADO. SAINDO...."
+  clear
+  echo ""
+  echo "SISTEMA INADEQUADO DETECTADO!"
+  echo "Este script exige o Ubuntu 22.04 e você está usando o $sysversion"
+  echo "SAINDO...."
   sleep 10
   exit
 }
@@ -253,7 +247,7 @@ sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print
   clear; echo "Criando um Beep bonitinho se tiver speaker no servidor!"
   beep
   clear; echo "Adicionando VM pfSense"
-  create_pfsense
+  startvm
   sleep 3
   clear; echo "Instalação concluida!"
   sleep 5
