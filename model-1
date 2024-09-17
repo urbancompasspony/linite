@@ -68,15 +68,16 @@ echo -e "
 # This is the network config written by 'linite model 1'
 network:
   ethernets:
+#    renderer: NetworkManager
+    eno1:
+      dhcp4: true
+      nameservers:
+        addresses: [1.0.0.1, 8.8.4.4]
     enp1s0:
       dhcp4: true
       nameservers:
         addresses: [1.0.0.1, 8.8.4.4]
     enp2s0:
-      dhcp4: true
-      nameservers:
-        addresses: [1.0.0.1, 8.8.4.4]
-    enp3s0:
       dhcp4: true
       nameservers:
         addresses: [1.0.0.1, 8.8.4.4]
@@ -136,6 +137,16 @@ function startvm {
 
     create_pfsense
   }
+}
+
+function fstab0 {
+echo -e "
+
+# Disk 01
+#/dev/disk/by-uuid/ /mnt/main ext4 defaults 0 0
+
+# Disk 02
+#/dev/disk/by-uuid/ /mnt/backup ext4 defaults 0 0" | sudo tee -a /etc/fstab
 }
 
 function create_pfsense {
@@ -260,6 +271,9 @@ sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print
   sleep 3
   clear; echo "Definindo MACVLAN para os containers"
   set_docker
+  sleep 3
+  clear; echo "Adicionando entradas extras ao fstab"
+  fstab0
   sleep 3
   clear; echo "Criando um Beep bonitinho se tiver speaker no servidor!"
   beep
