@@ -9,8 +9,13 @@
 
 export mainrelease="DISTRIB_RELEASE=22.04"
 export mainhard="Celeron(R) J4125"
-export NEEDRESTART_MODE=a
-export DEBIAN_FRONTEND=noninteractive
+
+usern4me="admin"
+passw0rd="isorulez"
+
+serverip="172.20.0.22"
+lanhost="http://$serverip"
+wanhost="http://z.net-freaks.com:3434"
 
 export list00="docker.io docker-buildx \
 net-tools speedtest-cli whois w3m w3m-img netdiscover iperf arp-scan traceroute sshpass fail2ban network-manager \
@@ -21,12 +26,9 @@ qemu-system qemu-utils qemu-user qemu-kvm qemu-guest-agent libvirt-clients libvi
 
 destpath="/var/lib/libvirt/images"
 pathsrv="/srv/containers/scripts/config"
-serverip="172.20.0.22"
-lanhost="http://$serverip"
-wanhost="http://z.net-freaks.com:3434"
 
-usern4me="admin"
-passw0rd="isorulez"
+export NEEDRESTART_MODE=a
+export DEBIAN_FRONTEND=noninteractive
 
 # ============================================================================ #
 
