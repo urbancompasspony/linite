@@ -8,7 +8,7 @@
 # ============================================================================ #
 
 export mainrelease="DISTRIB_RELEASE=22.04"
-export mainhard="J4125"
+export mainhard="Celeron(R) J4125"
 export NEEDRESTART_MODE=a
 export DEBIAN_FRONTEND=noninteractive
 
@@ -184,9 +184,10 @@ function set_docker {
   exit
   }
 
-hardversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print $1}')
+hardversion=$(cat /proc/cpuinfo | grep 'model name' | head -n 1 | awk -F: '{ print $2 }' | cut -d ' ' -f 3,4)
 [ $hardversion = "$mainhard" ] && {
-  echo . > /dev/null
+  clear; echo "Tudo ok, prosseguindo!"
+  sleep 1
 } || {
   clear
   echo ""
@@ -199,7 +200,8 @@ hardversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{prin
 
 sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print $1}')
 [ $sysversion = "$mainrelease" ] && {
-  echo . > /dev/null
+  clear; echo "Tudo ok, prosseguindo!"
+  sleep 1
 } || {
   clear
   echo ""
