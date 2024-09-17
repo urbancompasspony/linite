@@ -185,7 +185,8 @@ function set_docker {
   }
 
 hardversion=$(cat /proc/cpuinfo | grep 'model name' | head -n 1 | awk -F: '{ print $2 }' | cut -d ' ' -f 3,4)
-[ $hardversion = "$mainhard" ] && {
+
+[ "$hardversion" = "$mainhard" ] && {
   clear; echo "Tudo ok, prosseguindo!"
   sleep 1
 } || {
@@ -199,7 +200,8 @@ hardversion=$(cat /proc/cpuinfo | grep 'model name' | head -n 1 | awk -F: '{ pri
 }
 
 sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print $1}')
-[ $sysversion = "$mainrelease" ] && {
+
+[ "$sysversion" = "$mainrelease" ] && {
   clear; echo "Tudo ok, prosseguindo!"
   sleep 1
 } || {
