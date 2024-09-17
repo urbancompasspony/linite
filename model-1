@@ -141,9 +141,9 @@ function create_pfsense {
 --memory 2048 \
 --vcpus 2 \
 --cpu host \
---network type=direct,source=enp2s0,source_mode=bridge,mac=52:54:00:55:ea:01 \
---network type=direct,source=enp3s0,source_mode=bridge,mac=52:54:00:55:ea:02 \
---network type=direct,source=enp4s0,source_mode=bridge,mac=52:54:00:55:ea:03 \
+--network type=direct,source=enp1s0,source_mode=bridge,mac=52:54:00:55:ea:01 \
+--network type=direct,source=enp2s0,source_mode=bridge,mac=52:54:00:55:ea:02 \
+--network type=direct,source=eno1,source_mode=bridge,mac=52:54:00:55:ea:03 \
 --disk /var/lib/libvirt/images/pfsense.img \
 --os-variant=freebsd13.1 \
 --graphics vnc \
