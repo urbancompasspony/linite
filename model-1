@@ -135,6 +135,12 @@ function startvm {
 }
 
 function create_pfsense {
+
+# enp1s0 = ETH0
+# enp2s0 = ETH1
+# eno1 = enp3s0 = ETH2
+# ETH3 is macvlan docker
+
   virt-install --import \
 --name pfSense \
 --boot hd,cdrom,menu=on \
@@ -149,6 +155,10 @@ function create_pfsense {
 --graphics vnc \
 --import \
 --autostart 1>/dev/null 2>/dev/null &
+}
+
+function set_docker {
+  docker network create -d macvlan --subnet="172.25.0.0"/24 --gateway="172.25.0.1" -o parent="enp4s0" macvlan
 }
 
 # ============================================================================ #
@@ -231,22 +241,26 @@ sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print
   clear; echo "Ajustando JOURNAL"
   journaladjust
   sleep 3
-  clear; echo "Adicionando modelo Netplan"
+  clear; echo "Ajustando Netplan"
   netplan1
   sudo netplan apply
   sleep 3
   clear; echo "Criando novos /tmp"
   tmpfstab
   sleep 3
-  clear; echo "Definindo permissoes ao LibVirt"
+  clear; echo "Dando permissoes ao LibVirt"
   sudo chmod 777 /var/run/libvirt/libvirt-sock
   sleep 3
   clear; echo "Adicionando modelo SAMBA AD"
   smbconfig
   sleep 3
+  clear; echo "Definindo MACVLAN para os containers"
+  set_docker
+  sleep 3
   clear; echo "Criando um Beep bonitinho se tiver speaker no servidor!"
   beep
-  clear; echo "Adicionando VM pfSense"
+  sleep 3
+  clear; echo "Adicionando VM do pfSense"
   startvm
   sleep 3
   clear; echo "Instalação concluida!"
