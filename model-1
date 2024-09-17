@@ -2,7 +2,10 @@
 
 # ============================================================================ #
 
+# HOW TO USE/INSTALL:
 # curl -sSL https://m.linuxuniverse.com.br | bash
+
+# ============================================================================ #
 
 export mainrelease="DISTRIB_RELEASE=22.04"
 export mainhard="J4125"
@@ -20,6 +23,7 @@ destpath="/var/lib/libvirt/images"
 serverip="172.20.0.22"
 lanhost="http://$serverip"
 wanhost="http://z.net-freaks.com:3434"
+
 usern4me="admin"
 passw0rd="isorulez"
 
@@ -35,13 +39,12 @@ else
     webadress="$wanhost"
 fi
 
-# ============================================================================ #
-
 function sysctlconf {
 echo -e "kernel.sysrq=1
 vm.panic_on_oom=1
 vm.swappiness=10
 kernel.panic=5
+
 #net.ipv4.ip_forward=1
 #net.ipv6.conf.all.disable_ipv6=1
 #net.ipv6.conf.default.disable_ipv6=1" | sudo tee -a /etc/sysctl.conf
@@ -130,6 +133,7 @@ function startvm {
     clear
     sudo wget --user $usern4me --password $passw0rd $webadress/$1 -O $destpath/$1
     sudo chmod 777 -R "$destpath"
+
     create_pfsense
   }
 }
@@ -152,7 +156,7 @@ function create_pfsense {
 --network type=direct,source=eno1,source_mode=bridge,mac=52:54:00:55:ea:03 \
 --disk /var/lib/libvirt/images/pfsense.img \
 --os-variant=freebsd13.1 \
---graphics vnc \
+--graphics spice \
 --import \
 --autostart 1>/dev/null 2>/dev/null &
 }
