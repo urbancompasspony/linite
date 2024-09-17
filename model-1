@@ -20,6 +20,7 @@ gpm tmux xinit xorg openbox pavucontrol caja epiphany-browser gparted gnome-disk
 qemu-system qemu-utils qemu-user qemu-kvm qemu-guest-agent libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq genisoimage"
 
 destpath="/var/lib/libvirt/images"
+pathsrv="/srv/containers/scripts/config"
 serverip="172.20.0.22"
 lanhost="http://$serverip"
 wanhost="http://z.net-freaks.com:3434"
@@ -28,9 +29,6 @@ usern4me="admin"
 passw0rd="isorulez"
 
 # ============================================================================ #
-
-sudo mkdir -p "$destpath"
-sudo chmod 777 -R "$destpath"
 
 # Check where get the .img file
 if ping -c 1 $serverip >/dev/null; then
@@ -228,10 +226,12 @@ sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print
   echo "3"; sleep 1
   echo "2"; sleep 1
   echo "1"; sleep 1
-  clear; echo "Preparando sistema...."; echo ""
+  clear; echo "Preparando sistema.... e configurando bashrc"; echo ""
+  sudo mkdir -p "$destpath"; sudo chmod 777 -R "$destpath"
+  sudo mkdir -p "$pathsrv"
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
   . .bashrc
-  clear; echo "Criando SWAP caso não exista"
+  clear; echo "Criando swapfile caso não exista"
   mkswap0
   clear; echo "Removendo pacotes inuteis"; echo ""
   sudo apt purge needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolution-data-server bluez blueman bluetooth -y
