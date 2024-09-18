@@ -273,7 +273,7 @@ urbancompasspony/xpra-virt-manager:latest &
 hardversion=$(cat /proc/cpuinfo | grep 'model name' | head -n 1 | awk -F: '{ print $2 }' | cut -d ' ' -f 3,4)
 
 [ "$hardversion" = "$mainhard" ] && {
-  clear; echo "Tudo ok, prosseguindo!"; sleep 1
+  clear; echo "Hardware adequado, prosseguindo!"; sleep 1
 } || {
   clear; echo ""; echo "HARDWARE INADEQUADO DETECTADO!"
   echo "Este sistema exige o hardware 'Appliance 4x Gigabit Celeron J4125' e voce esta usando o $hardversion"
@@ -285,7 +285,7 @@ hardversion=$(cat /proc/cpuinfo | grep 'model name' | head -n 1 | awk -F: '{ pri
 sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print $1}')
 
 [ "$sysversion" = "$mainrelease" ] && {
-  clear; echo "Tudo ok, prosseguindo!"; sleep 1
+  clear; echo "Versão do Ubuntu Server adequado, prosseguindo!"; sleep 1
 } || {
   clear
   echo ""
