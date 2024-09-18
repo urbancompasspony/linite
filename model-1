@@ -306,9 +306,9 @@ sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print
   echo "Se esta executando esse comando apos instalar o Ubuntu Server AutoInstaller, a senha padrao eh: ubuntu"; sleep 5
   echo "5"; sleep 1; echo "4"; sleep 1; echo "3"; sleep 1; echo "2"; sleep 1; echo "1"; sleep 1
   clear; echo "Preparando sistema.... e configurando bashrc"; echo ""
-  sudo mkdir -p "$destpath"; sudo chmod 777 -R "$destpath"; sudo mkdir -p "$pathsrv"
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
   . .bashrc
+  sudo mkdir -p "$destpath"; sudo chmod 777 -R "$destpath"; sudo mkdir -p "$pathsrv"
   clear; echo "Criando swapfile caso não exista"
   mkswap0
   clear; echo "Removendo pacotes inuteis"; echo ""
