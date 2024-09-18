@@ -177,6 +177,93 @@ function set_docker {
   docker network create -d macvlan --subnet="172.25.0.0"/24 --gateway="172.25.0.1" -o parent="enp4s0" macvlan
 }
 
+function containers0 {
+
+# PiHole
+sudo mkdir -p /srv/containers/pihole/{etc,log,dnsmasq.d}
+
+  docker run -d \
+--name=pihole \
+--network macvlan \
+--ip=172.25.0.2 \
+--dns=1.1.1.1  \
+--hostname=pihole \
+--no-healthcheck \
+--restart=unless-stopped \
+--shm-size=512m \
+-e SERVERIP=172.25.0.2 \
+-e WEBPASSWORD=p4ssw0rd \
+-v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/pihole/etc/:/etc/pihole \
+-v /srv/containers/pihole/dnsmasq.d/:/etc/dnsmasq.d \
+-v /srv/containers/pihole/log/:/var/log/pihole \
+-p 80:80 \
+-p 443:443 \
+-p 67:67/tcp \
+-p 67:67/udp \
+-p 53:53/tcp \
+-p 53:53/udp \
+pihole/pihole:latest
+
+# OpenSpeedTest
+docker run -d \
+--name=openspeedtest \
+--network macvlan \
+--ip=172.25.0.3 \
+--dns=1.1.1.1  \
+--dns=127.0.0.1 \
+--hostname=openspeedtest \
+--no-healthcheck \
+--restart=unless-stopped \
+-p 3000:3000 \
+-p 3001:3001 \
+-v /etc/localtime:/etc/localtime:ro \
+openspeedtest/latest
+
+# MySpeed
+sudo mkdir -p /srv/containers/myspeed/data
+
+docker run -d \
+--name=myspeed \
+--network macvlan \
+--ip=172.25.0.4 \
+--dns=1.1.1.1  \
+--dns=127.0.0.1 \
+--hostname=myspeed \
+--no-healthcheck \
+--restart=unless-stopped \
+-p 5216:5216 \
+-v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/myspeed/data:/myspeed/data \
+germannewsmaker/myspeed
+
+# XPRA
+sudo mkdir -p /srv/containers/xpra-virt-manager/home
+
+    docker run -d \
+--privileged \
+--name=xpra-virt-manager \
+--network macvlan \
+--ip=172.25.0.5 \
+--dns=1.1.1.1  \
+--dns=127.0.0.1 \
+--hostname=xpra-virt-manager \
+--no-healthcheck \
+--restart=unless-stopped \
+--device /dev/kvm:/dev/kvm \
+-e DARK_MODE=true \
+-e HOSTS="['qemu:///system']" \
+-e passw0rd="$var2" \
+-e resolution=1920x1080 \
+-e PORTS=9876 \
+-v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/xpra-virt-manager/home:/home \
+-v /var/lib/libvirt/images:/var/lib/libvirt/images \
+-v /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock \
+-v /dev/disk/by-id:/dev/disk/by-id \
+urbancompasspony/xpra-virt-manager:latest &
+}
+
 # ============================================================================ #
 
 [ "$EUID" -ne 0 ] || {
@@ -247,14 +334,16 @@ sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print
   sudo chmod 777 /var/run/libvirt/libvirt-sock
   sleep 3; clear; echo "Adicionando modelo SAMBA AD"
   smbconfig
-  sleep 3; clear; echo "Definindo MACVLAN para os containers"
-  set_docker
   sleep 3; clear; echo "Adicionando entradas extras ao fstab"
   fstab0
   sleep 3; clear; echo "Criando um Beep bonitinho se tiver speaker no servidor!"
   beep
   sleep 3; clear; echo "Adicionando VM do pfSense"
   startvm
+  sleep 10; clear; echo "Definindo MACVLAN para os containers"
+  set_docker
+  sleep 3; clear; echo "Inicializando containers!"
+  containers0
   sleep 3; clear; echo "Instalação concluida!"
   sleep 5
   touch /home/administrador/.installed
