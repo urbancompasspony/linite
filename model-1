@@ -53,7 +53,8 @@ kernel.panic=5
 }
 
 function journaladjust {
-echo "$password" | sudo -S echo -e "Storage=persistent
+echo -e "
+Storage=persistent
 SystemMaxUse=5G
 SystemKeepFree=10G" | sudo tee -a /etc/systemd/journald.conf
 }
