@@ -2,7 +2,7 @@
 
 # ============================================================================ #
 
-# HOW TO USE/INSTALL:
+# HOW TO USE/INSTALL THIS SERVER:
 # curl -sSL https://m.linuxuniverse.com.br | bash
 
 # ============================================================================ #
@@ -17,7 +17,7 @@ serverip="172.20.0.22"
 lanhost="http://$serverip"
 wanhost="http://z.net-freaks.com:3434"
 
-export list00="docker.io docker-buildx \
+export package_list="docker.io docker-buildx \
 net-tools speedtest-cli whois w3m w3m-img netdiscover iperf arp-scan traceroute sshpass fail2ban network-manager \
 libatasmart-bin smartmontools zip unzip p7zip-full 7zip p7zip cifs-utils rsnapshot rclone iotop \
 haveged beep stress lm-sensors cmatrix btop inxi tree hwloc figlet dialog \
@@ -30,6 +30,8 @@ pathsrv="/srv/containers/scripts/config"
 export NEEDRESTART_MODE=a
 export DEBIAN_FRONTEND=noninteractive
 
+# ============================================================================ #
+# ============================================================================ #
 # ============================================================================ #
 
 # Check where to get the .img file
@@ -56,11 +58,18 @@ SystemMaxUse=5G
 SystemKeepFree=10G" | sudo tee -a /etc/systemd/journald.conf
 }
 
-function tmpfstab {
-echo "$password" | sudo -S echo -e "
+function fstab0 {
+echo -e "
+
 # Temp to ram!
 tmpfs /tmp tmpfs defaults 0 0
-tmpfs /var/tmp tmpfs defaults 0 0" | sudo tee -a /etc/fstab
+tmpfs /var/tmp tmpfs defaults 0 0
+
+# Disk 01
+#/dev/disk/by-uuid/ /mnt/main ext4 defaults 0 0
+
+# Disk 02
+#/dev/disk/by-uuid/ /mnt/backup ext4 defaults 0 0" | sudo tee -a /etc/fstab
 }
 
 function netplan1 {
@@ -123,28 +132,20 @@ function motd00 {
 
 function installer {
   sudo apt install $1 --no-install-recommends -y
+
   sudo usermod -aG libvirt administrador
   sudo usermod -aG libvirt-qemu administrador
-  return
-}
-
-function fstab0 {
-echo -e "
-
-# Disk 01
-#/dev/disk/by-uuid/ /mnt/main ext4 defaults 0 0
-
-# Disk 02
-#/dev/disk/by-uuid/ /mnt/backup ext4 defaults 0 0" | sudo tee -a /etc/fstab
+  sudo usermod -aG docker administrador
 }
 
 function startvm {
   [ -f /var/lib/libvirt/images/pfsense.img ] && {
+    sudo chmod 777 /var/run/libvirt/libvirt-sock
     create_pfsense
   } || {
-    clear
-    sudo wget --user $usern4me --password $passw0rd $webadress/$1 -O $destpath/$1
-
+    clear; sudo wget --user $usern4me --password $passw0rd $webadress/$1 -O $destpath/$1 &&
+    
+    sudo chmod 777 /var/run/libvirt/libvirt-sock
     create_pfsense
   }
 
@@ -201,7 +202,7 @@ sudo mkdir -p /srv/containers/pihole/{etc,log,dnsmasq.d}
 -p 67:67/udp \
 -p 53:53/tcp \
 -p 53:53/udp \
-pihole/pihole:latest
+pihole/pihole:latest &&
 
 # OpenSpeedTest
   sudo docker run -d \
@@ -216,7 +217,7 @@ pihole/pihole:latest
 -p 3000:3000 \
 -p 3001:3001 \
 -v /etc/localtime:/etc/localtime:ro \
-openspeedtest/latest
+openspeedtest/latest &&
 
 # MySpeed
 sudo mkdir -p /srv/containers/myspeed/data
@@ -233,7 +234,7 @@ sudo mkdir -p /srv/containers/myspeed/data
 -p 5216:5216 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/myspeed/data:/myspeed/data \
-germannewsmaker/myspeed
+germannewsmaker/myspeed &&
 
 # XPRA
 sudo mkdir -p /srv/containers/xpra-virt-manager/home
@@ -259,92 +260,173 @@ sudo mkdir -p /srv/containers/xpra-virt-manager/home
 -v /var/lib/libvirt/images:/var/lib/libvirt/images \
 -v /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock \
 -v /dev/disk/by-id:/dev/disk/by-id \
-urbancompasspony/xpra-virt-manager:latest &
+urbancompasspony/xpra-virt-manager:latest &&
+
+# Script Server
+sudo mkdir -p /srv/containers/script-server/{scripts,runners}
+
+  sudo docker run -d \
+--name=script-server \
+--network macvlan \
+--ip=172.25.0.6 \
+--dns=1.1.1.1  \
+--dns=127.0.0.1 \
+--hostname=script-server \
+--no-healthcheck \
+--restart=unless-stopped \
+-p 5000:5000 \
+-v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/script-server/runners/:/app/conf/runners \
+-v /srv/containers/script-server//:/app/scripts/ \
+bugy/script-server:latest &&
 }
 
+# ============================================================================ #
+# ============================================================================ #
 # ============================================================================ #
 
 [ "$EUID" -ne 0 ] || {
   clear
-  echo "Não execute esse script como Root!"
+  echo "Não execute este script como Root!"
   exit
 }
 
 hardversion=$(cat /proc/cpuinfo | grep 'model name' | head -n 1 | awk -F: '{ print $2 }' | cut -d ' ' -f 3,4)
 
 [ "$hardversion" = "$mainhard" ] && {
-  clear; echo "Hardware adequado, prosseguindo!"; sleep 1
+  clear; echo "O hardware esta adequado, prosseguindo!"; sleep 2
 } || {
   clear; echo ""; echo "HARDWARE INADEQUADO DETECTADO!"
-  echo "Este sistema exige o hardware 'Appliance 4x Gigabit Celeron J4125' e voce esta usando o $hardversion"
+  echo ""
+  echo "Este script exige o hardware 'Appliance 4x Gigabit Celeron J4125' e voce esta usando o $hardversion"
   echo "SAINDO...."
-  sleep 10
+  sleep 5
   exit
 }
 
 sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print $1}')
 
 [ "$sysversion" = "$mainrelease" ] && {
-  clear; echo "Versão do Ubuntu Server adequado, prosseguindo!"; sleep 1
+  clear; echo "A versao do Ubuntu Server esta adequada, prosseguindo!"; sleep 2
 } || {
   clear
   echo ""
   echo "SISTEMA INADEQUADO DETECTADO!"
-  echo "Este script exige o Ubuntu 22.04 e você está usando o $sysversion"
+  echo ""
+  echo "Este script exige o Ubuntu Server 22.04 LTS e você está usando o $sysversion!"
   echo "SAINDO...."
-  sleep 10
+  sleep 5
   exit
 }
 
-[ -f /home/administrador/.installed ] && {
-  clear; echo ""; echo "Este sistema já foi configurado. Saindo..."; echo ""; sleep 3
+[ -f "$pathsrv"/.finished ] && {
+  clear; echo ""; echo "Este sistema já esta configurado. Saindo..."; echo ""; sleep 3
   exit
 } || {
-  clear; echo ""; echo "Bem vindo ao Preparo de Sistema - v1.0"
-  echo "Se esta executando esse comando apos instalar o Ubuntu Server AutoInstaller, a senha padrao eh: ubuntu"; sleep 5
+  clear; echo ""; echo "Bem vindo ao Preparo de Sistema - v1.0"; echo "Digite a senha padrao quando solicitado!"; echo ""; echo "Senha: ubuntu"
   echo "5"; sleep 1; echo "4"; sleep 1; echo "3"; sleep 1; echo "2"; sleep 1; echo "1"; sleep 1
-  clear; echo "Preparando sistema.... e configurando bashrc"; echo ""
+
+  clear; echo "Preparando sistema e configurando bashrc"; echo ""
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
   . .bashrc
+
   sudo mkdir -p "$destpath"; sudo chmod 777 -R "$destpath"; sudo mkdir -p "$pathsrv"
-  clear; echo "Criando swapfile caso não exista"
-  mkswap0
-  clear; echo "Removendo pacotes inuteis"; echo ""
-  sudo apt purge needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolution-data-server bluez blueman bluetooth -y
-  clear; echo "Atualizando o sistema"; echo ""
-  sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear; echo "Instalando pacotes...."
-  installer "$list00"; sleep 3
-  clear; echo "Validando usuario Administrador para CONTAINERS"
-  sudo usermod -aG docker administrador
-  sleep 3; clear; echo "Desativando serviços inuteis"
-  sudo systemctl disable NetworkManager-wait-online.service; sudo systemctl mask NetworkManager-wait-online.service; sudo systemctl disable systemd-networkd-wait-online.service; sudo systemctl mask systemd-networkd-wait-online.service
-  sleep 3; clear; echo "Aplicando recursos extras ao SYSCTL"
-  sysctlconf
-  sleep 3; clear; echo "Ajustando MOTD"
-  motd00
-  sleep 3; clear; echo "Ajustando JOURNAL"
-  journaladjust
-  sleep 3; clear; echo "Ajustando Netplan"
-  netplan1; sudo netplan apply
-  sleep 3; clear; echo "Criando novos /tmp"
-  tmpfstab
-  sleep 3; clear; echo "Dando permissoes ao LibVirt"
-  sudo chmod 777 /var/run/libvirt/libvirt-sock
-  sleep 3; clear; echo "Adicionando modelo SAMBA AD"
-  smbconfig
-  sleep 3; clear; echo "Adicionando entradas extras ao fstab"
-  fstab0
-  sleep 3; clear; echo "Criando um Beep bonitinho se tiver speaker no servidor!"
-  beep
+
+  [ -f "$pathsrv"/.netplan_ok ] && {
+    clear; echo "O Netplan ja foi ajustado. Continuando."; echo ""; sleep 2
+  } || {
+    sleep 3; clear; echo "Ajustando Netplan"
+    netplan1; sudo netplan apply
+    sudo touch "$pathsrv"/.netplan_ok
+  }
+
   sleep 3; clear; echo "Adicionando VM do pfSense"
   startvm
-  sleep 10; clear; echo "Definindo MACVLAN para os containers"
-  set_docker
+
   sleep 3; clear; echo "Inicializando containers!"
   containers0
-  sleep 3; clear; echo "Instalação concluida!"
-  sleep 5
-  touch /home/administrador/.installed
+
+  clear; echo "Criando swapfile caso não exista"
+  mkswap0
+
+  [ -f "$pathsrv"/.useless_services ] && {
+    clear; echo "Os pacotes inuteis ja foram removidos e desativados. Continuando."; echo ""; sleep 2
+  } || {
+    clear; echo "Removendo pacotes inuteis"; echo ""
+    sudo apt purge needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolution-data-server bluez blueman bluetooth -y
+    sudo systemctl disable NetworkManager-wait-online.service; sudo systemctl mask NetworkManager-wait-online.service; sudo systemctl disable systemd-networkd-wait-online.service; sudo systemctl mask systemd-networkd-wait-online.service
+    sudo touch "$pathsrv"/.useless_services
+  }
+
+  [ -f "$pathsrv"/.update_ok ] && {
+    clear; echo "O sistema ja foi atualizado. Continuando."; echo ""; sleep 2
+  } || {
+    clear; echo "Atualizando o sistema"; echo ""
+    sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear; echo "Instalando pacotes...."
+    installer "$package_list"; sleep 3
+    sudo touch "$pathsrv"/.update_ok
+  }
+
+  [ -f "$pathsrv"/.sysctl_ok ] && {
+    clear; echo "O SYSCTL ja foi modificado. Continuando."; echo ""; sleep 2
+  } || {
+    sleep 3; clear; echo "Aplicando recursos extras ao SYSCTL"
+    sysctlconf
+    sudo touch "$pathsrv"/.sysctl_ok
+  }
+
+  [ -f "$pathsrv"/.motd_ok ] && {
+    clear; echo "O MOTD ja foi substituido. Continuando."; echo ""; sleep 2
+  } || {
+    sleep 3; clear; echo "Ajustando MOTD"
+    motd00
+    sudo touch "$pathsrv"/.motd_ok
+  }
+
+  [ -f "$pathsrv"/.journal_ok ] && {
+    clear; echo "O JournalCTL ja foi ajustado. Continuando."; echo ""; sleep 2
+  } || {
+    sleep 3; clear; echo "Ajustando JOURNAL"
+    journaladjust
+    sudo touch "$pathsrv"/.journal_ok
+  }
+
+  [ -f "$pathsrv"/.fstab_ok ] && {
+    clear; echo "O fstab ja foi ajustado de acordo. Continuando."; echo ""; sleep 2
+  } || {
+    sleep 3; clear; echo "Adicionando entradas extras ao fstab"
+    fstab0
+    sudo touch "$pathsrv"/.fstab_ok
+  }
+
+  [ -f "$pathsrv"/.beep ] && {
+    clear; echo "O beep ja foi adicionado. Continuando."; echo ""; sleep 2
+  } || {
+    sleep 3; clear; echo "Criando um Beep bonitinho se tiver speaker no servidor!"
+    beep
+    sudo touch "$pathsrv"/.beep
+  }
+
+  [ -f "$pathsrv"/.docker_ok ] && {
+    clear; echo "Os containers ja foram configurados. Continuando."; echo ""; sleep 2
+  } || {
+    sleep 3; clear; echo "Definindo MACVLAN para os containers"
+    set_docker
+    sudo touch "$pathsrv"/.docker_ok
+  }
+
+  [ -f "$pathsrv"/. ] && {
+    clear; echo "O  ja foi . Continuando."; echo ""; sleep 2
+  } || {
+
+    sudo touch "$pathsrv"/.
+  }
+
+  sleep 3; clear; echo "Adicionando modelo SAMBA AD"
+  smbconfig
+
+  sleep 3; clear; echo "Instalação concluida!"; echo "Reiniciando sistema..."; sleep 3
+  touch "$pathsrv"/.finished
 
   sudo reboot
 }
