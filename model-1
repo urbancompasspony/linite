@@ -32,11 +32,11 @@ export DEBIAN_FRONTEND=noninteractive
 
 # ============================================================================ #
 
-# Check where get the .img file
+# Check where to get the .img file
 if ping -c 1 $serverip >/dev/null; then
-    webadress="$lanhost"
+  webadress="$lanhost"
 else
-    webadress="$wanhost"
+  webadress="$wanhost"
 fi
 
 function sysctlconf {
@@ -103,12 +103,13 @@ function beep {
 
 function mkswap0 {
   [ -f /swapfile ] && {
-    echo "." >/dev/zero
+    echo "Swap localizada!"
   } || {
     sudo dd if=/dev/zero of=/swapfile bs=1k count=1000000
     sudo chmod 0600 /swapfile
     sudo mkswap /swapfile; sudo swapon /swapfile
     echo "/swapfile none swap sw 0 0" | sudo tee -a /etc/fstab
+    echo "Swap criada com sucesso."
   }
 }
 
@@ -137,6 +138,7 @@ function startvm {
 
     create_pfsense
   }
+
 }
 
 function fstab0 {
@@ -150,7 +152,6 @@ echo -e "
 }
 
 function create_pfsense {
-
 # enp1s0 = ETH0
 # enp2s0 = ETH1
 # eno1 = enp3s0 = ETH2
@@ -182,17 +183,14 @@ function set_docker {
   clear
   echo "Não execute esse script como Root!"
   exit
-  }
+}
 
 hardversion=$(cat /proc/cpuinfo | grep 'model name' | head -n 1 | awk -F: '{ print $2 }' | cut -d ' ' -f 3,4)
 
 [ "$hardversion" = "$mainhard" ] && {
-  clear; echo "Tudo ok, prosseguindo!"
-  sleep 1
+  clear; echo "Tudo ok, prosseguindo!"; sleep 1
 } || {
-  clear
-  echo ""
-  echo "HARDWARE INADEQUADO DETECTADO!"
+  clear; echo ""; echo "HARDWARE INADEQUADO DETECTADO!"
   echo "Este sistema exige o hardware 'Appliance 4x Gigabit Celeron J4125' e voce esta usando o $hardversion"
   echo "SAINDO...."
   sleep 10
@@ -202,8 +200,7 @@ hardversion=$(cat /proc/cpuinfo | grep 'model name' | head -n 1 | awk -F: '{ pri
 sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print $1}')
 
 [ "$sysversion" = "$mainrelease" ] && {
-  clear; echo "Tudo ok, prosseguindo!"
-  sleep 1
+  clear; echo "Tudo ok, prosseguindo!"; sleep 1
 } || {
   clear
   echo ""
@@ -215,22 +212,14 @@ sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print
 }
 
 [ -f /home/administrador/.installed ] && {
-  clear; echo ""; echo "Sistema já configurado. Saindo..."; echo ""; sleep 3
+  clear; echo ""; echo "Este sistema já foi configurado. Saindo..."; echo ""; sleep 3
   exit
 } || {
-  clear
-  echo ""
-  echo "Bem vindo ao Preparo de Sistema - v1.0"
-  echo "Se esta executando esse comando apos instalar o Ubuntu Server AutoInstaller, a senha padrao eh: ubuntu"
-  sleep 5
-  echo "5"; sleep 1
-  echo "4"; sleep 1
-  echo "3"; sleep 1
-  echo "2"; sleep 1
-  echo "1"; sleep 1
+  clear; echo ""; echo "Bem vindo ao Preparo de Sistema - v1.0"
+  echo "Se esta executando esse comando apos instalar o Ubuntu Server AutoInstaller, a senha padrao eh: ubuntu"; sleep 5
+  echo "5"; sleep 1; echo "4"; sleep 1; echo "3"; sleep 1; echo "2"; sleep 1; echo "1"; sleep 1
   clear; echo "Preparando sistema.... e configurando bashrc"; echo ""
-  sudo mkdir -p "$destpath"; sudo chmod 777 -R "$destpath"
-  sudo mkdir -p "$pathsrv"
+  sudo mkdir -p "$destpath"; sudo chmod 777 -R "$destpath"; sudo mkdir -p "$pathsrv"
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
   . .bashrc
   clear; echo "Criando swapfile caso não exista"
@@ -238,58 +227,38 @@ sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print
   clear; echo "Removendo pacotes inuteis"; echo ""
   sudo apt purge needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolution-data-server bluez blueman bluetooth -y
   clear; echo "Atualizando o sistema"; echo ""
-  sudo apt update
-  sudo apt upgrade -y
-  sudo apt autoremove -y
-  clear; echo "Instalando pacotes...."
-  installer "$list00"
-  sleep 3
+  sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear; echo "Instalando pacotes...."
+  installer "$list00"; sleep 3
   clear; echo "Validando usuario Administrador para CONTAINERS"
   sudo usermod -aG docker administrador
-  sleep 3
-  clear; echo "Desativando serviços inuteis"
-  sudo systemctl disable NetworkManager-wait-online.service
-  sudo systemctl mask NetworkManager-wait-online.service
-  sudo systemctl disable systemd-networkd-wait-online.service
-  sudo systemctl mask systemd-networkd-wait-online.service
-  sleep 3
-  clear; echo "Aplicando recursos extras ao SYSCTL"
+  sleep 3; clear; echo "Desativando serviços inuteis"
+  sudo systemctl disable NetworkManager-wait-online.service; sudo systemctl mask NetworkManager-wait-online.service; sudo systemctl disable systemd-networkd-wait-online.service; sudo systemctl mask systemd-networkd-wait-online.service
+  sleep 3; clear; echo "Aplicando recursos extras ao SYSCTL"
   sysctlconf
-  sleep 3
-  clear; echo "Ajustando MOTD"
+  sleep 3; clear; echo "Ajustando MOTD"
   motd00
-  sleep 3
-  clear; echo "Ajustando JOURNAL"
+  sleep 3; clear; echo "Ajustando JOURNAL"
   journaladjust
-  sleep 3
-  clear; echo "Ajustando Netplan"
-  netplan1
-  sudo netplan apply
-  sleep 3
-  clear; echo "Criando novos /tmp"
+  sleep 3; clear; echo "Ajustando Netplan"
+  netplan1; sudo netplan apply
+  sleep 3; clear; echo "Criando novos /tmp"
   tmpfstab
-  sleep 3
-  clear; echo "Dando permissoes ao LibVirt"
+  sleep 3; clear; echo "Dando permissoes ao LibVirt"
   sudo chmod 777 /var/run/libvirt/libvirt-sock
-  sleep 3
-  clear; echo "Adicionando modelo SAMBA AD"
+  sleep 3; clear; echo "Adicionando modelo SAMBA AD"
   smbconfig
-  sleep 3
-  clear; echo "Definindo MACVLAN para os containers"
+  sleep 3; clear; echo "Definindo MACVLAN para os containers"
   set_docker
-  sleep 3
-  clear; echo "Adicionando entradas extras ao fstab"
+  sleep 3; clear; echo "Adicionando entradas extras ao fstab"
   fstab0
-  sleep 3
-  clear; echo "Criando um Beep bonitinho se tiver speaker no servidor!"
+  sleep 3; clear; echo "Criando um Beep bonitinho se tiver speaker no servidor!"
   beep
-  sleep 3
-  clear; echo "Adicionando VM do pfSense"
+  sleep 3; clear; echo "Adicionando VM do pfSense"
   startvm
-  sleep 3
-  clear; echo "Instalação concluida!"
+  sleep 3; clear; echo "Instalação concluida!"
   sleep 5
   touch /home/administrador/.installed
+
   sudo reboot
 }
 
