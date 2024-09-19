@@ -2,8 +2,6 @@
 
 # ============================================================================ #
 
-# HOW TO USE/INSTALL THIS SERVER:
-
 # curl -L m.linuxuniverse.com.br | bash
 
 # ============================================================================ #
@@ -26,11 +24,10 @@ gpm tmux xinit xorg openbox pavucontrol caja epiphany-browser gparted gnome-disk
 qemu-system qemu-utils qemu-user qemu-kvm qemu-guest-agent libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq genisoimage"
 
 destpath="/var/lib/libvirt/images"
-pathsrv="/srv/containers/scripts/config/install"
+export pathsrv="/srv/containers/scripts/config/install"
 
 export NEEDRESTART_MODE=a
 export DEBIAN_FRONTEND=noninteractive
-export pathsrv
 
 # ============================================================================ #
 
