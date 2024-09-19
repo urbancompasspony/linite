@@ -326,23 +326,23 @@ function check0 {
   }
 }
 
+# ============================================================================ #
+
 function last_check {
   [ -f /home/administrador/.installed ] && {
     clear; echo ""; echo "Este servidor foi configurado previamente com outra versao do Linite. Devido ao risco de perdas de dados o instalador vai ser encerrado."; sleep 2
     exit
   } || {
-    clear; echo "Este sistema nao foi previamente configurado pelo usuario administrador. Continuando..."; sleep 1
+    echo . >/dev/null
   }
 
   sudo [ -f /root/.installed ] && {
     clear; echo ""; echo "Este servidor foi configurado previamente com outra versao do Linite. Devido ao risco de perdas de dados o instalador vai ser encerrado."; sleep 2
     exit
   } || {
-    clear; echo "Este sistema nao foi previamente configurado pelo usuario root. Continuando..."; sleep 1
+    echo . >/dev/null
   }
 }
-
-# ============================================================================ #
 
 [ "$EUID" -ne 0 ] || {
   clear
@@ -351,9 +351,8 @@ function last_check {
 }
 
 hardversion=$(cat /proc/cpuinfo | grep 'model name' | head -n 1 | awk -F: '{ print $2 }' | cut -d ' ' -f 3,4)
-
 [ "$hardversion" = "$mainhard" ] && {
-  clear; echo "O hardware esta adequado, prosseguindo!"; sleep 2
+  echo . >/dev/null
 } || {
   clear; echo ""; echo "HARDWARE INADEQUADO DETECTADO!"
   echo ""
@@ -364,9 +363,8 @@ hardversion=$(cat /proc/cpuinfo | grep 'model name' | head -n 1 | awk -F: '{ pri
 }
 
 sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print $1}')
-
 [ "$sysversion" = "$mainrelease" ] && {
-  clear; echo "A versao do Ubuntu Server esta adequada, prosseguindo!"; sleep 2
+  echo . >/dev/null
 } || {
   clear
   echo ""
@@ -378,13 +376,15 @@ sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print
   exit
 }
 
+# ============================================================================ #
+
 [ -f "$pathsrv"/finished ] && {
   clear; echo ""; echo "Este sistema já esta configurado. Saindo..."; echo ""; sleep 3
   exit
 
 } || {
 
-  clear; echo ""; echo "Bem vindo ao Preparo de Sistema - v1.0"; echo "Digite a senha padrao quando solicitado!"; echo ""; echo "Senha: ubuntu"
+  clear; echo ""; echo "Bem vindo ao Preparo de Sistema - v1.0"; echo "Digite a senha padrao quando solicitado!"; echo ""; echo "Senha: ubuntu"; echo ""
   echo "5"; sleep 1; echo "4"; sleep 1; echo "3"; sleep 1; echo "2"; sleep 1; echo "1"; sleep 1
 
   clear; echo "Preparando sistema e configurando bashrc"; echo ""
@@ -395,12 +395,21 @@ sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print
 
   last_check
 
+  [ -f "$pathsrv"/useless_services ] && {
+    clear; echo "Os pacotes inuteis ja foram removidos e desativados. Continuando."; echo ""; sleep 2
+  } || {
+    clear; echo "Removendo pacotes inuteis"; echo ""
+    sudo apt purge needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolution-data-server bluez blueman bluetooth -y
+    sudo systemctl disable NetworkManager-wait-online.service; sudo systemctl mask NetworkManager-wait-online.service; sudo systemctl disable systemd-networkd-wait-online.service; sudo systemctl mask systemd-networkd-wait-online.service
+    sudo touch "$pathsrv"/useless_services
+  }
+
   [ -f "$pathsrv"/update_ok ] && {
     clear; echo "O sistema ja foi atualizado e os pacotes necessarios instalados. Continuando."; echo ""; sleep 2
   } || {
     clear; echo "Atualizando o sistema"; echo ""
     sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear; echo "Instalando pacotes...."
-    installer "$package_list"; sleep 3
+    installer "$package_list"; sleep 2
     sudo touch "$pathsrv"/update_ok
   }
 
@@ -460,15 +469,6 @@ sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print
     sleep 3; clear; echo "Inicializando containers!"
     containers0
     sudo touch "$pathsrv"/docker_ok
-  }
-
-  [ -f "$pathsrv"/useless_services ] && {
-    clear; echo "Os pacotes inuteis ja foram removidos e desativados. Continuando."; echo ""; sleep 2
-  } || {
-    clear; echo "Removendo pacotes inuteis"; echo ""
-    sudo apt purge needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolution-data-server bluez blueman bluetooth -y
-    sudo systemctl disable NetworkManager-wait-online.service; sudo systemctl mask NetworkManager-wait-online.service; sudo systemctl disable systemd-networkd-wait-online.service; sudo systemctl mask systemd-networkd-wait-online.service
-    sudo touch "$pathsrv"/useless_services
   }
 
   [ -f "$pathsrv"/sysctl_ok ] && {
