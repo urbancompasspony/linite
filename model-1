@@ -32,10 +32,6 @@ export DEBIAN_FRONTEND=noninteractive
 
 # ============================================================================ #
 
-
-
-# ============================================================================ #
-
 # Check where to get the .img file
 if ping -c 1 $serverip >/dev/null; then
   webadress="$lanhost"
@@ -184,7 +180,7 @@ sudo mkdir -p /srv/containers/pihole/{etc,log,dnsmasq.d}
 --restart=unless-stopped \
 --shm-size=512m \
 -e SERVERIP=172.25.0.2 \
--e WEBPASSWORD=p4ssw0rd \
+-e WEBPASSWORD="$var1" \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/pihole/etc/:/etc/pihole \
 -v /srv/containers/pihole/dnsmasq.d/:/etc/dnsmasq.d \
@@ -198,6 +194,7 @@ sudo mkdir -p /srv/containers/pihole/{etc,log,dnsmasq.d}
 pihole/pihole:latest &&
 
 touch /srv/containers/pihole/Information
+
 echo "172.25.0.2" > /srv/containers/pihole/Information
 echo "$passw0rd" >> /srv/containers/pihole/Information
 echo "0.0.0.0" >> /srv/containers/pihole/Information
@@ -219,29 +216,32 @@ echo "macvlan" >> /srv/containers/pihole/Information
 -v /etc/localtime:/etc/localtime:ro \
 openspeedtest/latest &&
 
-touch /srv/containers/pihole/Information
-echo "172.25.0.2" > /srv/containers/pihole/Information
-echo "$passw0rd" >> /srv/containers/pihole/Information
-echo "0.0.0.0" >> /srv/containers/pihole/Information
-echo "openspeedtest" >> /srv/containers/pihole/Information
-echo "macvlan" >> /srv/containers/pihole/Information
+touch /srv/containers/openspeedtest/Information
+
+echo "openspeedtest" > /srv/containers/pihole/Information
+echo "172.25.0.3" >> /srv/containers/pihole/Information
 
 # MySpeed
-sudo mkdir -p /srv/containers/myspeed/data
+sudo mkdir -p /srv/containers/myspeed-tracker/data
 
   sudo docker run -d \
---name=myspeed \
+--name=myspeed-tracker \
 --network macvlan \
 --ip=172.25.0.4 \
 --dns=1.1.1.1  \
 --dns=127.0.0.1 \
---hostname=myspeed \
+--hostname=myspeed-tracker \
 --no-healthcheck \
 --restart=unless-stopped \
 -p 5216:5216 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/myspeed/data:/myspeed/data \
 germannewsmaker/myspeed &&
+
+touch /srv/containers/myspeed-tracker/Information
+
+echo "myspeed-tracker" > /srv/containers/myspeed-tracker/Information
+echo "172.25.0.4" >> /srv/containers/myspeed-tracker/Information
 
 # XPRA
 sudo mkdir -p /srv/containers/xpra-virt-manager/home
@@ -269,6 +269,14 @@ sudo mkdir -p /srv/containers/xpra-virt-manager/home
 -v /dev/disk/by-id:/dev/disk/by-id \
 urbancompasspony/xpra-virt-manager:latest &&
 
+touch /srv/containers/xpra-virt-manager/Information
+
+echo "xpra-virt-manager" > /srv/containers/xpra-virt-manager/Information
+echo "$var2" >> /srv/containers/xpra-virt-manager/Information
+echo "1920x1080" >> /srv/containers/xpra-virt-manager/Information
+echo "9876" >> /srv/containers/xpra-virt-manager/Information
+echo "172.25.0.5" >> /srv/containers/xpra-virt-manager/Information
+
 # Script Server
 sudo mkdir -p /srv/containers/script-server/{scripts,runners}
 
@@ -284,8 +292,35 @@ sudo mkdir -p /srv/containers/script-server/{scripts,runners}
 -p 5000:5000 \
 -v /etc/localtime:/etc/localtime:ro \
 -v /srv/containers/script-server/runners/:/app/conf/runners \
--v /srv/containers/script-server//:/app/scripts/ \
+-v /srv/containers/script-server/scripts/:/app/scripts/ \
 bugy/script-server:latest &&
+
+touch /srv/containers/script-server/Information
+
+echo "script-server" > /srv/containers/script-server/Information
+echo "172.25.0.6" >> /srv/containers/script-server/Information
+}
+
+function menu0 {
+VALUE0=$(dialog --ok-label "Iniciar" --title "Novo Servidor" --form "Defina as SENHAS a seguir:" 14 50 0 \
+"PiHole: " 1 1 "$VALUE1" 1 11 30 0 \
+"XPRA  : " 2 1 "$VALUE2" 2 11 30 0 \
+"Admin : " 3 1 "$VALUE3" 3 11 30 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+[ $? -ne 0 ] && clear; echo "INSTALACAO CANCELADA."; exit
+var1=$(echo "$VALUE0" | sed -n 1p)
+var2=$(echo "$VALUE0" | sed -n 2p)
+var3=$(echo "$VALUE0" | sed -n 3p)
+
+check0
+}
+
+function check0 {
+  [ "$var1" = "" ] || [ "$var2" = "" ] || [ "$var3" = "" ] &&
+    menu0
+  } || {
+    echo . >/dev/null
+  }
 }
 
 # ============================================================================ #
@@ -346,6 +381,32 @@ sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print
     sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear; echo "Instalando pacotes...."
     installer "$package_list"; sleep 3
     sudo touch "$pathsrv"/update_ok
+  }
+
+  [ -f "$pathsrv"/information ] && {
+    clear; echo "Informacoes coletadas de uma instalacao anterior. Continuando."; echo ""; sleep 2
+    var1=$(sed -n '1p' "$pathsrv"/information)
+    var2=$(sed -n '2p' "$pathsrv"/information)
+    var3=$(sed -n '3p' "$pathsrv"/information)
+    var4=$(sed -n '4p' "$pathsrv"/information)
+    var5=$(sed -n '5p' "$pathsrv"/information)
+  } || {
+    sudo touch "$pathsrv"/information
+    menu0
+
+    echo "$var1" > "$pathsrv"/information
+    echo "$var2" >> "$pathsrv"/information
+    echo "$var3" >> "$pathsrv"/information
+    echo "$var4" >> "$pathsrv"/information
+    echo "$var5" >> "$pathsrv"/information
+  }
+
+  [ -f "$pathsrv"/password_ok ] && {
+    clear; echo "Senha substituida anteriormente. Continuando."; echo ""; sleep 2
+  } || {
+    clear; echo "Trocando a senha do usuario ADMINISTRADOR deste servidor!"
+    echo -e "$var3\n$var3\n" | passwd administrador
+    sudo touch "$pathsrv"/password_ok
   }
 
   [ -f "$pathsrv"/netplan_ok ] && {
