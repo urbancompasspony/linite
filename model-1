@@ -191,11 +191,11 @@ pihole/pihole:latest &&
 
 touch /srv/containers/pihole/Information
 
-echo "172.25.0.2" > /srv/containers/pihole/Information
-echo "$passw0rd" >> /srv/containers/pihole/Information
-echo "0.0.0.0" >> /srv/containers/pihole/Information
-echo "pihole" >> /srv/containers/pihole/Information
-echo "macvlan" >> /srv/containers/pihole/Information
+echo "172.25.0.2" | sudo tee /srv/containers/pihole/Information
+echo "$passw0rd" | sudo tee -a /srv/containers/pihole/Information
+echo "0.0.0.0" | sudo tee -a /srv/containers/pihole/Information
+echo "pihole" | sudo tee -a /srv/containers/pihole/Information
+echo "macvlan" | sudo tee -a /srv/containers/pihole/Information
 
 # OpenSpeedTest
   sudo docker run -d \
@@ -214,8 +214,8 @@ openspeedtest/latest &&
 
 touch /srv/containers/openspeedtest/Information
 
-echo "openspeedtest" > /srv/containers/pihole/Information
-echo "172.25.0.3" >> /srv/containers/pihole/Information
+echo "openspeedtest" | sudo tee /srv/containers/pihole/Information
+echo "172.25.0.3" | sudo tee -a /srv/containers/pihole/Information
 
 # MySpeed
 sudo mkdir -p /srv/containers/myspeed-tracker/data
@@ -236,8 +236,8 @@ germannewsmaker/myspeed &&
 
 touch /srv/containers/myspeed-tracker/Information
 
-echo "myspeed-tracker" > /srv/containers/myspeed-tracker/Information
-echo "172.25.0.4" >> /srv/containers/myspeed-tracker/Information
+echo "myspeed-tracker" | sudo tee /srv/containers/myspeed-tracker/Information
+echo "172.25.0.4" | sudo tee -a /srv/containers/myspeed-tracker/Information
 
 # XPRA
 sudo mkdir -p /srv/containers/xpra-virt-manager/home
@@ -267,11 +267,11 @@ urbancompasspony/xpra-virt-manager:latest &&
 
 touch /srv/containers/xpra-virt-manager/Information
 
-echo "xpra-virt-manager" > /srv/containers/xpra-virt-manager/Information
-echo "$var2" >> /srv/containers/xpra-virt-manager/Information
-echo "1920x1080" >> /srv/containers/xpra-virt-manager/Information
-echo "9876" >> /srv/containers/xpra-virt-manager/Information
-echo "172.25.0.5" >> /srv/containers/xpra-virt-manager/Information
+echo "xpra-virt-manager" | sudo tee /srv/containers/xpra-virt-manager/Information
+echo "$var2" | sudo tee -a /srv/containers/xpra-virt-manager/Information
+echo "1920x1080" | sudo tee -a /srv/containers/xpra-virt-manager/Information
+echo "9876" | sudo tee -a /srv/containers/xpra-virt-manager/Information
+echo "172.25.0.5" | sudo tee -a /srv/containers/xpra-virt-manager/Information
 
 # Script Server
 sudo mkdir -p /srv/containers/script-server/{scripts,runners}
@@ -293,19 +293,21 @@ bugy/script-server:latest &&
 
 touch /srv/containers/script-server/Information
 
-echo "script-server" > /srv/containers/script-server/Information
-echo "172.25.0.6" >> /srv/containers/script-server/Information
+echo "script-server" | sudo tee /srv/containers/script-server/Information
+echo "172.25.0.6" | sudo tee -a /srv/containers/script-server/Information
 }
 
 function menu0 {
 VALUE1="passw0rd"; VALUE2="P4sswrd"; VALUE3="Psswd0"
 
-VALUE0=$(dialog --ok-label "Iniciar" --title "Novo Servidor" --form "Defina as SENHAS a seguir:" 14 50 0 \
-"PiHole: " 1 1 "$VALUE1" 1 11 30 0 \
-"XPRA  : " 2 1 "$VALUE2" 2 11 30 0 \
-"Admin : " 3 1 "$VALUE3" 3 11 30 0 \
+VALUE0=$(dialog --ok-label "Iniciar" --title "Novo Servidor" --form "Defina as SENHAS a seguir, nao deixe em branco:" 11 50 0 \
+"Senha  PiHole:" 1 1 "$VALUE1" 1 15 40 0 \
+"Senha do XPRA:" 2 1 "$VALUE2" 2 15 40 0 \
+"Administrador:" 3 1 "$VALUE3" 3 15 40 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
-[ $? -ne 0 ] && clear; echo "INSTALACAO CANCELADA."; exit
+
+[ $? -ne 0 ] && exit
+
 var1=$(echo "$VALUE0" | sed -n 1p)
 var2=$(echo "$VALUE0" | sed -n 2p)
 var3=$(echo "$VALUE0" | sed -n 3p)
@@ -315,6 +317,7 @@ check0
 
 function check0 {
   [ "$var1" = "" ] || [ "$var2" = "" ] || [ "$var3" = "" ] && {
+    clear; echo ""; echo "Nao deixe nenhum campo em branco!"; sleep 2
     menu0
   } || {
     echo . >/dev/null
@@ -379,7 +382,8 @@ sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print
 
 } || {
 
-  clear; echo ""; echo "Bem-vindo ao Preparo de Modelo by SuitIT® - v1.0"; echo "Digite a senha padrao quando solicitado!"; echo ""; echo "Senha: ubuntu"; echo ""
+  clear; echo ""; echo "Bem-vindo ao Preparo de Servidor-Modelo by SuitIT® - v1.0"; echo "Digite a senha padrao quando solicitado a seguir!"; echo ""; echo "Senha: ubuntu"; echo ""
+
   echo "5"; sleep 1; echo "4"; sleep 1; echo "3"; sleep 1; echo "2"; sleep 1; echo "1"; sleep 1
 
   clear; echo "Preparando sistema e configurando bashrc"; echo ""
@@ -396,6 +400,7 @@ sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print
     clear; echo "Removendo pacotes inuteis"; echo ""
     sudo apt purge needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolution-data-server bluez blueman bluetooth -y
     sudo systemctl disable NetworkManager-wait-online.service; sudo systemctl mask NetworkManager-wait-online.service; sudo systemctl disable systemd-networkd-wait-online.service; sudo systemctl mask systemd-networkd-wait-online.service
+
     sudo touch "$pathsrv"/useless_services
   }
 
@@ -411,20 +416,18 @@ sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print
 
   [ -f "$pathsrv"/information ] && {
     clear; echo "Informacoes coletadas de uma instalacao anterior. Continuando."; echo ""; sleep 2
+
     var1=$(sed -n '1p' "$pathsrv"/information)
     var2=$(sed -n '2p' "$pathsrv"/information)
     var3=$(sed -n '3p' "$pathsrv"/information)
-    var4=$(sed -n '4p' "$pathsrv"/information)
-    var5=$(sed -n '5p' "$pathsrv"/information)
   } || {
     sudo touch "$pathsrv"/information
+
     menu0
 
-    echo "$var1" > "$pathsrv"/information
-    echo "$var2" >> "$pathsrv"/information
-    echo "$var3" >> "$pathsrv"/information
-    echo "$var4" >> "$pathsrv"/information
-    echo "$var5" >> "$pathsrv"/information
+    echo "$var1" | sudo tee "$pathsrv"/information
+    echo "$var2" | sudo tee -a "$pathsrv"/information
+    echo "$var3" | sudo tee -a "$pathsrv"/information
   }
 
   [ -f "$pathsrv"/password_ok ] && {
