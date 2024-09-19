@@ -326,6 +326,22 @@ function check0 {
   }
 }
 
+function last_check {
+  [ -f /home/administrador/.installed ] && {
+    clear; echo ""; echo "Este servidor foi configurado previamente com outra versao do Linite. Devido ao risco de perdas de dados o instalador vai ser encerrado."; sleep 2
+    exit
+  } || {
+    clear; echo "Este sistema nao foi previamente configurado pelo usuario administrador. Continuando..."; sleep 1
+  }
+
+  sudo [ -f /root/.installed ] && {
+    clear; echo ""; echo "Este servidor foi configurado previamente com outra versao do Linite. Devido ao risco de perdas de dados o instalador vai ser encerrado."; sleep 2
+    exit
+  } || {
+    clear; echo "Este sistema nao foi previamente configurado pelo usuario root. Continuando..."; sleep 1
+  }
+}
+
 # ============================================================================ #
 
 [ "$EUID" -ne 0 ] || {
@@ -376,6 +392,8 @@ sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print
   . .bashrc
 
   sudo mkdir -p "$destpath"; sudo chmod 777 -R "$destpath"; sudo mkdir -p "$pathsrv"
+
+  last_check
 
   [ -f "$pathsrv"/update_ok ] && {
     clear; echo "O sistema ja foi atualizado e os pacotes necessarios instalados. Continuando."; echo ""; sleep 2
