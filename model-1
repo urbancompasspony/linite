@@ -300,13 +300,13 @@ echo "172.25.0.6" | sudo tee -a /srv/containers/script-server/Information
 function menu0 {
 VALUE1="passw0rd"; VALUE2="P4sswrd"; VALUE3="Psswd0"
 
-VALUE0=$(dialog --ok-label "Iniciar" --title "Novo Servidor" --form "Defina as SENHAS a seguir, nao deixe em branco:" 11 50 0 \
+VALUE0=$(dialog --cancel-label "Sair da Instalacao" --ok-label "Iniciar Instalacao" --title "Novo Servidor" --form "Defina as SENHAS a seguir, nao deixe em branco:" 11 50 0 \
 "Senha  PiHole:" 1 1 "$VALUE1" 1 15 40 0 \
 "Senha do XPRA:" 2 1 "$VALUE2" 2 15 40 0 \
 "Administrador:" 3 1 "$VALUE3" 3 15 40 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
-[ $? -ne 0 ] && exit
+[ $? -ne 0 ] && canceled_by_user
 
 var1=$(echo "$VALUE0" | sed -n 1p)
 var2=$(echo "$VALUE0" | sed -n 2p)
@@ -322,6 +322,10 @@ function check0 {
   } || {
     echo . >/dev/null
   }
+}
+
+function canceled_by_user {
+  clear; echo ""; echo "A INSTALACAO FOI CANCELADA PELO USUARIO."; echo ""; exit
 }
 
 # ============================================================================ #
