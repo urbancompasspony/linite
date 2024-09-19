@@ -61,7 +61,6 @@ SystemKeepFree=10G" | sudo tee -a /etc/systemd/journald.conf
 
 function fstab0 {
 echo -e "
-
 # Temp to ram!
 tmpfs /tmp tmpfs defaults 0 0
 tmpfs /var/tmp tmpfs defaults 0 0
@@ -125,7 +124,7 @@ function motd00 {
 }
 
 function installer {
-  sudo apt install "$1" --no-install-recommends -y
+  sudo apt install $package_list --no-install-recommends -y
   sync &&
 
   sudo usermod -aG libvirt administrador
@@ -410,7 +409,8 @@ sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print
   } || {
     clear; echo "Atualizando o sistema"; echo ""
     sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear; echo "Instalando pacotes...."
-    installer "$package_list"; sleep 2
+    installer
+
     sudo touch "$pathsrv"/update_ok
   }
 
