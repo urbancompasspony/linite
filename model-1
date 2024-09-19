@@ -3,7 +3,8 @@
 # ============================================================================ #
 
 # HOW TO USE/INSTALL THIS SERVER:
-# curl -sSL https://m.linuxuniverse.com.br | bash
+
+# curl -L m.linuxuniverse.com.br | bash
 
 # ============================================================================ #
 
