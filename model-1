@@ -25,13 +25,15 @@ gpm tmux xinit xorg openbox pavucontrol caja epiphany-browser gparted gnome-disk
 qemu-system qemu-utils qemu-user qemu-kvm qemu-guest-agent libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq genisoimage"
 
 destpath="/var/lib/libvirt/images"
-pathsrv="/srv/containers/scripts/config"
+pathsrv="/srv/containers/scripts/config/install"
 
 export NEEDRESTART_MODE=a
 export DEBIAN_FRONTEND=noninteractive
 
 # ============================================================================ #
-# ============================================================================ #
+
+
+
 # ============================================================================ #
 
 # Check where to get the .img file
@@ -103,9 +105,12 @@ function smbconfig {
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/SAMBA_Model/smbAD.conf | sudo tee /srv/containers/scripts/SMB-AD-Model.conf
 }
 
-function beep {
+function beep0 {
   wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh -O /home/administrador/.beep.sh
+  clear; echo "Beep instalado. Testando..."
   sudo bash /home/administrador/.beep.sh
+  sleep 2
+
   echo "@reboot sleep 60; bash /home/administrador/.beep.sh" | tee /tmp/crontab_new
   sudo crontab -l | cat - /tmp/crontab_new | tee crontab.txt && sudo crontab crontab.txt
   rm /home/administrador/crontab.txt
@@ -124,22 +129,26 @@ function motd00 {
 function installer {
   sudo apt install $1 --no-install-recommends -y
   sync &&
+
   sudo usermod -aG libvirt administrador
   sudo usermod -aG libvirt-qemu administrador
   sudo usermod -aG docker administrador
 }
 
 function startvm {
-  clear; sudo wget --user $usern4me --password $passw0rd $webadress/$1 -O $destpath/$1 &&  
+  clear; sudo wget --user $usern4me --password $passw0rd $webadress/pfsense.img -O $destpath/pfsense.img &&  
   sudo chmod 777 /var/run/libvirt/libvirt-sock
+
   create_pfsense
 }
 
 function create_pfsense {
-# enp1s0 = ETH0
-# enp2s0 = ETH1
+
+# Information:
+#        enp1s0 = ETH0
+#        enp2s0 = ETH1
 # eno1 = enp3s0 = ETH2
-# ETH3 is macvlan docker
+# macvlan net   = ETH3
 
   virt-install --import \
 --name pfSense \
@@ -188,6 +197,13 @@ sudo mkdir -p /srv/containers/pihole/{etc,log,dnsmasq.d}
 -p 53:53/udp \
 pihole/pihole:latest &&
 
+touch /srv/containers/pihole/Information
+echo "172.25.0.2" > /srv/containers/pihole/Information
+echo "$passw0rd" >> /srv/containers/pihole/Information
+echo "0.0.0.0" >> /srv/containers/pihole/Information
+echo "pihole" >> /srv/containers/pihole/Information
+echo "macvlan" >> /srv/containers/pihole/Information
+
 # OpenSpeedTest
   sudo docker run -d \
 --name=openspeedtest \
@@ -202,6 +218,13 @@ pihole/pihole:latest &&
 -p 3001:3001 \
 -v /etc/localtime:/etc/localtime:ro \
 openspeedtest/latest &&
+
+touch /srv/containers/pihole/Information
+echo "172.25.0.2" > /srv/containers/pihole/Information
+echo "$passw0rd" >> /srv/containers/pihole/Information
+echo "0.0.0.0" >> /srv/containers/pihole/Information
+echo "openspeedtest" >> /srv/containers/pihole/Information
+echo "macvlan" >> /srv/containers/pihole/Information
 
 # MySpeed
 sudo mkdir -p /srv/containers/myspeed/data
@@ -266,8 +289,6 @@ bugy/script-server:latest &&
 }
 
 # ============================================================================ #
-# ============================================================================ #
-# ============================================================================ #
 
 [ "$EUID" -ne 0 ] || {
   clear
@@ -303,7 +324,7 @@ sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print
   exit
 }
 
-[ -f "$pathsrv"/.finished ] && {
+[ -f "$pathsrv"/finished ] && {
   clear; echo ""; echo "Este sistema já esta configurado. Saindo..."; echo ""; sleep 3
   exit
 
@@ -318,100 +339,100 @@ sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print
 
   sudo mkdir -p "$destpath"; sudo chmod 777 -R "$destpath"; sudo mkdir -p "$pathsrv"
 
-  [ -f "$pathsrv"/.update_ok ] && {
+  [ -f "$pathsrv"/update_ok ] && {
     clear; echo "O sistema ja foi atualizado e os pacotes necessarios instalados. Continuando."; echo ""; sleep 2
   } || {
     clear; echo "Atualizando o sistema"; echo ""
     sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear; echo "Instalando pacotes...."
     installer "$package_list"; sleep 3
-    sudo touch "$pathsrv"/.update_ok
+    sudo touch "$pathsrv"/update_ok
   }
 
-  [ -f "$pathsrv"/.netplan_ok ] && {
+  [ -f "$pathsrv"/netplan_ok ] && {
     clear; echo "O Netplan ja foi ajustado. Continuando."; echo ""; sleep 2
   } || {
     sleep 3; clear; echo "Ajustando Netplan"
     netplan1; sudo netplan apply
-    sudo touch "$pathsrv"/.netplan_ok
+    sudo touch "$pathsrv"/netplan_ok
   }
 
-  [ -f "$pathsrv"/.macvlan_ok ] && {
+  [ -f "$pathsrv"/macvlan_ok ] && {
     clear; echo "A MAVLAN ja foi configurada. Continuando."; echo ""; sleep 2
   } || {
     sleep 3; clear; echo "Definindo MACVLAN para os containers"
     set_docker
-    sudo touch "$pathsrv"/.macvlan_ok
+    sudo touch "$pathsrv"/macvlan_ok
   }
 
-  [ -f "$pathsrv"/.pfsense_ok ] && {
+  [ -f "$pathsrv"/pfsense_ok ] && {
     clear; echo "O pfSense ja foi configurado. Continuando."; echo ""; sleep 2
   } || {
     sleep 3; clear; echo "Adicionando VM do pfSense"
     startvm
-    sudo touch "$pathsrv"/.pfsense_ok
+    sudo touch "$pathsrv"/pfsense_ok
   }
 
-  [ -f "$pathsrv"/.docker_ok ] && {
+  [ -f "$pathsrv"/docker_ok ] && {
     clear; echo "Os containers ja foram configurados. Continuando."; echo ""; sleep 2
   } || {
     sleep 3; clear; echo "Inicializando containers!"
     containers0
-    sudo touch "$pathsrv"/.docker_ok
+    sudo touch "$pathsrv"/docker_ok
   }
 
-  [ -f "$pathsrv"/.useless_services ] && {
+  [ -f "$pathsrv"/useless_services ] && {
     clear; echo "Os pacotes inuteis ja foram removidos e desativados. Continuando."; echo ""; sleep 2
   } || {
     clear; echo "Removendo pacotes inuteis"; echo ""
     sudo apt purge needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolution-data-server bluez blueman bluetooth -y
     sudo systemctl disable NetworkManager-wait-online.service; sudo systemctl mask NetworkManager-wait-online.service; sudo systemctl disable systemd-networkd-wait-online.service; sudo systemctl mask systemd-networkd-wait-online.service
-    sudo touch "$pathsrv"/.useless_services
+    sudo touch "$pathsrv"/useless_services
   }
 
-  [ -f "$pathsrv"/.sysctl_ok ] && {
+  [ -f "$pathsrv"/sysctl_ok ] && {
     clear; echo "O SYSCTL ja foi modificado. Continuando."; echo ""; sleep 2
   } || {
     sleep 3; clear; echo "Aplicando recursos extras ao SYSCTL"
     sysctlconf
-    sudo touch "$pathsrv"/.sysctl_ok
+    sudo touch "$pathsrv"/sysctl_ok
   }
 
-  [ -f "$pathsrv"/.motd_ok ] && {
+  [ -f "$pathsrv"/motd_ok ] && {
     clear; echo "O MOTD ja foi substituido. Continuando."; echo ""; sleep 2
   } || {
     sleep 3; clear; echo "Ajustando MOTD"
     motd00
-    sudo touch "$pathsrv"/.motd_ok
+    sudo touch "$pathsrv"/motd_ok
   }
 
-  [ -f "$pathsrv"/.journal_ok ] && {
+  [ -f "$pathsrv"/journal_ok ] && {
     clear; echo "O JournalCTL ja foi ajustado. Continuando."; echo ""; sleep 2
   } || {
     sleep 3; clear; echo "Ajustando JOURNAL"
     journaladjust
-    sudo touch "$pathsrv"/.journal_ok
+    sudo touch "$pathsrv"/journal_ok
   }
 
-  [ -f "$pathsrv"/.fstab_ok ] && {
+  [ -f "$pathsrv"/fstab_ok ] && {
     clear; echo "O fstab ja foi ajustado de acordo. Continuando."; echo ""; sleep 2
   } || {
     sleep 3; clear; echo "Adicionando entradas extras ao fstab"
     fstab0
-    sudo touch "$pathsrv"/.fstab_ok
+    sudo touch "$pathsrv"/fstab_ok
   }
 
-  [ -f "$pathsrv"/.beep ] && {
+  [ -f "$pathsrv"/beep ] && {
     clear; echo "O beep ja foi adicionado. Continuando."; echo ""; sleep 2
   } || {
     sleep 3; clear; echo "Criando um Beep bonitinho se tiver speaker no servidor!"
-    beep
-    sudo touch "$pathsrv"/.beep
+    beep0
+    sudo touch "$pathsrv"/beep
   }
 
   sleep 3; clear; echo "Adicionando modelo SAMBA AD"
   smbconfig
 
-  touch "$pathsrv"/.finished; sleep 3; clear; echo "Instalação concluida!"; echo "Reiniciando sistema..."; sleep 3; sudo reboot
+  touch "$pathsrv"/finished; sleep 3; clear; echo "Instalação concluida!"; echo "Reiniciando sistema..."; sleep 3; sudo reboot
 }
 
 exit 1
