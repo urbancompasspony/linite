@@ -29,6 +29,7 @@ pathsrv="/srv/containers/scripts/config/install"
 
 export NEEDRESTART_MODE=a
 export DEBIAN_FRONTEND=noninteractive
+export pathsrv
 
 # ============================================================================ #
 
@@ -123,7 +124,7 @@ function motd00 {
 }
 
 function installer {
-  sudo apt install $1 --no-install-recommends -y
+  sudo apt install "$1" --no-install-recommends -y
   sync &&
 
   sudo usermod -aG libvirt administrador
@@ -302,6 +303,8 @@ echo "172.25.0.6" >> /srv/containers/script-server/Information
 }
 
 function menu0 {
+VALUE1="passw0rd"; VALUE2="P4sswrd"; VALUE3="Psswd0"
+
 VALUE0=$(dialog --ok-label "Iniciar" --title "Novo Servidor" --form "Defina as SENHAS a seguir:" 14 50 0 \
 "PiHole: " 1 1 "$VALUE1" 1 11 30 0 \
 "XPRA  : " 2 1 "$VALUE2" 2 11 30 0 \
@@ -316,7 +319,7 @@ check0
 }
 
 function check0 {
-  [ "$var1" = "" ] || [ "$var2" = "" ] || [ "$var3" = "" ] &&
+  [ "$var1" = "" ] || [ "$var2" = "" ] || [ "$var3" = "" ] && {
     menu0
   } || {
     echo . >/dev/null
