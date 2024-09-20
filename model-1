@@ -189,7 +189,7 @@ sudo mkdir -p /srv/containers/pihole/{etc,log,dnsmasq.d}
 -p 53:53/udp \
 pihole/pihole:latest &&
 
-touch /srv/containers/pihole/Information
+sudo touch /srv/containers/pihole/Information
 
 echo "172.25.0.2" | sudo tee /srv/containers/pihole/Information
 echo "$passw0rd" | sudo tee -a /srv/containers/pihole/Information
@@ -212,7 +212,7 @@ echo "macvlan" | sudo tee -a /srv/containers/pihole/Information
 -v /etc/localtime:/etc/localtime:ro \
 openspeedtest/latest &&
 
-touch /srv/containers/openspeedtest/Information
+sudo touch /srv/containers/openspeedtest/Information
 
 echo "openspeedtest" | sudo tee /srv/containers/pihole/Information
 echo "172.25.0.3" | sudo tee -a /srv/containers/pihole/Information
@@ -234,7 +234,7 @@ sudo mkdir -p /srv/containers/myspeed-tracker/data
 -v /srv/containers/myspeed/data:/myspeed/data \
 germannewsmaker/myspeed &&
 
-touch /srv/containers/myspeed-tracker/Information
+sudo touch /srv/containers/myspeed-tracker/Information
 
 echo "myspeed-tracker" | sudo tee /srv/containers/myspeed-tracker/Information
 echo "172.25.0.4" | sudo tee -a /srv/containers/myspeed-tracker/Information
@@ -265,7 +265,7 @@ sudo mkdir -p /srv/containers/xpra-virt-manager/home
 -v /dev/disk/by-id:/dev/disk/by-id \
 urbancompasspony/xpra-virt-manager:latest &&
 
-touch /srv/containers/xpra-virt-manager/Information
+sudo touch /srv/containers/xpra-virt-manager/Information
 
 echo "xpra-virt-manager" | sudo tee /srv/containers/xpra-virt-manager/Information
 echo "$var2" | sudo tee -a /srv/containers/xpra-virt-manager/Information
@@ -291,7 +291,7 @@ sudo mkdir -p /srv/containers/script-server/{scripts,runners}
 -v /srv/containers/script-server/scripts/:/app/scripts/ \
 bugy/script-server:latest &&
 
-touch /srv/containers/script-server/Information
+sudo touch /srv/containers/script-server/Information
 
 echo "script-server" | sudo tee /srv/containers/script-server/Information
 echo "172.25.0.6" | sudo tee -a /srv/containers/script-server/Information
