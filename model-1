@@ -438,7 +438,8 @@ sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print
     clear; echo "Senha substituida anteriormente. Continuando."; echo ""; sleep 2
   } || {
     clear; echo "Trocando a senha do usuario ADMINISTRADOR deste servidor!"
-    echo -e "$var3\n$var3\n" | passwd administrador
+    #echo -e "$var3\n$var3\n" | sudo passwd administrador
+    echo "administrador:$var3" | sudo chpasswd
     sudo touch "$pathsrv"/password_ok
   }
 
@@ -506,6 +507,10 @@ sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print
     sudo touch "$pathsrv"/fstab_ok
   }
 
+# NOT FUNCTION HERE.
+  clear; echo "Adicionando modelo SAMBA AD"
+  smbconfig
+
   [ -f "$pathsrv"/beep ] && {
     clear; echo "O beep ja foi adicionado. Continuando."; echo ""; sleep 2
   } || {
@@ -513,9 +518,6 @@ sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print
     beep0
     sudo touch "$pathsrv"/beep
   }
-
-  sleep 3; clear; echo "Adicionando modelo SAMBA AD"
-  smbconfig
 
   touch "$pathsrv"/finished; sleep 3; clear; echo "Instalação concluida!"; echo "Reiniciando sistema..."; sleep 3; sudo reboot
 }
