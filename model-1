@@ -519,7 +519,7 @@ sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print
     sudo touch "$pathsrv"/beep
   }
 
-  touch "$pathsrv"/finished; sleep 3; clear; echo "Instalação concluida!"; echo "Reiniciando sistema..."; sleep 3; sudo reboot
+  sudo touch "$pathsrv"/finished; sleep 3; clear; echo "Instalação concluida!"; echo "Reiniciando sistema..."; sleep 3; sudo reboot
 }
 
 exit 1
