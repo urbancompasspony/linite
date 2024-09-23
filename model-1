@@ -128,7 +128,7 @@ function installer {
 }
 
 function create_pfsense {
-  [ -f "$destpath"/pfsense.img ] &&
+  [ -f "$destpath"/pfsense.img ] && {
     sudo chmod 777 /var/run/libvirt/libvirt-sock
   } || {
     clear; sudo wget --user $usern4me --password $passw0rd $webadress/pfsense.img -O $destpath/pfsense.img
