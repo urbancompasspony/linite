@@ -153,7 +153,7 @@ function create_pfsense {
 --network type=direct,source=eno1,source_mode=bridge,mac=52:54:00:55:ea:03 \
 --disk /var/lib/libvirt/images/pfsense.img \
 --os-variant=freebsd13.1 \
---graphics spice \
+--graphics vnc \
 --import \
 --autostart 1>/dev/null 2>/dev/null &
 }
