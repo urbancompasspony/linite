@@ -16,7 +16,7 @@ wanhost="http://z.net-freaks.com:3434"
 
 export package_list="docker.io docker-buildx \
 net-tools speedtest-cli whois w3m w3m-img netdiscover figlet iperf arp-scan traceroute sshpass fail2ban network-manager \
-libatasmart-bin smartmontools zip unzip p7zip-full 7zip p7zip cifs-utils rsnapshot rclone iotop \
+libatasmart-bin smartmontools zip unzip p7zip-full 7zip p7zip cifs-utils rsnapshot rclone iotop pluma \
 haveged beep stress lm-sensors cmatrix btop inxi tree hwloc figlet dialog \
 gpm tmux xinit xorg openbox pavucontrol caja epiphany-browser gparted gnome-disk-utility terminator rdesktop \
 qemu-system qemu-utils qemu-user qemu-kvm qemu-guest-agent libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq genisoimage"
@@ -149,7 +149,7 @@ function startvm {
 --network type=direct,source=enp1s0,source_mode=bridge,mac=52:54:00:55:ea:01 \
 --network type=direct,source=enp2s0,source_mode=bridge,mac=52:54:00:55:ea:02 \
 --network type=direct,source=eno1,source_mode=bridge,mac=52:54:00:55:ea:03 \
---disk $destpath/pfsense.img \
+--disk /var/lib/libvirt/images/pfsense.img \
 --os-variant=freebsd13.1 \
 --graphics vnc \
 --import \
