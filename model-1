@@ -510,7 +510,6 @@ sys_check
   useless_services0
   update0
   password0
-  netplan0
   macvlan0
   pfsense0
   docker0
@@ -520,6 +519,7 @@ sys_check
   fstab0
   smbconfig0
   beep0
+  netplan0
   the_end
 }
 
