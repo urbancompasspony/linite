@@ -80,7 +80,7 @@ function is_finished {
   exit
 }
 
-function intro_script {
+function welcome0 {
   clear; echo ""; echo "Bem-vindo ao Preparo de Servidor-Modelo by SuitIT®"; echo ""; echo "Insira a senha padrao a seguir: ubuntu"; echo ""
 
   [ -f /home/administrador/.installed ] && {
@@ -100,30 +100,31 @@ function intro_script {
   echo ""; echo "5"; sleep 1; echo "4"; sleep 1; echo "3"; sleep 1; echo "2"; sleep 1; echo "1"; sleep 1
 }
 
-function bash_config {
+function bashconf0 {
   clear; echo "Preparando sistema e configurando BASH"; echo ""
   sudo mkdir -p "$destpath"; sudo chmod 777 -R "$destpath"; sudo mkdir -p "$pathsrv"
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
   . .bashrc
 }
 
-function information0 {
+function passmgr0 {
   [ -f "$pathsrv"/information ] && {
     clear; echo "Informacoes coletadas de uma instalacao anterior. Continuando."; echo ""; sleep 2
     var1=$(sed -n '1p' "$pathsrv"/information)
     var2=$(sed -n '2p' "$pathsrv"/information)
     var3=$(sed -n '3p' "$pathsrv"/information)
+    password0
   } || {
     menu0
-
     sudo touch "$pathsrv"/information
     echo "$var1" | sudo tee "$pathsrv"/information
     echo "$var2" | sudo tee -a "$pathsrv"/information
     echo "$var3" | sudo tee -a "$pathsrv"/information
+    password0
   }
 }
 
-function useless_services0 {
+function useless0 {
   [ -f "$pathsrv"/useless_services ] && {
     clear; echo "Os pacotes inuteis ja foram removidos e desativados. Continuando."; echo ""; sleep 2
   } || {
@@ -184,8 +185,8 @@ network:
         addresses: [1.1.1.1, 8.8.8.8]
     enp4s0:
       dhcp4: true
-      addresses: [172.25.0.3/24]
-      gateway4: 172.25.0.1
+      #addresses: [172.25.0.3/24]
+      #gateway4: 172.25.0.1
       nameservers:
         addresses: [1.1.1.1, 8.8.8.8]
   version: 2" | sudo tee /etc/netplan/00-installer-config.yaml
@@ -235,7 +236,7 @@ function pfsense0 {
 --graphics vnc \
 --import \
 --autostart 1>/dev/null 2>/dev/null &
-
+    sleep 3; clear
     sudo touch "$pathsrv"/pfsense_ok
   }
 }
@@ -248,7 +249,6 @@ function docker0 {
 
     # PiHole
     sudo mkdir -p /srv/containers/pihole/{etc,log,dnsmasq.d}
-
     sudo docker run -d \
 --name=pihole \
 --network macvlan \
@@ -281,7 +281,6 @@ pihole/pihole:latest &&
 
     # MySpeed
     sudo mkdir -p /srv/containers/myspeed-tracker/data
-
     sudo docker run -d \
 --name=myspeed-tracker \
 --network macvlan \
@@ -302,7 +301,6 @@ germannewsmaker/myspeed &&
 
     # XPRA
     sudo mkdir -p /srv/containers/xpra-virt-manager/home
-
     sudo docker run -d \
 --privileged \
 --name=xpra-virt-manager \
@@ -335,7 +333,6 @@ urbancompasspony/xpra-virt-manager:latest &&
 
     # Script Server
     sudo mkdir -p /srv/containers/script-server/{scripts,runners}
-
     sudo docker run -d \
 --name=script-server \
 --network macvlan \
@@ -356,6 +353,7 @@ bugy/script-server:latest &&
     echo "172.25.0.6" | sudo tee -a /srv/containers/script-server/Information
 
     # OpenSpeedTest
+    sudo mkdir -p /srv/containers/openspeedtest
     sudo docker run -d \
 --name=openspeedtest \
 --network macvlan \
@@ -373,6 +371,7 @@ openspeedtest/latest &&
     sudo touch /srv/containers/openspeedtest/Information
     echo "openspeedtest" | sudo tee /srv/containers/pihole/Information
     echo "172.25.0.7" | sudo tee -a /srv/containers/pihole/Information
+
     sudo touch "$pathsrv"/docker_ok
   }
 }
@@ -460,7 +459,7 @@ function the_end {
   sleep 3; sudo reboot
 }
 
-function smbconfig0 {
+function smbconf0 {
   clear; echo "Adicionando modelo SAMBA AD"
   sudo mkdir -p /srv/containers/scripts/
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/SAMBA_Model/smbAD.conf | sudo tee /srv/containers/scripts/SMB-AD-Model.conf
@@ -504,12 +503,11 @@ sys_check
 [ -f "$pathsrv"/finished ] && {
   is_finished
 } || {
-  intro_script
-  bash_config
-  information0
-  useless_services0
+  welcome0
+  bashconf0
+  passmgr0
+  useless0
   update0
-  password0
   macvlan0
   pfsense0
   docker0
@@ -517,7 +515,7 @@ sys_check
   motd0
   journal0
   fstab0
-  smbconfig0
+  smbconf0
   beep0
   netplan0
   the_end
