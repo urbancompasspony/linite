@@ -397,12 +397,15 @@ function motd0 {
   [ -f "$pathsrv"/motd_ok ] && {
     clear; echo "O MOTD ja foi substituido. Continuando."; echo ""; sleep 2
   } || {
-    sleep 3; clear; echo "Ajustando MOTD"
+    sleep 3; clear; echo "Ajustando tela de boas vindas do servidor"
     sudo rm -R /etc/update-motd.d/*
-    sudo wget https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/00-header -O /etc/update-motd.d/00-header
-    sudo wget https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/20-sysinfo -O /etc/update-motd.d/20-sysinfo
-    sudo wget https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/90-dynamic-motd -O /etc/update-motd.d/90-dynamic-motd
-    sudo chmod +x /etc/update-motd.d/*&& sudo touch "$pathsrv"/motd_ok
+
+    curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/00-header | sudo tee /etc/update-motd.d/00-header
+    curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/20-sysinfo | sudo tee /etc/update-motd.d/20-sysinfo
+    curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/90-dynamic-motd | sudo tee /etc/update-motd.d/90-dynamic-motd
+
+    sudo chmod +x /etc/update-motd.d/*
+    sudo touch "$pathsrv"/motd_ok
   }
 }
 
