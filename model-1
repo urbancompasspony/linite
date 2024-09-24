@@ -385,26 +385,25 @@ sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print
   exit
 } || {
   clear; echo ""; echo "Bem-vindo ao Preparo de Servidor-Modelo by SuitIT® - v1.0"; echo ""; echo "Senha Padrao: ubuntu"; echo ""
+  last_check
   echo "5"; sleep 1; echo "4"; sleep 1; echo "3"; sleep 1; echo "2"; sleep 1; echo "1"; sleep 1
-  
+
+  clear; echo "Preparando sistema e configurando BASH"; echo ""
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
+  . .bashrc
+
   [ -f "$pathsrv"/information ] && {
     clear; echo "Informacoes coletadas de uma instalacao anterior. Continuando."; echo ""; sleep 2
     var1=$(sed -n '1p' "$pathsrv"/information)
     var2=$(sed -n '2p' "$pathsrv"/information)
     var3=$(sed -n '3p' "$pathsrv"/information)
   } || {
-    sudo touch "$pathsrv"/information
     menu0
+    sudo touch "$pathsrv"/information
     echo "$var1" | sudo tee "$pathsrv"/information
     echo "$var2" | sudo tee -a "$pathsrv"/information
     echo "$var3" | sudo tee -a "$pathsrv"/information
   }
-
-  last_check
-
-  clear; echo "Preparando sistema e configurando bashrc"; echo ""
-  curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
-  . .bashrc
 
   sudo mkdir -p "$destpath"; sudo chmod 777 -R "$destpath"; sudo mkdir -p "$pathsrv"
 
