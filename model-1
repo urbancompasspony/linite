@@ -7,12 +7,12 @@
 export mainrelease="DISTRIB_RELEASE=22.04"
 export mainhard="Celeron(R) J4125"
 
-usern4me="admin"
-passw0rd="isorulez"
+export usern4me="admin"
+export passw0rd="isorulez"
 
-serverip="172.20.0.22"
-lanhost="http://$serverip"
-wanhost="http://z.net-freaks.com:3434"
+export serverip="172.20.0.22"
+export lanhost="http://$serverip"
+export wanhost="http://z.net-freaks.com:3434"
 
 export package_list="docker.io docker-buildx \
 net-tools speedtest-cli whois w3m w3m-img netdiscover figlet iperf arp-scan traceroute sshpass fail2ban network-manager \
@@ -21,37 +21,189 @@ haveged beep stress lm-sensors cmatrix btop inxi tree hwloc figlet dialog \
 gpm tmux xinit xorg openbox pavucontrol caja epiphany-browser gparted gnome-disk-utility terminator rdesktop \
 qemu-system qemu-utils qemu-user qemu-kvm qemu-guest-agent libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq genisoimage"
 
-destpath="/var/lib/libvirt/images"
 export pathsrv="/srv/containers/scripts/config/install"
+export destpath="/var/lib/libvirt/images"
 
 export NEEDRESTART_MODE=a
 export DEBIAN_FRONTEND=noninteractive
 
-# ============================================================================ #
+# Informations:
+#        enp1s0 = ETH0
+#        enp2s0 = ETH1
+# eno1 = enp3s0 = ETH2
+# macvlan net   = ETH3
 
-# Check where to get the .img file
-if ping -c 1 $serverip >/dev/null; then
-  webadress="$lanhost"
-else
-  webadress="$wanhost"
-fi
+# ======================================================================================================================================================== #
 
-function sysctlconf {
-echo -e "kernel.sysrq=1
+function is_finished {
+  clear; echo ""; echo "Este sistema já esta configurado. Saindo..."; echo ""; sleep 3
+  exit
+}
+
+function intro_script {
+  clear; echo ""; echo "Bem-vindo ao Preparo de Servidor-Modelo by SuitIT® - v1.0"; echo ""; echo "Senha Padrao: ubuntu"; echo ""
+  last_check
+  echo "5"; sleep 1; echo "4"; sleep 1; echo "3"; sleep 1; echo "2"; sleep 1; echo "1"; sleep 1
+}
+
+function bash_config {
+  clear; echo "Preparando sistema e configurando BASH"; echo ""
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
+  . .bashrc
+}
+
+function information0 {
+  [ -f "$pathsrv"/information ] && {
+    clear; echo "Informacoes coletadas de uma instalacao anterior. Continuando."; echo ""; sleep 2
+    var1=$(sed -n '1p' "$pathsrv"/information)
+    var2=$(sed -n '2p' "$pathsrv"/information)
+    var3=$(sed -n '3p' "$pathsrv"/information)
+  } || {
+    menu0
+    sudo touch "$pathsrv"/information
+    echo "$var1" | sudo tee "$pathsrv"/information
+    echo "$var2" | sudo tee -a "$pathsrv"/information
+    echo "$var3" | sudo tee -a "$pathsrv"/information
+  }
+}
+
+function paths0 {
+  sudo mkdir -p "$destpath"; sudo chmod 777 -R "$destpath"; sudo mkdir -p "$pathsrv"
+}
+
+function useless_services0 {
+  [ -f "$pathsrv"/useless_services ] && {
+    clear; echo "Os pacotes inuteis ja foram removidos e desativados. Continuando."; echo ""; sleep 2
+  } || {
+    clear; echo "Removendo pacotes inuteis"; echo ""
+    sudo apt purge needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolution-data-server bluez blueman bluetooth -y
+    sudo systemctl disable NetworkManager-wait-online.service; sudo systemctl mask NetworkManager-wait-online.service; sudo systemctl disable systemd-networkd-wait-online.service; sudo systemctl mask systemd-networkd-wait-online.service
+    sudo touch "$pathsrv"/useless_services
+  }
+}
+
+function update0 {
+  [ -f "$pathsrv"/update_ok ] && {
+    clear; echo "O sistema ja foi atualizado e os pacotes necessarios instalados. Continuando."; echo ""; sleep 2
+  } || {
+    clear; echo "Atualizando o sistema"; echo ""
+    sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear; echo "Instalando pacotes...."
+    installer && sudo touch "$pathsrv"/update_ok
+  }
+}
+
+function password0 {
+  [ -f "$pathsrv"/password_ok ] && {
+    clear; echo "Senha substituida anteriormente. Continuando."; echo ""; sleep 2
+  } || {
+    clear; echo "Trocando a senha do usuario ADMINISTRADOR deste servidor!"
+    #echo -e "$var3\n$var3\n" | sudo passwd administrador
+    echo "administrador:$var3" | sudo chpasswd && sudo touch "$pathsrv"/password_ok
+  }
+}
+
+function netplan0 {
+  [ -f "$pathsrv"/netplan_ok ] && {
+    clear; echo "O Netplan ja foi ajustado. Continuando."; echo ""; sleep 2
+  } || {
+    sleep 3; clear; echo "Ajustando Netplan"
+    netplan1; sudo netplan apply && sudo touch "$pathsrv"/netplan_ok
+  }
+}
+
+function macvlan0 {
+  [ -f "$pathsrv"/macvlan_ok ] && {
+    clear; echo "A MAVLAN ja foi configurada. Continuando."; echo ""; sleep 2
+  } || {
+    sleep 3; clear; echo "Definindo MACVLAN para os containers"
+    set_docker && sudo touch "$pathsrv"/macvlan_ok
+  }
+}
+
+function pfsense0 {
+  [ -f "$pathsrv"/pfsense_ok ] && {
+    clear; echo "O pfSense ja foi configurado. Continuando."; echo ""; sleep 2
+  } || {
+    sleep 3; clear; echo "Adicionando VM do pfSense"
+    startvm && sudo touch "$pathsrv"/pfsense_ok
+  }
+}
+
+function docker0 {
+  [ -f "$pathsrv"/docker_ok ] && {
+    clear; echo "Os containers ja foram configurados. Continuando."; echo ""; sleep 2
+  } || {
+    sleep 3; clear; echo "Inicializando containers!"
+    containers0 && sudo touch "$pathsrv"/docker_ok
+  }
+}
+
+function sysctl0 {
+  [ -f "$pathsrv"/sysctl_ok ] && {
+    clear; echo "O SYSCTL ja foi modificado. Continuando."; echo ""; sleep 2
+  } || {
+    sleep 3; clear; echo "Aplicando recursos extras ao SYSCTL"
+    echo -e "kernel.sysrq=1
 vm.panic_on_oom=1
 vm.swappiness=10
 kernel.panic=5
-
 #net.ipv4.ip_forward=1
 #net.ipv6.conf.all.disable_ipv6=1
-#net.ipv6.conf.default.disable_ipv6=1" | sudo tee -a /etc/sysctl.conf
+#net.ipv6.conf.default.disable_ipv6=1" | sudo tee -a /etc/sysctl.conf &&
+    sudo touch "$pathsrv"/sysctl_ok
+  }
 }
 
-function journaladjust {
-echo -e "
+function motd0 {
+  [ -f "$pathsrv"/motd_ok ] && {
+    clear; echo "O MOTD ja foi substituido. Continuando."; echo ""; sleep 2
+  } || {
+    sleep 3; clear; echo "Ajustando MOTD"
+    motd00
+    sudo touch "$pathsrv"/motd_ok
+  }
+}
+
+function journal0 {
+  [ -f "$pathsrv"/journal_ok ] && {
+    clear; echo "O JournalCTL ja foi ajustado. Continuando."; echo ""; sleep 2
+  } || {
+    sleep 3; clear; echo "Ajustando JOURNAL"
+    echo -e "
 Storage=persistent
 SystemMaxUse=5G
-SystemKeepFree=10G" | sudo tee -a /etc/systemd/journald.conf
+SystemKeepFree=10G" | sudo tee -a /etc/systemd/journald.conf &&
+    sudo touch "$pathsrv"/journal_ok
+  }
+}
+
+function fstab0 {
+  [ -f "$pathsrv"/fstab_ok ] && {
+    clear; echo "O fstab ja foi ajustado de acordo. Continuando."; echo ""; sleep 2
+  } || {
+    sleep 3; clear; echo "Adicionando entradas extras ao fstab"
+    fstab0
+    sudo touch "$pathsrv"/fstab_ok
+  }
+}
+
+function beep0 {
+  [ -f "$pathsrv"/beep ] && {
+    clear; echo "O beep ja foi adicionado. Continuando."; echo ""; sleep 2
+  } || {
+    sleep 3; clear; echo "Criando um Beep bonitinho se tiver speaker no servidor!"
+    beep0
+    sudo touch "$pathsrv"/beep
+  }
+}
+
+function the_end {
+  sudo touch "$pathsrv"/finished
+  sleep 3
+  clear; echo "Instalação concluida!"
+  echo "Reiniciando sistema..."
+  sleep 3
+  sudo reboot
 }
 
 function fstab0 {
@@ -95,17 +247,15 @@ network:
 }
 
 function smbconfig {
+  clear; echo "Adicionando modelo SAMBA AD"
   sudo mkdir -p /srv/containers/scripts/
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/SAMBA_Model/smbAD.conf | sudo tee /srv/containers/scripts/SMB-AD-Model.conf
 }
 
 function beep0 {
   wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh -O /home/administrador/.beep.sh
-  clear; echo "Beep instalado. Testando..."
-  sudo bash /home/administrador/.beep.sh
-  sleep 2
-
-  echo "@reboot sleep 60; bash /home/administrador/.beep.sh" | sudo tee /tmp/crontab_new
+  clear; echo "Beep instalado. Testando..."; sudo bash /home/administrador/.beep.sh
+  sleep 2; echo "@reboot sleep 60; bash /home/administrador/.beep.sh" | sudo tee /tmp/crontab_new
   sudo crontab -l | cat - /tmp/crontab_new | tee crontab.txt && sudo crontab crontab.txt
   sudo rm crontab.txt
 }
@@ -130,18 +280,18 @@ function installer {
 }
 
 function startvm {
+  if ping -c 1 $serverip >/dev/null; then
+    webadress="$lanhost"
+  else
+    webadress="$wanhost"
+  fi
+
   [ -f "$destpath"/pfsense.img ] && {
     sudo chmod 777 /var/run/libvirt/libvirt-sock
   } || {
     clear; sudo wget --user $usern4me --password $passw0rd $webadress/pfsense.img -O $destpath/pfsense.img
     sudo chmod 777 /var/run/libvirt/libvirt-sock
   }
-
-# Information:
-#        enp1s0 = ETH0
-#        enp2s0 = ETH1
-# eno1 = enp3s0 = ETH2
-# macvlan net   = ETH3
 
   sudo virt-install --import \
 --name pfSense \
@@ -164,7 +314,6 @@ function set_docker {
 }
 
 function containers0 {
-
 # PiHole
 sudo mkdir -p /srv/containers/pihole/{etc,log,dnsmasq.d}
 
@@ -319,7 +468,7 @@ check0
 
 function check0 {
   [ "$var1" = "" ] || [ "$var2" = "" ] || [ "$var3" = "" ] && {
-    clear; echo ""; echo "Nao deixe nenhum campo em branco!"; sleep 2
+    clear; echo ""; echo "Nao deixe nenhum campo em branco!"; sleep 2;
     menu0
   } || {
     echo . >/dev/null
@@ -346,171 +495,73 @@ function last_check {
   }
 }
 
-# ============================================================================ #
-
-hardversion=$(cat /proc/cpuinfo | grep 'model name' | head -n 1 | awk -F: '{ print $2 }' | cut -d ' ' -f 3,4)
-[ "$hardversion" = "$mainhard" ] && {
-  echo . >/dev/null
-} || {
-  clear; echo ""; echo "HARDWARE INADEQUADO DETECTADO!"
-  echo ""
-  echo "Este script exige o hardware 'Appliance 4x Gigabit Celeron J4125' e voce esta usando o $hardversion"
-  echo "SAINDO...."
-  sleep 5
-  exit
+function root_check {
+  [ "$EUID" -ne 0 ] || {
+    clear
+    echo "Não execute este script como Root!"
+    exit
+  }
 }
 
-sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print $1}')
-[ "$sysversion" = "$mainrelease" ] && {
-  echo . >/dev/null
-} || {
-  clear
-  echo ""
-  echo "SISTEMA INADEQUADO DETECTADO!"
-  echo ""
-  echo "Este script exige o Ubuntu Server 22.04 LTS e você está usando o $sysversion!"
-  echo "SAINDO...."
-  sleep 5
-  exit
+function hard_check {
+  hardversion=$(cat /proc/cpuinfo | grep 'model name' | head -n 1 | awk -F: '{ print $2 }' | cut -d ' ' -f 3,4)
+
+  [ "$hardversion" = "$mainhard" ] && {
+    echo . >/dev/null
+  } || {
+    clear; echo ""; echo "HARDWARE INADEQUADO DETECTADO!"
+    echo ""
+    echo "Este script exige o hardware 'Appliance 4x Gigabit Celeron J4125' e voce esta usando o $hardversion"
+    echo "SAINDO...."
+    sleep 5
+    exit
+  }
 }
 
-[ "$EUID" -ne 0 ] || {
-  clear
-  echo "Não execute este script como Root!"
-  exit
+function sys_check {
+  sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print $1}')
+
+  [ "$sysversion" = "$mainrelease" ] && {
+    echo . >/dev/null
+  } || {
+    clear
+    echo ""
+    echo "SISTEMA INADEQUADO DETECTADO!"
+    echo ""
+    echo "Este script exige o Ubuntu Server 22.04 LTS e você está usando o $sysversion!"
+    echo "SAINDO...."
+    sleep 5
+    exit
+  }
 }
+
+# ======================================================================================================================================================== #
+
+hard_check
+sys_check
+root_check
 
 [ -f "$pathsrv"/finished ] && {
-  clear; echo ""; echo "Este sistema já esta configurado. Saindo..."; echo ""; sleep 3
-  exit
+  is_finished
 } || {
-  clear; echo ""; echo "Bem-vindo ao Preparo de Servidor-Modelo by SuitIT® - v1.0"; echo ""; echo "Senha Padrao: ubuntu"; echo ""
-  last_check
-  echo "5"; sleep 1; echo "4"; sleep 1; echo "3"; sleep 1; echo "2"; sleep 1; echo "1"; sleep 1
-
-  clear; echo "Preparando sistema e configurando BASH"; echo ""
-  curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
-  . .bashrc
-
-  [ -f "$pathsrv"/information ] && {
-    clear; echo "Informacoes coletadas de uma instalacao anterior. Continuando."; echo ""; sleep 2
-    var1=$(sed -n '1p' "$pathsrv"/information)
-    var2=$(sed -n '2p' "$pathsrv"/information)
-    var3=$(sed -n '3p' "$pathsrv"/information)
-  } || {
-    menu0
-    sudo touch "$pathsrv"/information
-    echo "$var1" | sudo tee "$pathsrv"/information
-    echo "$var2" | sudo tee -a "$pathsrv"/information
-    echo "$var3" | sudo tee -a "$pathsrv"/information
-  }
-
-  sudo mkdir -p "$destpath"; sudo chmod 777 -R "$destpath"; sudo mkdir -p "$pathsrv"
-
-  [ -f "$pathsrv"/useless_services ] && {
-    clear; echo "Os pacotes inuteis ja foram removidos e desativados. Continuando."; echo ""; sleep 2
-  } || {
-    clear; echo "Removendo pacotes inuteis"; echo ""
-    sudo apt purge needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolution-data-server bluez blueman bluetooth -y
-    sudo systemctl disable NetworkManager-wait-online.service; sudo systemctl mask NetworkManager-wait-online.service; sudo systemctl disable systemd-networkd-wait-online.service; sudo systemctl mask systemd-networkd-wait-online.service
-    sudo touch "$pathsrv"/useless_services
-  }
-
-  [ -f "$pathsrv"/update_ok ] && {
-    clear; echo "O sistema ja foi atualizado e os pacotes necessarios instalados. Continuando."; echo ""; sleep 2
-  } || {
-    clear; echo "Atualizando o sistema"; echo ""
-    sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear; echo "Instalando pacotes...."
-    installer
-    sudo touch "$pathsrv"/update_ok
-  }
-
-  [ -f "$pathsrv"/password_ok ] && {
-    clear; echo "Senha substituida anteriormente. Continuando."; echo ""; sleep 2
-  } || {
-    clear; echo "Trocando a senha do usuario ADMINISTRADOR deste servidor!"
-    #echo -e "$var3\n$var3\n" | sudo passwd administrador
-    echo "administrador:$var3" | sudo chpasswd
-    sudo touch "$pathsrv"/password_ok
-  }
-
-  [ -f "$pathsrv"/netplan_ok ] && {
-    clear; echo "O Netplan ja foi ajustado. Continuando."; echo ""; sleep 2
-  } || {
-    sleep 3; clear; echo "Ajustando Netplan"
-    netplan1; sudo netplan apply
-    sudo touch "$pathsrv"/netplan_ok
-  }
-
-  [ -f "$pathsrv"/macvlan_ok ] && {
-    clear; echo "A MAVLAN ja foi configurada. Continuando."; echo ""; sleep 2
-  } || {
-    sleep 3; clear; echo "Definindo MACVLAN para os containers"
-    set_docker
-    sudo touch "$pathsrv"/macvlan_ok
-  }
-
-  [ -f "$pathsrv"/pfsense_ok ] && {
-    clear; echo "O pfSense ja foi configurado. Continuando."; echo ""; sleep 2
-  } || {
-    sleep 3; clear; echo "Adicionando VM do pfSense"
-    startvm
-    sudo touch "$pathsrv"/pfsense_ok
-  }
-
-  [ -f "$pathsrv"/docker_ok ] && {
-    clear; echo "Os containers ja foram configurados. Continuando."; echo ""; sleep 2
-  } || {
-    sleep 3; clear; echo "Inicializando containers!"
-    containers0
-    sudo touch "$pathsrv"/docker_ok
-  }
-
-  [ -f "$pathsrv"/sysctl_ok ] && {
-    clear; echo "O SYSCTL ja foi modificado. Continuando."; echo ""; sleep 2
-  } || {
-    sleep 3; clear; echo "Aplicando recursos extras ao SYSCTL"
-    sysctlconf
-    sudo touch "$pathsrv"/sysctl_ok
-  }
-
-  [ -f "$pathsrv"/motd_ok ] && {
-    clear; echo "O MOTD ja foi substituido. Continuando."; echo ""; sleep 2
-  } || {
-    sleep 3; clear; echo "Ajustando MOTD"
-    motd00
-    sudo touch "$pathsrv"/motd_ok
-  }
-
-  [ -f "$pathsrv"/journal_ok ] && {
-    clear; echo "O JournalCTL ja foi ajustado. Continuando."; echo ""; sleep 2
-  } || {
-    sleep 3; clear; echo "Ajustando JOURNAL"
-    journaladjust
-    sudo touch "$pathsrv"/journal_ok
-  }
-
-  [ -f "$pathsrv"/fstab_ok ] && {
-    clear; echo "O fstab ja foi ajustado de acordo. Continuando."; echo ""; sleep 2
-  } || {
-    sleep 3; clear; echo "Adicionando entradas extras ao fstab"
-    fstab0
-    sudo touch "$pathsrv"/fstab_ok
-  }
-
-  # NOT A FUNCTION!
-    clear; echo "Adicionando modelo SAMBA AD"
-    smbconfig
-
-  [ -f "$pathsrv"/beep ] && {
-    clear; echo "O beep ja foi adicionado. Continuando."; echo ""; sleep 2
-  } || {
-    sleep 3; clear; echo "Criando um Beep bonitinho se tiver speaker no servidor!"
-    beep0
-    sudo touch "$pathsrv"/beep
-  }
-
-  sudo touch "$pathsrv"/finished; sleep 3; clear; echo "Instalação concluida!"; echo "Reiniciando sistema..."; sleep 3; sudo reboot
+  intro_script
+  bash_config
+  information0
+  paths0
+  useless_services0
+  update0
+  password0
+  netplan0
+  macvlan0
+  pfsense0
+  docker0
+  sysctl0
+  motd0
+  journal0
+  fstab0
+  smbconfig
+  beep0
+  the_end
 }
 
 exit 1
