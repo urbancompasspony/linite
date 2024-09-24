@@ -35,466 +35,6 @@ export DEBIAN_FRONTEND=noninteractive
 
 # ======================================================================================================================================================== #
 
-function is_finished {
-  clear; echo ""; echo "Este sistema já esta configurado. Saindo..."; echo ""; sleep 3
-  exit
-}
-
-function intro_script {
-  clear; echo ""; echo "Bem-vindo ao Preparo de Servidor-Modelo by SuitIT® - v1.0"; echo ""; echo "Senha Padrao: ubuntu"; echo ""
-  last_check
-  echo "5"; sleep 1; echo "4"; sleep 1; echo "3"; sleep 1; echo "2"; sleep 1; echo "1"; sleep 1
-}
-
-function bash_config {
-  clear; echo "Preparando sistema e configurando BASH"; echo ""
-  curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
-  . .bashrc
-}
-
-function information0 {
-  [ -f "$pathsrv"/information ] && {
-    clear; echo "Informacoes coletadas de uma instalacao anterior. Continuando."; echo ""; sleep 2
-    var1=$(sed -n '1p' "$pathsrv"/information)
-    var2=$(sed -n '2p' "$pathsrv"/information)
-    var3=$(sed -n '3p' "$pathsrv"/information)
-  } || {
-    menu0
-    sudo touch "$pathsrv"/information
-    echo "$var1" | sudo tee "$pathsrv"/information
-    echo "$var2" | sudo tee -a "$pathsrv"/information
-    echo "$var3" | sudo tee -a "$pathsrv"/information
-  }
-}
-
-function paths0 {
-  sudo mkdir -p "$destpath"; sudo chmod 777 -R "$destpath"; sudo mkdir -p "$pathsrv"
-}
-
-function useless_services0 {
-  [ -f "$pathsrv"/useless_services ] && {
-    clear; echo "Os pacotes inuteis ja foram removidos e desativados. Continuando."; echo ""; sleep 2
-  } || {
-    clear; echo "Removendo pacotes inuteis"; echo ""
-    sudo apt purge needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolution-data-server bluez blueman bluetooth -y
-    sudo systemctl disable NetworkManager-wait-online.service; sudo systemctl mask NetworkManager-wait-online.service; sudo systemctl disable systemd-networkd-wait-online.service; sudo systemctl mask systemd-networkd-wait-online.service
-    sudo touch "$pathsrv"/useless_services
-  }
-}
-
-function update0 {
-  [ -f "$pathsrv"/update_ok ] && {
-    clear; echo "O sistema ja foi atualizado e os pacotes necessarios instalados. Continuando."; echo ""; sleep 2
-  } || {
-    clear; echo "Atualizando o sistema"; echo ""
-    sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear; echo "Instalando pacotes...."
-    installer && sudo touch "$pathsrv"/update_ok
-  }
-}
-
-function password0 {
-  [ -f "$pathsrv"/password_ok ] && {
-    clear; echo "Senha substituida anteriormente. Continuando."; echo ""; sleep 2
-  } || {
-    clear; echo "Trocando a senha do usuario ADMINISTRADOR deste servidor!"
-    #echo -e "$var3\n$var3\n" | sudo passwd administrador
-    echo "administrador:$var3" | sudo chpasswd && sudo touch "$pathsrv"/password_ok
-  }
-}
-
-function netplan0 {
-  [ -f "$pathsrv"/netplan_ok ] && {
-    clear; echo "O Netplan ja foi ajustado. Continuando."; echo ""; sleep 2
-  } || {
-    sleep 3; clear; echo "Ajustando Netplan"
-    netplan1; sudo netplan apply && sudo touch "$pathsrv"/netplan_ok
-  }
-}
-
-function macvlan0 {
-  [ -f "$pathsrv"/macvlan_ok ] && {
-    clear; echo "A MAVLAN ja foi configurada. Continuando."; echo ""; sleep 2
-  } || {
-    sleep 3; clear; echo "Definindo MACVLAN para os containers"
-    set_docker && sudo touch "$pathsrv"/macvlan_ok
-  }
-}
-
-function pfsense0 {
-  [ -f "$pathsrv"/pfsense_ok ] && {
-    clear; echo "O pfSense ja foi configurado. Continuando."; echo ""; sleep 2
-  } || {
-    sleep 3; clear; echo "Adicionando VM do pfSense"
-    startvm && sudo touch "$pathsrv"/pfsense_ok
-  }
-}
-
-function docker0 {
-  [ -f "$pathsrv"/docker_ok ] && {
-    clear; echo "Os containers ja foram configurados. Continuando."; echo ""; sleep 2
-  } || {
-    sleep 3; clear; echo "Inicializando containers!"
-    containers0 && sudo touch "$pathsrv"/docker_ok
-  }
-}
-
-function sysctl0 {
-  [ -f "$pathsrv"/sysctl_ok ] && {
-    clear; echo "O SYSCTL ja foi modificado. Continuando."; echo ""; sleep 2
-  } || {
-    sleep 3; clear; echo "Aplicando recursos extras ao SYSCTL"
-    echo -e "kernel.sysrq=1
-vm.panic_on_oom=1
-vm.swappiness=10
-kernel.panic=5
-#net.ipv4.ip_forward=1
-#net.ipv6.conf.all.disable_ipv6=1
-#net.ipv6.conf.default.disable_ipv6=1" | sudo tee -a /etc/sysctl.conf &&
-    sudo touch "$pathsrv"/sysctl_ok
-  }
-}
-
-function motd0 {
-  [ -f "$pathsrv"/motd_ok ] && {
-    clear; echo "O MOTD ja foi substituido. Continuando."; echo ""; sleep 2
-  } || {
-    sleep 3; clear; echo "Ajustando MOTD"
-    motd00
-    sudo touch "$pathsrv"/motd_ok
-  }
-}
-
-function journal0 {
-  [ -f "$pathsrv"/journal_ok ] && {
-    clear; echo "O JournalCTL ja foi ajustado. Continuando."; echo ""; sleep 2
-  } || {
-    sleep 3; clear; echo "Ajustando JOURNAL"
-    echo -e "
-Storage=persistent
-SystemMaxUse=5G
-SystemKeepFree=10G" | sudo tee -a /etc/systemd/journald.conf &&
-    sudo touch "$pathsrv"/journal_ok
-  }
-}
-
-function fstab0 {
-  [ -f "$pathsrv"/fstab_ok ] && {
-    clear; echo "O fstab ja foi ajustado de acordo. Continuando."; echo ""; sleep 2
-  } || {
-    sleep 3; clear; echo "Adicionando entradas extras ao fstab"
-    fstab0
-    sudo touch "$pathsrv"/fstab_ok
-  }
-}
-
-function beep0 {
-  [ -f "$pathsrv"/beep ] && {
-    clear; echo "O beep ja foi adicionado. Continuando."; echo ""; sleep 2
-  } || {
-    sleep 3; clear; echo "Criando um Beep bonitinho se tiver speaker no servidor!"
-    beep0
-    sudo touch "$pathsrv"/beep
-  }
-}
-
-function the_end {
-  sudo touch "$pathsrv"/finished
-  sleep 3
-  clear; echo "Instalação concluida!"
-  echo "Reiniciando sistema..."
-  sleep 3
-  sudo reboot
-}
-
-function fstab0 {
-echo -e "
-# Temp to ram!
-tmpfs /tmp tmpfs defaults 0 0
-tmpfs /var/tmp tmpfs defaults 0 0
-
-# Disk 01
-#/dev/disk/by-uuid/ /mnt/main ext4 defaults 0 0
-
-# Disk 02
-#/dev/disk/by-uuid/ /mnt/backup ext4 defaults 0 0" | sudo tee -a /etc/fstab
-}
-
-function netplan1 {
-echo -e "
-# This is the network config written by 'linite model-1' script
-network:
-  ethernets:
-#    renderer: NetworkManager
-    eno1:
-      dhcp4: true
-      nameservers:
-        addresses: [1.1.1.1, 8.8.8.8]
-    enp1s0:
-      dhcp4: true
-      nameservers:
-        addresses: [1.1.1.1, 8.8.8.8]
-    enp2s0:
-      dhcp4: true
-      nameservers:
-        addresses: [1.1.1.1, 8.8.8.8]
-    enp4s0:
-      dhcp4: true
-      addresses: [172.25.0.3/24]
-      gateway4: 172.25.0.1
-      nameservers:
-        addresses: [1.1.1.1, 8.8.8.8]
-  version: 2" | sudo tee /etc/netplan/00-installer-config.yaml
-}
-
-function smbconfig {
-  clear; echo "Adicionando modelo SAMBA AD"
-  sudo mkdir -p /srv/containers/scripts/
-  curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/SAMBA_Model/smbAD.conf | sudo tee /srv/containers/scripts/SMB-AD-Model.conf
-}
-
-function beep0 {
-  wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh -O /home/administrador/.beep.sh
-  clear; echo "Beep instalado. Testando..."; sudo bash /home/administrador/.beep.sh
-  sleep 2; echo "@reboot sleep 60; bash /home/administrador/.beep.sh" | sudo tee /tmp/crontab_new
-  sudo crontab -l | cat - /tmp/crontab_new | tee crontab.txt && sudo crontab crontab.txt
-  sudo rm crontab.txt
-}
-
-function motd00 {
-  sudo rm -R /etc/update-motd.d/*
-
-  sudo wget https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/00-header -O /etc/update-motd.d/00-header
-  sudo wget https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/20-sysinfo -O /etc/update-motd.d/20-sysinfo
-  sudo wget https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/90-dynamic-motd -O /etc/update-motd.d/90-dynamic-motd
-
-  sudo chmod +x /etc/update-motd.d/*
-}
-
-function installer {
-  sudo apt install $package_list --no-install-recommends -y
-  sync &&
-
-  sudo usermod -aG libvirt administrador
-  sudo usermod -aG libvirt-qemu administrador
-  sudo usermod -aG docker administrador
-}
-
-function startvm {
-  if ping -c 1 $serverip >/dev/null; then
-    webadress="$lanhost"
-  else
-    webadress="$wanhost"
-  fi
-
-  [ -f "$destpath"/pfsense.img ] && {
-    sudo chmod 777 /var/run/libvirt/libvirt-sock
-  } || {
-    clear; sudo wget --user $usern4me --password $passw0rd $webadress/pfsense.img -O $destpath/pfsense.img
-    sudo chmod 777 /var/run/libvirt/libvirt-sock
-  }
-
-  sudo virt-install --import \
---name pfSense \
---boot hd,cdrom,menu=on \
---memory 2048 \
---vcpus 2 \
---cpu host \
---network type=direct,source=enp1s0,source_mode=bridge,mac=52:54:00:55:ea:01 \
---network type=direct,source=enp2s0,source_mode=bridge,mac=52:54:00:55:ea:02 \
---network type=direct,source=eno1,source_mode=bridge,mac=52:54:00:55:ea:03 \
---disk /var/lib/libvirt/images/pfsense.img \
---os-variant=freebsd13.1 \
---graphics vnc \
---import \
---autostart 1>/dev/null 2>/dev/null &
-}
-
-function set_docker {
-  sudo docker network create -d macvlan --subnet="172.25.0.0"/24 --gateway="172.25.0.1" -o parent="enp4s0" macvlan
-}
-
-function containers0 {
-# PiHole
-sudo mkdir -p /srv/containers/pihole/{etc,log,dnsmasq.d}
-
-  sudo docker run -d \
---name=pihole \
---network macvlan \
---ip=172.25.0.2 \
---dns=1.1.1.1  \
---hostname=pihole \
---no-healthcheck \
---restart=unless-stopped \
---shm-size=512m \
--e SERVERIP=172.25.0.2 \
--e WEBPASSWORD="$var1" \
--v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/pihole/etc/:/etc/pihole \
--v /srv/containers/pihole/dnsmasq.d/:/etc/dnsmasq.d \
--v /srv/containers/pihole/log/:/var/log/pihole \
--p 80:80 \
--p 443:443 \
--p 67:67/tcp \
--p 67:67/udp \
--p 53:53/tcp \
--p 53:53/udp \
-pihole/pihole:latest &&
-
-sudo touch /srv/containers/pihole/Information
-
-echo "172.25.0.2" | sudo tee /srv/containers/pihole/Information
-echo "$passw0rd" | sudo tee -a /srv/containers/pihole/Information
-echo "0.0.0.0" | sudo tee -a /srv/containers/pihole/Information
-echo "pihole" | sudo tee -a /srv/containers/pihole/Information
-echo "macvlan" | sudo tee -a /srv/containers/pihole/Information
-
-# MySpeed
-sudo mkdir -p /srv/containers/myspeed-tracker/data
-
-  sudo docker run -d \
---name=myspeed-tracker \
---network macvlan \
---ip=172.25.0.4 \
---dns=1.1.1.1  \
---dns=127.0.0.1 \
---hostname=myspeed-tracker \
---no-healthcheck \
---restart=unless-stopped \
--p 5216:5216 \
--v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/myspeed/data:/myspeed/data \
-germannewsmaker/myspeed &&
-
-sudo touch /srv/containers/myspeed-tracker/Information
-
-echo "myspeed-tracker" | sudo tee /srv/containers/myspeed-tracker/Information
-echo "172.25.0.4" | sudo tee -a /srv/containers/myspeed-tracker/Information
-
-# XPRA
-sudo mkdir -p /srv/containers/xpra-virt-manager/home
-
-    sudo docker run -d \
---privileged \
---name=xpra-virt-manager \
---network macvlan \
---ip=172.25.0.5 \
---dns=1.1.1.1  \
---dns=127.0.0.1 \
---hostname=xpra-virt-manager \
---no-healthcheck \
---restart=unless-stopped \
---device /dev/kvm:/dev/kvm \
--e DARK_MODE=true \
--e HOSTS="['qemu:///system']" \
--e passw0rd="$var2" \
--e resolution=1920x1080 \
--e PORTS=9876 \
--v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/xpra-virt-manager/home:/home \
--v /var/lib/libvirt/images:/var/lib/libvirt/images \
--v /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock \
--v /dev/disk/by-id:/dev/disk/by-id \
-urbancompasspony/xpra-virt-manager:latest &&
-
-sudo touch /srv/containers/xpra-virt-manager/Information
-
-echo "xpra-virt-manager" | sudo tee /srv/containers/xpra-virt-manager/Information
-echo "$var2" | sudo tee -a /srv/containers/xpra-virt-manager/Information
-echo "1920x1080" | sudo tee -a /srv/containers/xpra-virt-manager/Information
-echo "9876" | sudo tee -a /srv/containers/xpra-virt-manager/Information
-echo "172.25.0.5" | sudo tee -a /srv/containers/xpra-virt-manager/Information
-
-# Script Server
-sudo mkdir -p /srv/containers/script-server/{scripts,runners}
-
-  sudo docker run -d \
---name=script-server \
---network macvlan \
---ip=172.25.0.6 \
---dns=1.1.1.1  \
---dns=127.0.0.1 \
---hostname=script-server \
---no-healthcheck \
---restart=unless-stopped \
--p 5000:5000 \
--v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/script-server/runners/:/app/conf/runners \
--v /srv/containers/script-server/scripts/:/app/scripts/ \
-bugy/script-server:latest &&
-
-sudo touch /srv/containers/script-server/Information
-
-echo "script-server" | sudo tee /srv/containers/script-server/Information
-echo "172.25.0.6" | sudo tee -a /srv/containers/script-server/Information
-
-# OpenSpeedTest
-  sudo docker run -d \
---name=openspeedtest \
---network macvlan \
---ip=172.25.0.7 \
---dns=1.1.1.1  \
---dns=127.0.0.1 \
---hostname=openspeedtest \
---no-healthcheck \
---restart=unless-stopped \
--p 3000:3000 \
--p 3001:3001 \
--v /etc/localtime:/etc/localtime:ro \
-openspeedtest/latest &&
-
-sudo touch /srv/containers/openspeedtest/Information
-
-echo "openspeedtest" | sudo tee /srv/containers/pihole/Information
-echo "172.25.0.7" | sudo tee -a /srv/containers/pihole/Information
-}
-
-function menu0 {
-VALUE1="passw0rd"; VALUE2="P4sswrd"; VALUE3="Psswd0"
-
-VALUE0=$(dialog --cancel-label "Sair da Instalacao" --ok-label "Iniciar Instalacao" --title "Novo Servidor" --form "Defina as SENHAS a seguir, nao deixe em branco:" 11 50 0 \
-"Senha  PiHole:" 1 1 "$VALUE1" 1 15 40 0 \
-"Senha do XPRA:" 2 1 "$VALUE2" 2 15 40 0 \
-"Administrador:" 3 1 "$VALUE3" 3 15 40 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
-
-[ $? -ne 0 ] && canceled_by_user
-
-var1=$(echo "$VALUE0" | sed -n 1p)
-var2=$(echo "$VALUE0" | sed -n 2p)
-var3=$(echo "$VALUE0" | sed -n 3p)
-
-check0
-}
-
-function check0 {
-  [ "$var1" = "" ] || [ "$var2" = "" ] || [ "$var3" = "" ] && {
-    clear; echo ""; echo "Nao deixe nenhum campo em branco!"; sleep 2;
-    menu0
-  } || {
-    echo . >/dev/null
-  }
-}
-
-function canceled_by_user {
-  clear; echo ""; echo "A INSTALACAO FOI CANCELADA PELO USUARIO."; echo ""; exit
-}
-
-function last_check {
-  [ -f /home/administrador/.installed ] && {
-    clear; echo ""; echo "Este servidor foi configurado previamente com outra versao do Linite. Devido ao risco de perdas de dados o instalador vai ser encerrado."; sleep 2
-    exit
-  } || {
-    echo . >/dev/null
-  }
-
-  sudo [ -f /root/.installed ] && {
-    clear; echo ""; echo "Este servidor foi configurado previamente com outra versao do Linite. Devido ao risco de perdas de dados o instalador vai ser encerrado."; sleep 2
-    exit
-  } || {
-    echo . >/dev/null
-  }
-}
-
 function root_check {
   [ "$EUID" -ne 0 ] || {
     clear
@@ -535,11 +75,435 @@ function sys_check {
   }
 }
 
+function is_finished {
+  clear; echo ""; echo "Este sistema já esta configurado. Saindo..."; echo ""; sleep 3
+  exit
+}
+
+function intro_script {
+  clear; echo ""; echo "Bem-vindo ao Preparo de Servidor-Modelo by SuitIT® - v1.0"; echo ""; echo "Senha Padrao: ubuntu"; echo ""
+
+  [ -f /home/administrador/.installed ] && {
+    clear; echo ""; echo "Este servidor foi configurado previamente com outra versao do Linite. Devido ao risco de perdas de dados o instalador vai ser encerrado."; sleep 2
+    exit
+  } || {
+    echo . >/dev/null
+  }
+
+  sudo [ -f /root/.installed ] && {
+    clear; echo ""; echo "Este servidor foi configurado previamente com outra versao do Linite. Devido ao risco de perdas de dados o instalador vai ser encerrado."; sleep 2
+    exit
+  } || {
+    echo . >/dev/null
+  }
+
+  echo "5"; sleep 1; echo "4"; sleep 1; echo "3"; sleep 1; echo "2"; sleep 1; echo "1"; sleep 1
+}
+
+function bash_config {
+  clear; echo "Preparando sistema e configurando BASH"; echo ""
+  sudo mkdir -p "$destpath"; sudo chmod 777 -R "$destpath"; sudo mkdir -p "$pathsrv"
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
+  . .bashrc
+}
+
+function information0 {
+  [ -f "$pathsrv"/information ] && {
+    clear; echo "Informacoes coletadas de uma instalacao anterior. Continuando."; echo ""; sleep 2
+    var1=$(sed -n '1p' "$pathsrv"/information)
+    var2=$(sed -n '2p' "$pathsrv"/information)
+    var3=$(sed -n '3p' "$pathsrv"/information)
+  } || {
+    menu0
+    sudo touch "$pathsrv"/information
+    echo "$var1" | sudo tee "$pathsrv"/information
+    echo "$var2" | sudo tee -a "$pathsrv"/information
+    echo "$var3" | sudo tee -a "$pathsrv"/information
+  }
+}
+
+function useless_services0 {
+  [ -f "$pathsrv"/useless_services ] && {
+    clear; echo "Os pacotes inuteis ja foram removidos e desativados. Continuando."; echo ""; sleep 2
+  } || {
+    clear; echo "Removendo pacotes inuteis"; echo ""
+    sudo apt purge needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolution-data-server bluez blueman bluetooth -y
+    sudo systemctl disable NetworkManager-wait-online.service; sudo systemctl mask NetworkManager-wait-online.service; sudo systemctl disable systemd-networkd-wait-online.service; sudo systemctl mask systemd-networkd-wait-online.service
+    sudo touch "$pathsrv"/useless_services
+  }
+}
+
+function update0 {
+  [ -f "$pathsrv"/update_ok ] && {
+    clear; echo "O sistema ja foi atualizado e os pacotes necessarios instalados. Continuando."; echo ""; sleep 2
+  } || {
+    clear; echo "Atualizando o sistema"; echo ""
+    sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear; echo "Instalando pacotes...."
+    sudo apt install $package_list --no-install-recommends -y
+    sync &&
+    sudo usermod -aG libvirt administrador
+    sudo usermod -aG libvirt-qemu administrador
+    sudo usermod -aG docker administrador && sudo touch "$pathsrv"/update_ok
+  }
+}
+
+function password0 {
+  [ -f "$pathsrv"/password_ok ] && {
+    clear; echo "Senha substituida anteriormente. Continuando."; echo ""; sleep 2
+  } || {
+    clear; echo "Trocando a senha do usuario ADMINISTRADOR deste servidor!"
+    echo "administrador:$var3" | sudo chpasswd && sudo touch "$pathsrv"/password_ok
+  }
+}
+
+function netplan0 {
+  [ -f "$pathsrv"/netplan_ok ] && {
+    clear; echo "O Netplan ja foi ajustado. Continuando."; echo ""; sleep 2
+  } || {
+    sleep 3; clear; echo "Ajustando Netplan"
+    echo -e "
+# This is the network config written by 'linite model-1' script
+network:
+  ethernets:
+#    renderer: NetworkManager
+    eno1:
+      dhcp4: true
+      nameservers:
+        addresses: [1.1.1.1, 8.8.8.8]
+    enp1s0:
+      dhcp4: true
+      nameservers:
+        addresses: [1.1.1.1, 8.8.8.8]
+    enp2s0:
+      dhcp4: true
+      nameservers:
+        addresses: [1.1.1.1, 8.8.8.8]
+    enp4s0:
+      dhcp4: true
+      addresses: [172.25.0.3/24]
+      gateway4: 172.25.0.1
+      nameservers:
+        addresses: [1.1.1.1, 8.8.8.8]
+  version: 2" | sudo tee /etc/netplan/00-installer-config.yaml
+  sudo netplan apply && sudo touch "$pathsrv"/netplan_ok
+  }
+}
+
+function macvlan0 {
+  [ -f "$pathsrv"/macvlan_ok ] && {
+    clear; echo "A MAVLAN ja foi configurada. Continuando."; echo ""; sleep 2
+  } || {
+    sleep 3; clear; echo "Definindo MACVLAN para os containers"
+    sudo docker network create -d macvlan --subnet="172.25.0.0"/24 --gateway="172.25.0.1" -o parent="enp4s0" macvlan && sudo touch "$pathsrv"/macvlan_ok
+  }
+}
+
+function pfsense0 {
+  [ -f "$pathsrv"/pfsense_ok ] && {
+    clear; echo "O pfSense ja foi configurado. Continuando."; echo ""; sleep 2
+  } || {
+    sleep 3; clear; echo "Adicionando VM do pfSense"
+    startvm && sudo touch "$pathsrv"/pfsense_ok
+  }
+}
+
+function docker0 {
+  [ -f "$pathsrv"/docker_ok ] && {
+    clear; echo "Os containers ja foram configurados. Continuando."; echo ""; sleep 2
+  } || {
+    sleep 3; clear; echo "Inicializando containers!"
+
+  # PiHole
+  sudo mkdir -p /srv/containers/pihole/{etc,log,dnsmasq.d}
+
+  sudo docker run -d \
+--name=pihole \
+--network macvlan \
+--ip=172.25.0.2 \
+--dns=1.1.1.1  \
+--hostname=pihole \
+--no-healthcheck \
+--restart=unless-stopped \
+--shm-size=512m \
+-e SERVERIP=172.25.0.2 \
+-e WEBPASSWORD="$var1" \
+-v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/pihole/etc/:/etc/pihole \
+-v /srv/containers/pihole/dnsmasq.d/:/etc/dnsmasq.d \
+-v /srv/containers/pihole/log/:/var/log/pihole \
+-p 80:80 \
+-p 443:443 \
+-p 67:67/tcp \
+-p 67:67/udp \
+-p 53:53/tcp \
+-p 53:53/udp \
+pihole/pihole:latest &&
+
+  sudo touch /srv/containers/pihole/Information
+
+  echo "172.25.0.2" | sudo tee /srv/containers/pihole/Information
+  echo "$passw0rd" | sudo tee -a /srv/containers/pihole/Information
+  echo "0.0.0.0" | sudo tee -a /srv/containers/pihole/Information
+  echo "pihole" | sudo tee -a /srv/containers/pihole/Information
+  echo "macvlan" | sudo tee -a /srv/containers/pihole/Information
+
+  # MySpeed
+  sudo mkdir -p /srv/containers/myspeed-tracker/data
+
+  sudo docker run -d \
+--name=myspeed-tracker \
+--network macvlan \
+--ip=172.25.0.4 \
+--dns=1.1.1.1  \
+--dns=127.0.0.1 \
+--hostname=myspeed-tracker \
+--no-healthcheck \
+--restart=unless-stopped \
+-p 5216:5216 \
+-v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/myspeed/data:/myspeed/data \
+germannewsmaker/myspeed &&
+
+  sudo touch /srv/containers/myspeed-tracker/Information
+
+  echo "myspeed-tracker" | sudo tee /srv/containers/myspeed-tracker/Information
+  echo "172.25.0.4" | sudo tee -a /srv/containers/myspeed-tracker/Information
+
+  # XPRA
+  sudo mkdir -p /srv/containers/xpra-virt-manager/home
+
+    sudo docker run -d \
+--privileged \
+--name=xpra-virt-manager \
+--network macvlan \
+--ip=172.25.0.5 \
+--dns=1.1.1.1  \
+--dns=127.0.0.1 \
+--hostname=xpra-virt-manager \
+--no-healthcheck \
+--restart=unless-stopped \
+--device /dev/kvm:/dev/kvm \
+-e DARK_MODE=true \
+-e HOSTS="['qemu:///system']" \
+-e passw0rd="$var2" \
+-e resolution=1920x1080 \
+-e PORTS=9876 \
+-v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/xpra-virt-manager/home:/home \
+-v /var/lib/libvirt/images:/var/lib/libvirt/images \
+-v /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock \
+-v /dev/disk/by-id:/dev/disk/by-id \
+urbancompasspony/xpra-virt-manager:latest &&
+
+  sudo touch /srv/containers/xpra-virt-manager/Information
+
+  echo "xpra-virt-manager" | sudo tee /srv/containers/xpra-virt-manager/Information
+  echo "$var2" | sudo tee -a /srv/containers/xpra-virt-manager/Information
+  echo "1920x1080" | sudo tee -a /srv/containers/xpra-virt-manager/Information
+  echo "9876" | sudo tee -a /srv/containers/xpra-virt-manager/Information
+  echo "172.25.0.5" | sudo tee -a /srv/containers/xpra-virt-manager/Information
+
+  # Script Server
+  sudo mkdir -p /srv/containers/script-server/{scripts,runners}
+
+  sudo docker run -d \
+--name=script-server \
+--network macvlan \
+--ip=172.25.0.6 \
+--dns=1.1.1.1  \
+--dns=127.0.0.1 \
+--hostname=script-server \
+--no-healthcheck \
+--restart=unless-stopped \
+-p 5000:5000 \
+-v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/script-server/runners/:/app/conf/runners \
+-v /srv/containers/script-server/scripts/:/app/scripts/ \
+bugy/script-server:latest &&
+
+  sudo touch /srv/containers/script-server/Information
+
+  echo "script-server" | sudo tee /srv/containers/script-server/Information
+  echo "172.25.0.6" | sudo tee -a /srv/containers/script-server/Information
+
+  # OpenSpeedTest
+  sudo docker run -d \
+--name=openspeedtest \
+--network macvlan \
+--ip=172.25.0.7 \
+--dns=1.1.1.1  \
+--dns=127.0.0.1 \
+--hostname=openspeedtest \
+--no-healthcheck \
+--restart=unless-stopped \
+-p 3000:3000 \
+-p 3001:3001 \
+-v /etc/localtime:/etc/localtime:ro \
+openspeedtest/latest &&
+
+  sudo touch /srv/containers/openspeedtest/Information
+
+  echo "openspeedtest" | sudo tee /srv/containers/pihole/Information
+  echo "172.25.0.7" | sudo tee -a /srv/containers/pihole/Information
+
+  sudo touch "$pathsrv"/docker_ok
+  }
+}
+
+function sysctl0 {
+  [ -f "$pathsrv"/sysctl_ok ] && {
+    clear; echo "O SYSCTL ja foi modificado. Continuando."; echo ""; sleep 2
+  } || {
+    sleep 3; clear; echo "Aplicando recursos extras ao SYSCTL"
+    echo -e "kernel.sysrq=1
+vm.panic_on_oom=1
+vm.swappiness=10
+kernel.panic=5
+#net.ipv4.ip_forward=1
+#net.ipv6.conf.all.disable_ipv6=1
+#net.ipv6.conf.default.disable_ipv6=1" | sudo tee -a /etc/sysctl.conf &&
+    sudo touch "$pathsrv"/sysctl_ok
+  }
+}
+
+function motd0 {
+  [ -f "$pathsrv"/motd_ok ] && {
+    clear; echo "O MOTD ja foi substituido. Continuando."; echo ""; sleep 2
+  } || {
+    sleep 3; clear; echo "Ajustando MOTD"
+    sudo rm -R /etc/update-motd.d/*
+    sudo wget https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/00-header -O /etc/update-motd.d/00-header
+    sudo wget https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/20-sysinfo -O /etc/update-motd.d/20-sysinfo
+    sudo wget https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/90-dynamic-motd -O /etc/update-motd.d/90-dynamic-motd
+    sudo chmod +x /etc/update-motd.d/*&& sudo touch "$pathsrv"/motd_ok
+  }
+}
+
+function journal0 {
+  [ -f "$pathsrv"/journal_ok ] && {
+    clear; echo "O JournalCTL ja foi ajustado. Continuando."; echo ""; sleep 2
+  } || {
+    sleep 3; clear; echo "Ajustando JOURNAL"
+    echo -e "
+Storage=persistent
+SystemMaxUse=5G
+SystemKeepFree=10G" | sudo tee -a /etc/systemd/journald.conf &&
+    sudo touch "$pathsrv"/journal_ok
+  }
+}
+
+function fstab0 {
+  [ -f "$pathsrv"/fstab_ok ] && {
+    clear; echo "O fstab ja foi ajustado de acordo. Continuando."; echo ""; sleep 2
+  } || {
+    sleep 3; clear; echo "Adicionando entradas extras ao fstab"
+    echo -e "
+# Temp to ram!
+tmpfs /tmp tmpfs defaults 0 0
+tmpfs /var/tmp tmpfs defaults 0 0
+
+# Disk 01
+#/dev/disk/by-uuid/ /mnt/main ext4 defaults 0 0
+
+# Disk 02
+#/dev/disk/by-uuid/ /mnt/backup ext4 defaults 0 0" | sudo tee -a /etc/fstab && sudo touch "$pathsrv"/fstab_ok
+  }
+}
+
+function beep0 {
+  [ -f "$pathsrv"/beep ] && {
+    clear; echo "O beep ja foi adicionado. Continuando."; echo ""; sleep 2
+  } || {
+    sleep 3; clear; echo "Criando um Beep bonitinho se tiver speaker no servidor!"
+    wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh -O /home/administrador/.beep.sh
+    clear; echo "Beep instalado. Testando..."; sudo bash /home/administrador/.beep.sh
+    sleep 2; echo "@reboot sleep 60; bash /home/administrador/.beep.sh" | sudo tee /tmp/crontab_new
+    sudo crontab -l | cat - /tmp/crontab_new | tee crontab.txt && sudo crontab crontab.txt
+    sudo rm crontab.txt; sudo touch "$pathsrv"/beep
+  }
+}
+
+function the_end {
+  sudo touch "$pathsrv"/finished
+  sleep 3
+  clear; echo "Instalação concluida!"
+  echo "Reiniciando sistema..."
+  sleep 3
+  sudo reboot
+}
+
+function smbconfig0 {
+  clear; echo "Adicionando modelo SAMBA AD"
+  sudo mkdir -p /srv/containers/scripts/
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/SAMBA_Model/smbAD.conf | sudo tee /srv/containers/scripts/SMB-AD-Model.conf
+}
+
+function startvm {
+  if ping -c 1 $serverip >/dev/null; then
+    webadress="$lanhost"
+  else
+    webadress="$wanhost"
+  fi
+
+  [ -f "$destpath"/pfsense.img ] && {
+    sudo chmod 777 /var/run/libvirt/libvirt-sock
+  } || {
+    clear; sudo wget --user $usern4me --password $passw0rd $webadress/pfsense.img -O $destpath/pfsense.img
+    sudo chmod 777 /var/run/libvirt/libvirt-sock
+  }
+
+  sudo virt-install --import \
+--name pfSense \
+--boot hd,cdrom,menu=on \
+--memory 2048 \
+--vcpus 2 \
+--cpu host \
+--network type=direct,source=enp1s0,source_mode=bridge,mac=52:54:00:55:ea:01 \
+--network type=direct,source=enp2s0,source_mode=bridge,mac=52:54:00:55:ea:02 \
+--network type=direct,source=eno1,source_mode=bridge,mac=52:54:00:55:ea:03 \
+--disk /var/lib/libvirt/images/pfsense.img \
+--os-variant=freebsd13.1 \
+--graphics vnc \
+--import \
+--autostart 1>/dev/null 2>/dev/null &
+}
+
+function menu0 {
+VALUE1="passw0rd"; VALUE2="P4sswrd"; VALUE3="Psswd0"
+
+VALUE0=$(dialog --cancel-label "Sair da Instalacao" --ok-label "Iniciar Instalacao" --title "Novo Servidor" --form "Defina as SENHAS a seguir, nao deixe em branco:" 11 50 0 \
+"Senha  PiHole:" 1 1 "$VALUE1" 1 15 40 0 \
+"Senha do XPRA:" 2 1 "$VALUE2" 2 15 40 0 \
+"Administrador:" 3 1 "$VALUE3" 3 15 40 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+[ $? -ne 0 ] && canceled_by_user
+
+var1=$(echo "$VALUE0" | sed -n 1p)
+var2=$(echo "$VALUE0" | sed -n 2p)
+var3=$(echo "$VALUE0" | sed -n 3p)
+
+check0
+}
+
+function check0 {
+  [ "$var1" = "" ] || [ "$var2" = "" ] || [ "$var3" = "" ] && {
+    clear; echo ""; echo "Nao deixe nenhum campo em branco!"; sleep 2;
+    menu0
+  } || {
+    echo . >/dev/null
+  }
+}
+
+function canceled_by_user {
+  clear; echo ""; echo "A INSTALACAO FOI CANCELADA PELO USUARIO."; echo ""; exit
+}
+
 # ======================================================================================================================================================== #
 
+root_check
 hard_check
 sys_check
-root_check
 
 [ -f "$pathsrv"/finished ] && {
   is_finished
@@ -547,7 +511,6 @@ root_check
   intro_script
   bash_config
   information0
-  paths0
   useless_services0
   update0
   password0
@@ -559,7 +522,7 @@ root_check
   motd0
   journal0
   fstab0
-  smbconfig
+  smbconfig0
   beep0
   the_end
 }
