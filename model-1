@@ -215,10 +215,10 @@ function pfsense0 {
       webadress="$wanhost"
     fi
 
-    [ -f "$destpath"/pfsense.img ] && {
+    [ -f "$destpath"/pfsense-modelo.img ] && {
       sudo chmod 777 /var/run/libvirt/libvirt-sock
     } || {
-      clear; sudo wget --user $usern4me --password $passw0rd $webadress/pfsense.img -O $destpath/pfsense.img &&
+      clear; sudo wget --user $usern4me --password $passw0rd $webadress/pfsense-modelo.img -O $destpath/pfsense-modelo.img &&
       sudo chmod 777 /var/run/libvirt/libvirt-sock
     }
 
@@ -231,7 +231,7 @@ function pfsense0 {
 --network type=direct,source=enp1s0,source_mode=bridge,mac=52:54:00:55:ea:01 \
 --network type=direct,source=enp2s0,source_mode=bridge,mac=52:54:00:55:ea:02 \
 --network type=direct,source=eno1,source_mode=bridge,mac=52:54:00:55:ea:03 \
---disk /var/lib/libvirt/images/pfsense.img \
+--disk /var/lib/libvirt/images/pfsense-modelo.img \
 --os-variant=freebsd13.1 \
 --graphics vnc \
 --import \
