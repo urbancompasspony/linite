@@ -128,7 +128,7 @@ function timezone0 {
   [ -f "$pathsrv"/timezone_ok ] && {
     clear; echo "TimeZone ja foi configurado. Continuando."; echo ""; sleep 2
   } || {
-    sudo timedatectl set-timezone America/Bahia
+    sudo timedatectl set-timezone Etc/GMT+3
     sudo touch "$pathsrv"/timezone_ok
   }
 }
