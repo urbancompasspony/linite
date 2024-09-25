@@ -114,8 +114,8 @@ function motd00 {
 function installer {
   sudo apt install $1 --no-install-recommends -y
 
-  mkdir -p /home/administrador/.config/openbox
-  wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/Wayland/LabWC/menu.xml -O .config/openbox/menu.xml
+  #mkdir -p /home/administrador/.config/openbox
+  #wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/Wayland/LabWC/menu.xml -O .config/openbox/menu.xml
 
   [ $(arch) = "aarch64" ] && {
     sudo apt install linux-modules-extra-raspi -y
