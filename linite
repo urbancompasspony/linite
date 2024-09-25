@@ -165,6 +165,9 @@ sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print
   mkswap0
   clear; echo "Removendo pacotes inuteis"; echo ""
   sudo apt purge needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolution-data-server bluez blueman bluetooth -y
+  clear; echo "Definindo TimeZone"
+  timedatectl set-timezone Etc/GMT+3
+  clear; date; sleep 2
   clear; echo "Atualizando o sistema"; echo ""
   sudo apt update
   sudo apt upgrade -y
