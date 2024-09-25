@@ -308,7 +308,6 @@ echo -e "
 
 function smbconfig {
 mv /etc/samba/smb.conf /etc/samba/smb.BKP
-
 curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/SAMBA_Model/smbAD.conf | sudo tee /etc/samba/smb-AD-Model.conf
 }
 
