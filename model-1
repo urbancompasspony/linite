@@ -199,6 +199,7 @@ function macvlan0 {
     clear; echo "A MAVLAN ja foi configurada. Continuando."; echo ""; sleep 2
   } || {
     sleep 3; clear; echo "Definindo MACVLAN para os containers"
+
     sudo docker network create -d macvlan --subnet="172.25.0.0"/24 --gateway="172.25.0.1" -o parent="enp4s0" macvlan && sudo touch "$pathsrv"/macvlan_ok
   }
 }
@@ -247,130 +248,11 @@ function docker0 {
   } || {
     sleep 3; clear; echo "Inicializando containers!"
 
-    # PiHole
-    sudo mkdir -p /srv/containers/pihole/{etc,log,dnsmasq.d}
-    sudo docker run -d \
---name=pihole \
---network macvlan \
---ip=172.25.0.2 \
---dns=1.1.1.1  \
---hostname=pihole \
---no-healthcheck \
---restart=unless-stopped \
---shm-size=512m \
--e SERVERIP=172.25.0.2 \
--e WEBPASSWORD="$var1" \
--v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/pihole/etc/:/etc/pihole \
--v /srv/containers/pihole/dnsmasq.d/:/etc/dnsmasq.d \
--v /srv/containers/pihole/log/:/var/log/pihole \
--p 80:80 \
--p 443:443 \
--p 67:67/tcp \
--p 67:67/udp \
--p 53:53/tcp \
--p 53:53/udp \
-pihole/pihole:latest &&
-
-    sudo touch /srv/containers/pihole/Information
-    echo "172.25.0.2" | sudo tee /srv/containers/pihole/Information
-    echo "$passw0rd" | sudo tee -a /srv/containers/pihole/Information
-    echo "0.0.0.0" | sudo tee -a /srv/containers/pihole/Information
-    echo "pihole" | sudo tee -a /srv/containers/pihole/Information
-    echo "macvlan" | sudo tee -a /srv/containers/pihole/Information
-
-    # MySpeed
-    sudo mkdir -p /srv/containers/myspeed-tracker/data
-    sudo docker run -d \
---name=myspeed-tracker \
---network macvlan \
---ip=172.25.0.4 \
---dns=1.1.1.1  \
---dns=127.0.0.1 \
---hostname=myspeed-tracker \
---no-healthcheck \
---restart=unless-stopped \
--p 5216:5216 \
--v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/myspeed/data:/myspeed/data \
-germannewsmaker/myspeed &&
-
-    sudo touch /srv/containers/myspeed-tracker/Information
-    echo "myspeed-tracker" | sudo tee /srv/containers/myspeed-tracker/Information
-    echo "172.25.0.4" | sudo tee -a /srv/containers/myspeed-tracker/Information
-
-    # XPRA
-    sudo mkdir -p /srv/containers/xpra-virt-manager/home
-    sudo docker run -d \
---privileged \
---name=xpra-virt-manager \
---network macvlan \
---ip=172.25.0.5 \
---dns=1.1.1.1  \
---dns=127.0.0.1 \
---hostname=xpra-virt-manager \
---no-healthcheck \
---restart=unless-stopped \
---device /dev/kvm:/dev/kvm \
--e DARK_MODE=true \
--e HOSTS="['qemu:///system']" \
--e passw0rd="$var2" \
--e resolution=1920x1080 \
--e PORTS=9876 \
--v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/xpra-virt-manager/home:/home \
--v /var/lib/libvirt/images:/var/lib/libvirt/images \
--v /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock \
--v /dev/disk/by-id:/dev/disk/by-id \
-urbancompasspony/xpra-virt-manager:latest &&
-
-    sudo touch /srv/containers/xpra-virt-manager/Information
-    echo "xpra-virt-manager" | sudo tee /srv/containers/xpra-virt-manager/Information
-    echo "$var2" | sudo tee -a /srv/containers/xpra-virt-manager/Information
-    echo "1920x1080" | sudo tee -a /srv/containers/xpra-virt-manager/Information
-    echo "9876" | sudo tee -a /srv/containers/xpra-virt-manager/Information
-    echo "172.25.0.5" | sudo tee -a /srv/containers/xpra-virt-manager/Information
-
-    # Script Server
-    sudo mkdir -p /srv/containers/script-server/{scripts,runners}
-    sudo docker run -d \
---name=script-server \
---network macvlan \
---ip=172.25.0.6 \
---dns=1.1.1.1  \
---dns=127.0.0.1 \
---hostname=script-server \
---no-healthcheck \
---restart=unless-stopped \
--p 5000:5000 \
--v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/script-server/runners/:/app/conf/runners \
--v /srv/containers/script-server/scripts/:/app/scripts/ \
-bugy/script-server:latest &&
-
-    sudo touch /srv/containers/script-server/Information
-    echo "script-server" | sudo tee /srv/containers/script-server/Information
-    echo "172.25.0.6" | sudo tee -a /srv/containers/script-server/Information
-
-    # OpenSpeedTest
-    sudo mkdir -p /srv/containers/openspeedtest
-    sudo docker run -d \
---name=openspeedtest \
---network macvlan \
---ip=172.25.0.7 \
---dns=1.1.1.1  \
---dns=127.0.0.1 \
---hostname=openspeedtest \
---no-healthcheck \
---restart=unless-stopped \
--p 3000:3000 \
--p 3001:3001 \
--v /etc/localtime:/etc/localtime:ro \
-openspeedtest/latest &&
-
-    sudo touch /srv/containers/openspeedtest/Information
-    echo "openspeedtest" | sudo tee /srv/containers/pihole/Information
-    echo "172.25.0.7" | sudo tee -a /srv/containers/pihole/Information
+    pihole0
+    myspeed0
+    xpra0
+    scriptsrv0
+    openspeed0
 
     sudo touch "$pathsrv"/docker_ok
   }
@@ -494,6 +376,137 @@ function canceled_by_user {
   clear; echo ""; echo "A INSTALACAO FOI CANCELADA PELO USUARIO."; echo ""; exit
 }
 
+function pihole0 {
+  sudo mkdir -p /srv/containers/pihole/{etc,log,dnsmasq.d}
+  sudo docker run -d \
+--name=pihole \
+--network macvlan \
+--ip=172.25.0.2 \
+--dns=1.1.1.1  \
+--hostname=pihole \
+--no-healthcheck \
+--restart=unless-stopped \
+--shm-size=512m \
+-e SERVERIP=172.25.0.2 \
+-e WEBPASSWORD="$var1" \
+-v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/pihole/etc/:/etc/pihole \
+-v /srv/containers/pihole/dnsmasq.d/:/etc/dnsmasq.d \
+-v /srv/containers/pihole/log/:/var/log/pihole \
+-p 80:80 \
+-p 443:443 \
+-p 67:67/tcp \
+-p 67:67/udp \
+-p 53:53/tcp \
+-p 53:53/udp \
+pihole/pihole:latest &&
+
+  sudo touch /srv/containers/pihole/Information
+
+  echo "172.25.0.2" | sudo tee /srv/containers/pihole/Information
+  echo "$passw0rd" | sudo tee -a /srv/containers/pihole/Information
+  echo "0.0.0.0" | sudo tee -a /srv/containers/pihole/Information
+  echo "pihole" | sudo tee -a /srv/containers/pihole/Information
+  echo "macvlan" | sudo tee -a /srv/containers/pihole/Information
+}
+
+function myspeed0 {
+  sudo mkdir -p /srv/containers/myspeed-tracker/data
+  sudo docker run -d \
+--name=myspeed-tracker \
+--network macvlan \
+--ip=172.25.0.4 \
+--dns=1.1.1.1  \
+--dns=127.0.0.1 \
+--hostname=myspeed-tracker \
+--no-healthcheck \
+--restart=unless-stopped \
+-p 5216:5216 \
+-v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/myspeed/data:/myspeed/data \
+germannewsmaker/myspeed &&
+
+  sudo touch /srv/containers/myspeed-tracker/Information
+  echo "myspeed-tracker" | sudo tee /srv/containers/myspeed-tracker/Information
+  echo "172.25.0.4" | sudo tee -a /srv/containers/myspeed-tracker/Information
+}
+
+function xpra0 {
+  sudo mkdir -p /srv/containers/xpra-virt-manager/home
+  sudo docker run -d \
+--privileged \
+--name=xpra-virt-manager \
+--network macvlan \
+--ip=172.25.0.5 \
+--dns=1.1.1.1  \
+--dns=127.0.0.1 \
+--hostname=xpra-virt-manager \
+--no-healthcheck \
+--restart=unless-stopped \
+--device /dev/kvm:/dev/kvm \
+-e DARK_MODE=true \
+-e HOSTS="['qemu:///system']" \
+-e passw0rd="$var2" \
+-e resolution=1920x1080 \
+-e PORTS=9876 \
+-v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/xpra-virt-manager/home:/home \
+-v /var/lib/libvirt/images:/var/lib/libvirt/images \
+-v /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock \
+-v /dev/disk/by-id:/dev/disk/by-id \
+urbancompasspony/xpra-virt-manager:latest &&
+
+  sudo touch /srv/containers/xpra-virt-manager/Information
+  echo "xpra-virt-manager" | sudo tee /srv/containers/xpra-virt-manager/Information
+  echo "$var2" | sudo tee -a /srv/containers/xpra-virt-manager/Information
+  echo "1920x1080" | sudo tee -a /srv/containers/xpra-virt-manager/Information
+  echo "9876" | sudo tee -a /srv/containers/xpra-virt-manager/Information
+  echo "172.25.0.5" | sudo tee -a /srv/containers/xpra-virt-manager/Information
+}
+
+function scriptsrv0 {
+  sudo mkdir -p /srv/containers/script-server/{scripts,runners}
+  sudo docker run -d \
+--name=script-server \
+--network macvlan \
+--ip=172.25.0.6 \
+--dns=1.1.1.1  \
+--dns=127.0.0.1 \
+--hostname=script-server \
+--no-healthcheck \
+--restart=unless-stopped \
+-p 5000:5000 \
+-v /etc/localtime:/etc/localtime:ro \
+-v /srv/containers/script-server/runners/:/app/conf/runners \
+-v /srv/containers/script-server/scripts/:/app/scripts/ \
+bugy/script-server:latest &&
+
+  sudo touch /srv/containers/script-server/Information
+  echo "script-server" | sudo tee /srv/containers/script-server/Information
+  echo "172.25.0.6" | sudo tee -a /srv/containers/script-server/Information
+}
+
+function openspeed0 {
+  sudo mkdir -p /srv/containers/openspeedtest
+  sudo docker run -d \
+--name=openspeedtest \
+--network macvlan \
+--ip=172.25.0.7 \
+--dns=1.1.1.1  \
+--dns=127.0.0.1 \
+--hostname=openspeedtest \
+--no-healthcheck \
+--restart=unless-stopped \
+-p 3000:3000 \
+-p 3001:3001 \
+-v /etc/localtime:/etc/localtime:ro \
+openspeedtest/latest &&
+
+  sudo touch /srv/containers/openspeedtest/Information
+  echo "openspeedtest" | sudo tee /srv/containers/openspeedtest/Information
+  echo "172.25.0.7" | sudo tee -a /srv/containers/openspeedtest/Information
+}
+
 # ======================================================================================================================================================== #
 
 root_check
@@ -508,8 +521,8 @@ sys_check
   passmgr0
   useless0
   update0
-  macvlan0
   pfsense0
+  macvlan0
   docker0
   sysctl0
   motd0
