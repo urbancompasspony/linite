@@ -334,7 +334,7 @@ function flatpakhub {
 # ============================================================================ #
 
 function start-arch {
-timedatectl set-timezone America/Bahia
+timedatectl set-timezone Etc/GMT+3
 menuB
 }
 
@@ -364,7 +364,7 @@ menuB
   sudo apt upgrade -y
   apt autoremove -y
   clear; echo "Definindo timezone"; echo ""
-  timedatectl set-timezone America/Bahia
+  timedatectl set-timezone Etc/GMT+3
   touch /home/$USER/.installed
   clear; echo "Concluido!"; echo ""; sleep 3
   menuB
