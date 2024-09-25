@@ -124,6 +124,15 @@ function passmgr0 {
   }
 }
 
+function timezone0 {
+  [ -f "$pathsrv"/timezone_ok ] && {
+    clear; echo "TimeZone ja foi configurado. Continuando."; echo ""; sleep 2
+  } || {
+    sudo timedatectl set-timezone America/Bahia
+    sudo touch "$pathsrv"/timezone_ok
+  }
+}
+
 function useless0 {
   [ -f "$pathsrv"/useless_services ] && {
     clear; echo "Os pacotes inuteis ja foram removidos e desativados. Continuando."; echo ""; sleep 2
@@ -520,6 +529,7 @@ sys_check0
   welcome0
   bashconf0
   passmgr0
+  timezone0
   useless0
   update0
   pfsense0
