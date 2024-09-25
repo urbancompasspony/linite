@@ -35,7 +35,7 @@ export DEBIAN_FRONTEND=noninteractive
 
 # ======================================================================================================================================================== #
 
-function root_check {
+function root_check0 {
   [ "$EUID" -ne 0 ] || {
     clear
     echo "Não execute este script como Root! DICA: Remova o SUDO do comando ou execute-o como administrador."; echo ""
@@ -43,7 +43,7 @@ function root_check {
   }
 }
 
-function hard_check {
+function hard_check0 {
   hardversion=$(cat /proc/cpuinfo | grep 'model name' | head -n 1 | awk -F: '{ print $2 }' | cut -d ' ' -f 3,4)
 
   [ "$hardversion" = "$mainhard" ] && {
@@ -58,7 +58,7 @@ function hard_check {
   }
 }
 
-function sys_check {
+function sys_check0 {
   sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print $1}')
 
   [ "$sysversion" = "$mainrelease" ] && {
@@ -75,7 +75,7 @@ function sys_check {
   }
 }
 
-function is_finished {
+function is_finished0 {
   clear; echo ""; echo "Este sistema já esta configurado. Saindo..."; echo ""; sleep 3
   exit
 }
@@ -280,11 +280,9 @@ function motd0 {
   } || {
     sleep 3; clear; echo "Ajustando tela de boas vindas do servidor"
     sudo rm -R /etc/update-motd.d/*
-
     curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/00-header | sudo tee /etc/update-motd.d/00-header
     curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/20-sysinfo | sudo tee /etc/update-motd.d/20-sysinfo
     curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/90-dynamic-motd | sudo tee /etc/update-motd.d/90-dynamic-motd
-
     sudo chmod +x /etc/update-motd.d/*
     sudo touch "$pathsrv"/motd_ok
   }
@@ -317,7 +315,10 @@ tmpfs /var/tmp tmpfs defaults 0 0
 #/dev/disk/by-uuid/ /mnt/main ext4 defaults 0 0
 
 # Disk 02
-#/dev/disk/by-uuid/ /mnt/backup ext4 defaults 0 0" | sudo tee -a /etc/fstab && sudo touch "$pathsrv"/fstab_ok
+#/dev/disk/by-uuid/ /mnt/backup ext4 defaults 0 0
+
+# Acesso Externo
+//172.25.0.X/folder /mnt/folder cifs credentials=/home/administrador/.smb,iocharset=utf8,file_mode=0777,dir_mode=0777,noperm,user,vers=2.1,nofail,x-systemd.automount,x-systemd.requires=network-online.target,x-systemd.device-timeout=3 0 0" | sudo tee -a /etc/fstab && sudo touch "$pathsrv"/fstab_ok
   }
 }
 
@@ -334,7 +335,7 @@ function beep0 {
   }
 }
 
-function the_end {
+function the_end0 {
   sudo touch "$pathsrv"/finished
   clear; echo "Instalação concluida!"
   echo "Reiniciando sistema..."
@@ -509,12 +510,12 @@ openspeedtest/latest &&
 
 # ======================================================================================================================================================== #
 
-root_check
-hard_check
-sys_check
+root_check0
+hard_check0
+sys_check0
 
 [ -f "$pathsrv"/finished ] && {
-  is_finished
+  is_finished0
 } || {
   welcome0
   bashconf0
@@ -531,7 +532,7 @@ sys_check
   smbconf0
   beep0
   netplan0
-  the_end
+  the_end0
 }
 
 exit 1
