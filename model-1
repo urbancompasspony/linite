@@ -43,21 +43,6 @@ function root_check0 {
   }
 }
 
-function hard_check0 {
-  hardversion=$(cat /proc/cpuinfo | grep 'model name' | head -n 1 | awk -F: '{ print $2 }' | cut -d ' ' -f 3,4)
-
-  [ "$hardversion" = "$mainhard" ] && {
-    echo . >/dev/null
-  } || {
-    clear; echo ""; echo "HARDWARE INADEQUADO DETECTADO!"
-    echo ""
-    echo "Este script exige o hardware 'Appliance 4x Gigabit Celeron J4125' e voce esta usando o $hardversion"
-    echo "SAINDO...."
-    sleep 5
-    exit
-  }
-}
-
 function sys_check0 {
   sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print $1}')
 
@@ -66,12 +51,28 @@ function sys_check0 {
   } || {
     clear
     echo ""
-    echo "SISTEMA INADEQUADO DETECTADO!"
+    echo "SISTEMA OPERACIONAL INADEQUADO DETECTADO!"
     echo ""
-    echo "Este script exige o Ubuntu Server 22.04 LTS e você está usando o $sysversion!"
+    echo "Este script requer o Ubuntu Server 22.04 LTS e você está usando o $sysversion!"
+    echo ""
     echo "SAINDO...."
     sleep 5
     exit
+  }
+}
+
+function hard_check0 {
+  hardversion=$(cat /proc/cpuinfo | grep 'model name' | head -n 1 | awk -F: '{ print $2 }' | cut -d ' ' -f 3,4)
+
+  [ "$hardversion" = "$mainhard" ] && {
+    appliance0
+  } || {
+    clear; echo ""; echo "HARDWARE FORA DE MODELO DETECTADO!"
+    echo ""
+    echo "A versão automática deste script exige o hardware 'Appliance 4x Gigabit Celeron J4125' e voce esta usando o $hardversion"
+    echo ""
+    echo "Prosseguindo com o Modelo Linite 1.0 de instalação Manual"; sleep 2
+    linite0
   }
 }
 
@@ -81,17 +82,10 @@ function is_finished0 {
 }
 
 function welcome0 {
-  clear; echo ""; echo "Bem-vindo ao Preparo de Servidor-Modelo by SuitIT®"; echo ""; echo "Insira a senha padrao a seguir: ubuntu"; echo ""
+  clear; echo ""; echo "Bem-vindo ao Preparo de Servidor $1 by SuitIT®"; echo ""; echo "Insira a senha padrao a seguir: ubuntu"; echo ""
 
-  [ -f /home/administrador/.installed ] && {
-    clear; echo ""; echo "Este servidor foi configurado previamente com outra versao do Linite. Devido ao risco de perdas de dados o instalador vai ser encerrado."; sleep 2
-    exit
-  } || {
-    echo . >/dev/null
-  }
-
-  sudo [ -f /root/.installed ] && {
-    clear; echo ""; echo "Este servidor foi configurado previamente com outra versao do Linite. Devido ao risco de perdas de dados o instalador vai ser encerrado."; sleep 2
+  [ -f "$pathsrv"/finished ] || [ -f /home/administrador/.installed ] && {
+    clear; echo ""; echo "Este servidor ja foi configurado previamente. Devido ao risco de perdas de dados o instalador vai ser encerrado."; sleep 2
     exit
   } || {
     echo . >/dev/null
@@ -105,6 +99,17 @@ function bashconf0 {
   sudo mkdir -p "$destpath"; sudo chmod 777 -R "$destpath"; sudo mkdir -p "$pathsrv"
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
   . .bashrc
+}
+
+function mkswap0 {
+  [ -f /swapfile ] && {
+    echo "." >/dev/zero
+  } || {
+    sudo dd if=/dev/zero of=/swapfile bs=1k count=1000000
+    sudo chmod 0600 /swapfile
+    sudo mkswap /swapfile; sudo swapon /swapfile
+    echo "/swapfile none swap sw 0 0" | sudo tee -a /etc/fstab
+  }
 }
 
 function passmgr0 {
@@ -225,10 +230,10 @@ function pfsense0 {
       webadress="$wanhost"
     fi
 
-    [ -f "$destpath"/pfsense-modelo.img ] && {
+    [ -f "$destpath"/"$1" ] && {
       sudo chmod 777 /var/run/libvirt/libvirt-sock
     } || {
-      clear; sudo wget --user $usern4me --password $passw0rd $webadress/pfsense-modelo.img -O $destpath/pfsense-modelo.img &&
+      clear; sudo wget --user $usern4me --password $passw0rd $webadress/"$1" -O $destpath/"$1" &&
       sudo chmod 777 /var/run/libvirt/libvirt-sock
     }
 
@@ -241,7 +246,7 @@ function pfsense0 {
 --network type=direct,source=enp1s0,source_mode=bridge,mac=52:54:00:55:ea:01 \
 --network type=direct,source=enp2s0,source_mode=bridge,mac=52:54:00:55:ea:02 \
 --network type=direct,source=eno1,source_mode=bridge,mac=52:54:00:55:ea:03 \
---disk /var/lib/libvirt/images/pfsense-modelo.img \
+--disk /var/lib/libvirt/images/"$1" \
 --os-variant=freebsd13.1 \
 --graphics vnc \
 --import \
@@ -519,20 +524,33 @@ openspeedtest/latest &&
 
 # ======================================================================================================================================================== #
 
-root_check0
-hard_check0
-sys_check0
+function linite0 {
+  welcome0 "Generico v2.0"
+  bashconf0
+  mkswap0
+  timezone0
+  useless0
+  update0
+  pfsense0 "pfsense.img"
 
-[ -f "$pathsrv"/finished ] && {
-  is_finished0
-} || {
-  welcome0
+  sysctl0
+  motd0
+  journal0
+  fstab0
+  smbconf0
+  beep0
+  netplan0
+  the_end0
+}
+
+function appliance0 {
+  welcome0 "Modelo Appliance v3.0"
   bashconf0
   passmgr0
   timezone0
   useless0
   update0
-  pfsense0
+  pfsense0 "pfsense-modelo.img"
   macvlan0
   docker0
   sysctl0
@@ -544,5 +562,9 @@ sys_check0
   netplan0
   the_end0
 }
+
+root_check0
+sys_check0
+hard_check0
 
 exit 1
