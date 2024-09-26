@@ -532,6 +532,9 @@ function xpra0 {
 -v /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock \
 -v /dev/disk/by-id:/dev/disk/by-id \
 urbancompasspony/xpra-virt-manager:latest
+
+  sudo chmod 777 /var/run/libvirt/libvirt-sock
+  sudo chmod 777 -R /srv/containers/xpra-virt-manager/home
 }
 
 function scriptsrv0 {
