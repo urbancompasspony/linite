@@ -70,9 +70,9 @@ function sys_check0 {
     } || {
       clear; echo ""
       echo "SISTEMA OPERACIONAL INADEQUADO DETECTADO!"; echo ""
-      echo "Este script requer o Ubuntu Server 22.04 LTS e você está usando o $sysversion!"; echo ""
-      echo "SAINDO...."
-      sleep 5; exit
+      echo "O automatismo deste script exige o sistema 'Ubuntu Server 22.04 LTS' e voce esta usando o $sysversion"; echo ""
+      echo "Prosseguindo com o Modelo Linite 1.0 de instalação Manual..."; sleep 2
+      linite0
     }
   }
 }
