@@ -20,14 +20,6 @@ export list04="winehq-staging winetricks libvulkan1:i386 libgl1-mesa-glx:i386 li
 # Raspbian & Tools
 export list05="openvpn curl nmap parallel zip unzip dialog iperf traceroute arp-scan net-tools netdiscover speedtest-cli iotop whois docker.io"
 
-# For ArchLinux:
-export listpac="qqc2-desktop-style iperf docker-buildx qemu-base torbrowser-launcher p7zip arch-install-scripts lib32-libxcomposite lib32-pipewire redshift cronie gparted beep dconf-editor inxi curl nmap parallel smartmontools tmux zip unzip \
-dialog traceroute arp-scan net-tools rdesktop scrcpy speedtest-cli whois btop rsnapshot rclone net-tools haveged cifs-utils w3m iotop htop samba sshpass speedtest-cli traceroute docker.io docker-buildx btrfs-progs virt-manager terminator \
-wine openvpn btop scrcpy libatasmart k3b audacity rdesktop qbittorrent dconf-editor filezilla thunderbird libreoffice libreoffice-fresh-pt-br thunderbird-i18n-pt-br nmap drawing kodi vlc kpat gimp fluidsynth cmatrix ettercap-gtk wireshark-qt blender dconf-editor"
-
-export listyay="freetube-bin yaru-colors-gtk-theme yaru-colors-icon-theme yaru-gtk-theme yaru-icon-theme gnome-disk-utility serpro-signer mate-tweak rpi-imager anydesk-bin microsoft-edge-stable-bin google-chrome opera adb"
-# qqc2-desktop-style for kdenlive!
-
 export NEEDRESTART_MODE=a
 export DEBIAN_FRONTEND=noninteractive
 
@@ -149,25 +141,6 @@ $list05" 25 40
 menuB
 }
 
-# for EndeavourOS 1
-function endeavour00 {
-  echo "Install with PACMAN: $listpac"
-  sleep 15
-  echo "Install with YAY: $listyay"
-  sleep 10
-  echo "ENABLE these services: cronie, sshd"
-}
-
-# for EndeavourOS 2
-function endeavour01 {
-  user0
-  perfil
-  servicesoff
-  sysctlconf
-  sysctltweaks
-  smbconfig
-}
-
 # ============================================================================ #
 
 function installer {
@@ -175,7 +148,7 @@ function installer {
     pacman -S $1
   } || {
     apt install $1 --no-install-recommends -y
-    }  
+    }
 }
 
 function user0 {
@@ -332,34 +305,9 @@ timedatectl set-timezone Etc/GMT+3
 menuB
 }
 
-# ============================================================================ #
-
 [ "$EUID" -ne 0 ] || {
   echo "Não execute esse script como Root! Ainda. Insira a senha quando solicitado."
   exit
   }
 
-[ -f /home/$USER/.installed ] && {
-  clear
-  echo ""
-  echo "Sistema já Instalado."
-  menuB
-} || {
-  clear
-  clear; echo "Sistema não configurado. Configurando..."; echo ""
-  curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
-  . .bashrc
-  clear; echo "Removendo pacotes inuteis"; echo ""
-  sudo apt purge needrestart cloud-init cloud-initramfs-dyn-netconf snapd unattended-upgrades plank deja-dup evolution evolution-data-server bluez blueman bluetooth -y
-  clear; echo "Instalando pacotes essenciais"; echo ""
-  sudo apt update
-  sudo apt install dialog curl
-  clear; echo "Atualizando o sistema"; echo ""
-  sudo apt upgrade -y
-  apt autoremove -y
-  clear; echo "Definindo timezone"; echo ""
-  timedatectl set-timezone Etc/GMT+3
-  touch /home/$USER/.installed
-  clear; echo "Concluido!"; echo ""; sleep 3
-  menuB
-}
+menuB
