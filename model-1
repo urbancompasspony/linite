@@ -46,11 +46,11 @@ export destpath="/var/lib/libvirt/images"
 export NEEDRESTART_MODE=a
 export DEBIAN_FRONTEND=noninteractive
 
-# Informations:
+# Informations for the compliance Celeron:
 #        enp1s0 = ETH0
 #        enp2s0 = ETH1
-# eno1 = enp3s0 = ETH2
-# macvlan net   = ETH3
+# eno1 (enp3s0) = ETH2
+# MACVLAN       = ETH3
 
 # ======================================================================================================================================================== #
 
