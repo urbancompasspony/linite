@@ -629,6 +629,11 @@ $list00" 25 40
 menuB
 }
 
+function menu_arch0 {
+  echo 0
+  exit
+}
+
 function flatpakhub {
   sudo apt install flatpak
   flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
