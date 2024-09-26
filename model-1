@@ -70,15 +70,11 @@ function sys_check0 {
     [ -f /usr/bin/pacman ] && {
       menu_arch0
     } || {
-      clear
-      echo ""
-      echo "SISTEMA OPERACIONAL INADEQUADO DETECTADO!"
-      echo ""
-      echo "Este script requer o Ubuntu Server 22.04 LTS e você está usando o $sysversion!"
-      echo ""
+      clear; echo ""
+      echo "SISTEMA OPERACIONAL INADEQUADO DETECTADO!"; echo ""
+      echo "Este script requer o Ubuntu Server 22.04 LTS e você está usando o $sysversion!"; echo ""
       echo "SAINDO...."
-      sleep 5
-      exit
+      sleep 5; exit
     }
   }
 }
@@ -88,25 +84,18 @@ function hard_check0 {
   [ "$hardversion" = "$mainhard" ] && {
     appliance0
   } || {
-    clear; echo ""; echo "HARDWARE FORA DE MODELO DETECTADO!"
-    echo ""
-    echo "A versão automática deste script exige o hardware 'Appliance 4x Gigabit Celeron J4125' e voce esta usando o $hardversion"
-    echo ""
-    echo "Prosseguindo com o Modelo Linite 1.0 de instalação Manual"; sleep 2
+    clear; echo ""; echo "HARDWARE FORA DE PADRAO DETECTADO!"; echo ""
+    echo "O automatismo deste script exige o hardware 'Appliance 4x Gigabit Celeron J4125' e voce esta usando o $hardversion"; echo ""
+    echo "Prosseguindo com o Modelo Linite 1.0 de instalação Manual..."; sleep 2
     linite0
   }
-}
-
-function is_finished0 {
-  clear; echo ""; echo "Este sistema já esta configurado. Saindo..."; echo ""; sleep 3
-  exit
 }
 
 function welcome0 {
   clear; echo ""; echo "Bem-vindo ao Preparo de Servidor $1 by SuitIT®"; echo ""; echo "Insira a senha padrao a seguir: ubuntu"; echo ""
 
   [ -f "$pathsrv"/finished ] || [ -f /home/$USER/.installed ] && {
-    clear; echo ""; echo "Este servidor ja foi configurado previamente."; sleep 2
+    clear; echo ""; echo "Este servidor ja foi configurado previamente. Entrando no menu Linite manual..."; sleep 3
     menuB
   } || {
     echo . >/dev/null
