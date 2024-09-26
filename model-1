@@ -193,7 +193,7 @@ network:
       nameservers:
         addresses: [1.1.1.1, 8.8.8.8]
     enp4s0:
-      dhcp4: true
+      dhcp4: false
       addresses: [172.25.0.3/24]
       gateway4: 172.25.0.1
       nameservers:
