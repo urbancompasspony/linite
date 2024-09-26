@@ -1,56 +1,51 @@
 #!/usr/bin/env bash
 
-# ============================================================================ #
+# ======================================================================================================================================================== #
 # curl -L m.linuxuniverse.com.br | bash
-# ============================================================================ #
-
-export mainrelease="DISTRIB_RELEASE=22.04"
-export mainhard="Celeron(R) J4125"
-
-export usern4me="admin"
-export passw0rd="isorulez"
-
-export serverip="172.20.0.22"
-export lanhost="http://$serverip"
-export wanhost="http://z.net-freaks.com:3434"
-
-# Main Script
-export package_list="docker.io docker-buildx \
-net-tools speedtest-cli whois w3m w3m-img netdiscover figlet iperf arp-scan traceroute sshpass fail2ban network-manager \
-libatasmart-bin smartmontools zip unzip p7zip-full 7zip p7zip cifs-utils rsnapshot rclone iotop pluma \
-haveged beep stress lm-sensors cmatrix btop inxi tree hwloc figlet dialog \
-gpm tmux xinit xorg openbox pavucontrol caja epiphany-browser gparted gnome-disk-utility terminator rdesktop \
-qemu-system qemu-utils qemu-user qemu-kvm qemu-guest-agent libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq genisoimage"
-
-# VM & Docker
-export list00="qemu-system qemu-utils qemu-user qemu-kvm qemu-guest-agent libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq docker.io docker-buildx"
-
-# Essentials [+VM/SoC]
-export list01="beep inxi curl iperf nmap parallel smartmontools tmux zip unzip dialog traceroute arp-scan net-tools netdiscover rdesktop scrcpy speedtest-cli whois btop rsnapshot rclone openssh-server net-tools haveged cifs-utils w3m w3m-img iotop htop lm-sensors samba samba-dsdb-modules samba-vfs-modules sshpass speedtest-cli traceroute docker.io docker-buildx build-essential libatasmart-bin btrfs-progs"
-
-# Server [No VM/SoC]
-export list02="$list00 $list01 dialog fail2ban gpm xinit xorg openbox pavucontrol caja epiphany-browser gparted gnome-disk-utility terminator cmatrix"
-
-# Desktop
-export list03="$list01 shotcut ubuntu-restricted-extras scrcpy adb pavucontrol printer-driver-all rdesktop terminator hardinfo cpu-x qbittorrent dconf-editor filezilla thunderbird thunderbird-locale-pt-br rss-glx xscreensaver xscreensaver-data xscreensaver-data-extra xscreensaver-gl-extra xscreensaver-gl k3b drawing mypaint gimp audacity kodi vlc aisleriot gnome-mines gnome-mahjongg kpat fluidsynth cmatrix"
-
-# WINE
-export list04="winehq-staging winetricks libvulkan1:i386 libgl1-mesa-glx:i386 libglu1-mesa:i386 lib32-libxcomposite"
-
-# Raspbian & Tools
-export list05="openvpn curl nmap parallel zip unzip dialog iperf traceroute arp-scan net-tools netdiscover speedtest-cli iotop whois docker.io"
-
-export pathsrv="/srv/containers/scripts/config/install"
-export destpath="/var/lib/libvirt/images"
-
-export NEEDRESTART_MODE=a
-export DEBIAN_FRONTEND=noninteractive
+# ======================================================================================================================================================== #
 
 # Informations for the compliance Celeron:
 #        enp1s0 = ETH0
 #        enp2s0 = ETH1
 # eno1 (enp3s0) = ETH2
 # MACVLAN       = ETH3
+
+export serverip="172.20.0.22"
+export lanhost="http://$serverip"
+export wanhost="http://z.net-freaks.com:3434"
+export usern4me="admin"; export passw0rd="isorulez"
+export mainrelease="DISTRIB_RELEASE=22.04"; export mainhard="Celeron(R) J4125"
+
+export NEEDRESTART_MODE=a; export DEBIAN_FRONTEND=noninteractive
+export pathsrv="/srv/containers/scripts/config/install"; export destpath="/var/lib/libvirt/images"
+
+# Main Script
+export package_list="docker.io docker-buildx \
+net-tools speedtest-cli whois w3m w3m-img netdiscover figlet iperf arp-scan traceroute sshpass fail2ban network-manager \
+libatasmart-bin smartmontools zip unzip p7zip-full 7zip p7zip cifs-utils rsnapshot rclone iotop pluma \
+haveged beep stress lm-sensors cmatrix btop inxi tree hwloc figlet dialog \
+gpm tmux xinit xorg openbox pavucontrol caja epiphany-browser gparted gnome-disk-utility terminator rdesktop unrar \
+qemu-system qemu-utils qemu-user qemu-kvm qemu-guest-agent libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq genisoimage"
+
+# VM & Docker
+export list00="qemu-system qemu-utils qemu-user qemu-kvm qemu-guest-agent libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq \
+docker.io docker-buildx"
+
+# Essentials [+VM/SoC]
+export list01="beep inxi curl iperf nmap parallel smartmontools tmux zip unzip dialog traceroute arp-scan net-tools netdiscover rdesktop scrcpy speedtest-cli whois btop \
+rsnapshot rclone openssh-server net-tools haveged cifs-utils w3m w3m-img iotop htop lm-sensors samba samba-dsdb-modules samba-vfs-modules sshpass speedtest-cli traceroute \
+docker.io docker-buildx build-essential libatasmart-bin btrfs-progs unrar"
+
+# Server [No VM/SoC]
+export list02="$list00 $list01 dialog fail2ban gpm xinit xorg openbox pavucontrol caja epiphany-browser gparted gnome-disk-utility terminator cmatrix unrar"
+
+# Desktop
+export list03="$list01 shotcut ubuntu-restricted-extras scrcpy adb pavucontrol printer-driver-all rdesktop terminator hardinfo cpu-x qbittorrent dconf-editor \
+filezilla thunderbird thunderbird-locale-pt-br rss-glx xscreensaver xscreensaver-data xscreensaver-data-extra xscreensaver-gl-extra xscreensaver-gl k3b drawing mypaint gimp audacity kodi vlc \
+aisleriot gnome-mines gnome-mahjongg kpat fluidsynth cmatrix"
+
+# Raspbian & Tools
+export list05="openvpn curl nmap parallel zip unzip dialog iperf traceroute arp-scan net-tools netdiscover speedtest-cli iotop whois docker.io unrar"
 
 # ======================================================================================================================================================== #
 
@@ -152,9 +147,12 @@ function useless0 {
   [ -f "$pathsrv"/useless_services ] && {
     clear; echo "Os pacotes inuteis ja foram removidos e desativados. Continuando."; echo ""; sleep 2
   } || {
-    clear; echo "Removendo pacotes inuteis"; echo ""
+    clear; echo "Removendo pacotes e desativando servicos inuteis"; echo ""
     sudo apt purge needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolution-data-server bluez blueman bluetooth -y
-    sudo systemctl disable NetworkManager-wait-online.service; sudo systemctl mask NetworkManager-wait-online.service; sudo systemctl disable systemd-networkd-wait-online.service; sudo systemctl mask systemd-networkd-wait-online.service
+    sudo systemctl disable NetworkManager-wait-online.service
+    sudo systemctl mask NetworkManager-wait-online.service
+    sudo systemctl disable systemd-networkd-wait-online.service
+    sudo systemctl mask systemd-networkd-wait-online.service
     sudo touch "$pathsrv"/useless_services
   }
 }
@@ -164,8 +162,9 @@ function update0 {
     clear; echo "O sistema ja foi atualizado e os pacotes necessarios instalados. Continuando."; echo ""; sleep 2
   } || {
     clear; echo "Atualizando o sistema"; echo ""
-    sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear; echo "Instalando pacotes...."
+    sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear
 
+    echo "Instalando pacotes...."
     sudo apt install $package_list --no-install-recommends -y &&
     sync &&
 
