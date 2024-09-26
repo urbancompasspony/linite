@@ -379,7 +379,7 @@ tmpfs /tmp tmpfs defaults 0 0
 tmpfs /var/tmp tmpfs defaults 0 0
 
 # Main Disk
-# /dev/disk/by-uuid/$1 /mnt/main ext4 defaults 0 0
+# /dev/disk/by-uuid/ /mnt/main ext4 defaults 0 0
 
 # Backup
 # /dev/disk/by-uuid/ /mnt/backup ext4 defaults 0 0
@@ -387,7 +387,6 @@ tmpfs /var/tmp tmpfs defaults 0 0
 # Acesso Externo
 # //172.25.0.X/folder /mnt/folder cifs credentials=/home/administrador/.smb,iocharset=utf8,file_mode=0777,dir_mode=0777,noperm,user,vers=2.1,nofail,x-systemd.automount,x-systemd.requires=network-online.target,x-systemd.device-timeout=3 0 0" | sudo tee -a /etc/fstab &&
 
-    sudo mount -a; clear; df -h; sleep 3
     sudo touch "$pathsrv"/fstab_ok
   }
 }
@@ -676,8 +675,7 @@ function appliance0 {
   sysctl0
   motd0
   journal0
-  #diskfun0
-  fstab0 "$UUID1"
+  fstab0
   smbconf0
   beep0
   netplan0
