@@ -87,13 +87,14 @@ function hard_check0 {
 }
 
 function welcome0 {
-  clear; echo ""; echo "Bem-vindo ao Preparo de Servidor $1 by SuitIT®"; echo ""; echo "Insira a senha padrao a seguir: ubuntu"; echo ""
+  clear; echo ""; echo "Bem-vindo ao Preparo de Servidor $1 by SuitIT®"; echo ""
 
   [ -f "$pathsrv"/finished ] || [ -f /home/$USER/.installed ] && {
     clear; echo ""; echo "Este servidor ja foi configurado previamente. Entrando no menu Linite manual..."; sleep 3
     menuB
   } || {
-    echo . >/dev/null
+    echo "Insira a senha padrao a seguir: ubuntu"; echo ""
+    sudo echo . >/dev/null
   }
 
   echo ""; echo "5"; sleep 1; echo "4"; sleep 1; echo "3"; sleep 1; echo "2"; sleep 1; echo "1"; sleep 1
