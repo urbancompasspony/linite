@@ -680,8 +680,11 @@ function appliance0 {
   the_end0
 }
 
-root_check0
-sys_check0
-hard_check0
+function start0 {
+  root_check0
+  sys_check0
+  hard_check0
+}
 
+start0
 exit 1
