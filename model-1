@@ -49,6 +49,8 @@ export list05="openvpn curl nmap parallel zip unzip dialog iperf traceroute arp-
 
 # ======================================================================================================================================================== #
 
+function menu_arch0 { exit; }
+
 function root_check0 {
   [ "$EUID" -ne 0 ] || {
     clear
@@ -87,7 +89,7 @@ function hard_check0 {
 }
 
 function welcome0 {
-  clear; echo ""; echo "Bem-vindo ao Preparo de Servidor $1 by SuitIT®"; echo ""
+  clear; echo ""; echo "Preparo de Servidor by SuitIT®: $1"; echo ""
 
   [ -f "$pathsrv"/finished ] || [ -f /home/$USER/.installed ] && {
     clear; echo ""; echo "Este servidor ja foi configurado previamente. Entrando no menu Linite manual..."; sleep 3
@@ -368,6 +370,7 @@ function fstab0 {
   } || {
     sudo mkdir /mnt/main
     sudo mkdir /mnt/backup
+
     sleep 3; clear; echo "Adicionando entradas extras ao fstab"
 
     echo -e "
@@ -376,7 +379,7 @@ tmpfs /tmp tmpfs defaults 0 0
 tmpfs /var/tmp tmpfs defaults 0 0
 
 # Main Disk
-# /dev/disk/by-uuid/ /mnt/main ext4 defaults 0 0
+# /dev/disk/by-uuid/$1 /mnt/main ext4 defaults 0 0
 
 # Backup
 # /dev/disk/by-uuid/ /mnt/backup ext4 defaults 0 0
@@ -384,6 +387,7 @@ tmpfs /var/tmp tmpfs defaults 0 0
 # Acesso Externo
 # //172.25.0.X/folder /mnt/folder cifs credentials=/home/administrador/.smb,iocharset=utf8,file_mode=0777,dir_mode=0777,noperm,user,vers=2.1,nofail,x-systemd.automount,x-systemd.requires=network-online.target,x-systemd.device-timeout=3 0 0" | sudo tee -a /etc/fstab &&
 
+    sudo mount -a; clear; df -h; sleep 3
     sudo touch "$pathsrv"/fstab_ok
   }
 }
@@ -633,7 +637,11 @@ $list00" 25 40
 menuB
 }
 
-function menu_arch0 { exit; }
+function diskfun0 {
+  UUID0=$(lsblk -o NAME,MOUNTPOINT | grep -v 'MOUNTPOINT' | awk '$2 == "" {print $1}')
+  sudo mkfs.ext4 -FF -m 0 /dev/$UUID0
+  export UUID1=$(lsblk -f | grep $UUID0 | awk '{print $4}')
+}
 
 # ======================================================================================================================================================== #
 
@@ -656,7 +664,7 @@ function linite0 {
 }
 
 function appliance0 {
-  welcome0 "Modelo Appliance v3.0"
+  welcome0 "Appliance v3.0"
   bashconf0
   passmgr0
   timezone0
@@ -668,7 +676,8 @@ function appliance0 {
   sysctl0
   motd0
   journal0
-  fstab0
+  #diskfun0
+  fstab0 "$UUID1"
   smbconf0
   beep0
   netplan0
