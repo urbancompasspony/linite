@@ -582,10 +582,6 @@ openspeedtest/latest &&
   echo "172.25.0.7" | sudo tee -a /srv/containers/openspeedtest/Information
 }
 
-function menu_arch0 {
-
-]
-
 function menuB {
 var0=$(dialog --title 'Linite' --backtitle "L I N I T E" --menu " " 0 0 0 \
 1 'Linux Essentials [All]' \
