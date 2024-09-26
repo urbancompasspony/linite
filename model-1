@@ -478,6 +478,25 @@ function pihole0 {
 -p 53:53/tcp \
 -p 53:53/udp \
 pihole/pihole:latest
+
+docker start pihole
+docker exec pihole rm /etc/pihole/pihole-FTL.conf
+docker exec pihole touch /etc/pihole/pihole-FTL.conf
+docker exec pihole bash -c "echo 'LOCAL_IPV4=0.0.0.0' >> /etc/pihole/pihole-FTL.conf"
+docker exec pihole bash -c "echo 'RATE_LIMIT=0/0' >> /etc/pihole/pihole-FTL.conf"
+
+  [ -f /srv/containers/pihole/dnsmasq.d/02-custom-settings.conf ] || {
+    docker exec pihole bash -c "echo '# domain forward lookups' > /etc/dnsmasq.d/02-custom-settings.conf"
+    docker exec pihole bash -c "echo '#server=/ad.domain.local/191.168.0.10' >> /etc/dnsmasq.d/02-custom-settings.conf"
+    docker exec pihole bash -c "echo '# domain PTR/reverse lookups' >> /etc/dnsmasq.d/02-custom-settings.conf"
+    docker exec pihole bash -c "echo '#server=/0.168.192.in-addr.arpa/192.168.0.10' >> /etc/dnsmasq.d/02-custom-settings.conf"
+    docker exec pihole bash -c "echo '# Custom DNS Max Queries and Cache' >> /etc/dnsmasq.d/02-custom-settings.conf"
+    docker exec pihole bash -c "echo 'dns-forward-max=5096' >> /etc/dnsmasq.d/02-custom-settings.conf"
+    docker exec pihole bash -c "echo 'min-cache-ttl=300' >> /etc/dnsmasq.d/02-custom-settings.conf"
+    docker exec pihole bash -c "echo 'rebind-domain-ok=' >> /etc/dnsmasq.d/02-custom-settings.conf"
+  } && {
+    echo "." >/dev/null
+  }
 }
 
 function myspeed0 {
