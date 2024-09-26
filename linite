@@ -1,17 +1,11 @@
 #!/usr/bin/env bash
 
 # ============================================================================ #
-# ============================================================================ #
-# ============================================================================ #
 
 # O comando para usar este script é:
 # curl -sSL https://linite.linuxuniverse.com.br | bash
 
 export mainrelease="DISTRIB_RELEASE=22.04"
-
-# ============================================================================ #
-# ============================================================================ #
-# ============================================================================ #
 
 export NEEDRESTART_MODE=a
 export DEBIAN_FRONTEND=noninteractive
@@ -21,8 +15,9 @@ net-tools speedtest-cli whois w3m w3m-img netdiscover iperf arp-scan traceroute 
 libatasmart-bin smartmontools zip unzip p7zip-full 7zip p7zip cifs-utils rsnapshot rclone iotop \
 haveged beep stress lm-sensors cmatrix btop inxi tree hwloc figlet dialog \
 gpm tmux xinit xorg openbox pavucontrol caja epiphany-browser gparted gnome-disk-utility terminator rdesktop"
-
 # samba samba-dsdb-modules samba-vfs-modules 
+
+# ============================================================================ #
 
 function sysctlconf {
 echo -e "kernel.sysrq=1
