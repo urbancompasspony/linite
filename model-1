@@ -18,6 +18,7 @@ export mainrelease="DISTRIB_RELEASE=22.04"; export mainhard="Celeron(R) J4125"
 
 export NEEDRESTART_MODE=a; export DEBIAN_FRONTEND=noninteractive
 export pathsrv="/srv/containers/scripts/config/install"; export destpath="/var/lib/libvirt/images"
+export github="https://raw.githubusercontent.com/urbancompasspony/docker/main/"
 
 # Main Script
 export package_list="docker.io docker-buildx \
@@ -579,6 +580,14 @@ bugy/script-server:latest
 }
 
 function openspeed0 {
+  wget "$github"16-openspeedtest -O /tmp/speedtest
+  source /tmp/speedtest
+  VALUE1="$NOMECONTAINER"
+  VALUE2="172.25.0.7"
+  create
+}
+
+function openspeed00 {
   sudo mkdir -p /srv/containers/openspeedtest
   sudo touch /srv/containers/openspeedtest/Information
   echo "openspeedtest" | sudo tee /srv/containers/openspeedtest/Information
@@ -660,8 +669,9 @@ menuB
 
 function diskfun0 {
   UUID0=$(lsblk -o NAME,MOUNTPOINT | grep -v 'MOUNTPOINT' | awk '$2 == "" {print $1}')
-  sudo mkfs.ext4 -FF -m 0 /dev/$UUID0
-  export UUID1=$(lsblk -f | grep $UUID0 | awk '{print $4}')
+  sudo mkfs.ext4 -FF -m 0 /dev/"$UUID0"
+  UUID1=$(lsblk -f | grep "$UUID0" | awk '{print $4}')
+  export UUID1
 }
 
 # ======================================================================================================================================================== #
