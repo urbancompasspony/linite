@@ -192,7 +192,6 @@ function update1 {
     sync &&
 
     sudo usermod -aG docker administrador
-
     sudo touch "$pathsrv"/updatearm_ok
   }
 }
