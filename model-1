@@ -308,22 +308,6 @@ function pfsense0 {
   }
 }
 
-function docker0 {
-  [ -f "$pathsrv"/docker_ok ] && {
-    clear; echo "Os containers ja foram configurados. Continuando."; echo ""; sleep 2
-  } || {
-    sleep 3; clear; echo "Inicializando containers!"
-
-    pihole0 &&
-    myspeed0 &&
-    xpra0 &&
-    scriptsrv0 &&
-    openspeed0 &&
-
-    sudo touch "$pathsrv"/docker_ok
-  }
-}
-
 function sysctl0 {
   [ -f "$pathsrv"/sysctl_ok ] && {
     clear; echo "O SYSCTL ja foi modificado. Continuando."; echo ""; sleep 2
@@ -448,6 +432,28 @@ function check0 {
 function canceled_by_user {
   clear; echo ""; echo "A INSTALACAO FOI CANCELADA PELO USUARIO."; echo ""
   exit
+}
+
+function docker0 {
+  [ -f "$pathsrv"/dockers_ok ] && {
+    clear; echo "Os containers ja foram configurados. Continuando."; echo ""; sleep 2
+  } || {
+    sleep 3; clear; echo "Instalando e inicializando containers!"
+
+    pihole0
+    myspeed0
+    xpra0
+    scriptsrv0
+    openspeed0
+
+    # Devem haver 5 containers listados!
+    dkn=$(docker ps -aq | wc -l)
+    [ "$dkn" == "5" ] && {
+      sudo touch "$pathsrv"/dockers_ok
+    } || {
+      echo . >/dev/null
+    }
+  }
 }
 
 function pihole0 {
