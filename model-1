@@ -58,6 +58,17 @@ function root_check0 {
   }
 }
 
+function basic_struct0 {
+  [ -f /usr/bin/dialog ] && {
+    echo . >/dev/null
+  } || {
+    sudo apt update
+    sudo apt install dialog wget -y
+    bashconf0
+    exit
+  }
+}
+
 function hardsys0 {
   export sysmain="DISTRIB_RELEASE=22.04"
   sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print $1}')
@@ -83,7 +94,7 @@ function hardsys0 {
       clear; echo ""
       echo "SISTEMA OU HARDWARE INADEQUADO(S) DETECTADO!"; echo ""
       echo "O automatismo deste script exige o sistema 'Ubuntu Server 22.04 LTS' e voce esta usando o $sysversion"; echo ""
-      echo "O automatismo deste script exige o hardware 'Appliance 4x Gigabit Celeron J4125' e voce esta usando o $hardversion"; echo ""
+      echo "Da mesma forma este script exige o hardware 'Appliance 4x Gigabit Celeron J4125' e voce esta usando o $hardversion"; echo ""
       echo "Prosseguindo com o Modelo Linite de instalação Manual..."; sleep 2
       menuB
     }
@@ -660,6 +671,7 @@ function appliance0 {
 }
 
 root_check0
+basic_struct0
 hardsys0
 
 exit 1
