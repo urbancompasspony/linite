@@ -83,7 +83,7 @@ function hardsys0 {
         linite0
       }
     } || {
-      # Se o Ubuntu não é adequado e o hardware é genérico, prosseguir com cautela.
+      # Se o sistema não é adequado e o hardware é genérico, prosseguir com cautela.
       clear; echo ""
       echo "SISTEMA OU HARDWARE INADEQUADO(S) DETECTADO!"; echo ""
       echo "O automatismo deste script exige o sistema 'Ubuntu Server 22.04 LTS' e voce esta usando o $sysversion"; echo ""
