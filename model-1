@@ -14,7 +14,6 @@ export serverip="172.20.0.22"
 export usern4me="admin"; export passw0rd="isorulez"
 
 export lanhost="http://$serverip"; export wanhost="http://z.net-freaks.com:3434"
-export mainrelease="DISTRIB_RELEASE=22.04"; export newrelease="DISTRIB_RELEASE=24.04"; export mainhard="Celeron(R) J4125"
 
 export NEEDRESTART_MODE=a; export DEBIAN_FRONTEND=noninteractive
 export pathsrv="/srv/containers/scripts/config/install"; export destpath="/var/lib/libvirt/images"
@@ -59,33 +58,34 @@ function root_check0 {
   }
 }
 
-function sys_check0 {
+function hardsys0 {
+  export sysmain="DISTRIB_RELEASE=22.04"
   sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print $1}')
-  export sysversion
-  [ "$sysversion" = "$mainrelease" ] && {
-    echo . >/dev/null
-  } || {
-    clear; echo ""
-    echo "SISTEMA OPERACIONAL INADEQUADO DETECTADO!"; echo ""
-    echo "O automatismo deste script exige o sistema 'Ubuntu Server 22.04 LTS' e voce esta usando o $sysversion"; echo ""
-    echo "Prosseguindo com o Modelo Linite 1.0 de instalação Manual..."; sleep 2
-    linite0
-  }
-}
 
-function hard_check0 {
+  export hardmain="Celeron(R) J4125"
   hardversion=$(cat /proc/cpuinfo | grep 'model name' | head -n 1 | awk -F: '{ print $2 }' | cut -d ' ' -f 3,4)
-  export hardversion
-  [ "$hardversion" = "$mainhard" ] && {
+
+  # Se hardware e sistema estão ok, é o Appliance!
+  [ "$sysversion" = "$sysmain" ] && [ "$hardversion" = "$hardmain" ] && {
     appliance0
   } || {
-    [ $(arch) = "aarch64" ] && {
-      aarcharm0
+    # Se não é o Appliance, mas o Ubuntu é o adequado, verificar hardware...
+    [ "$sysversion" = "$sysmain" ] && {
+      # ...que pode ser aarch64...
+      [ $(arch) = "aarch64" ] && {
+        aarcharm0
+      } || {
+        # ...ou generico.
+        linite0
+      }
     } || {
-      clear; echo ""; echo "HARDWARE FORA DE PADRAO DETECTADO!"; echo ""
+      # Se o Ubuntu não é adequado e o hardware é genérico, prosseguir com cautela.
+      clear; echo ""
+      echo "SISTEMA OU HARDWARE INADEQUADO(S) DETECTADO!"; echo ""
+      echo "O automatismo deste script exige o sistema 'Ubuntu Server 22.04 LTS' e voce esta usando o $sysversion"; echo ""
       echo "O automatismo deste script exige o hardware 'Appliance 4x Gigabit Celeron J4125' e voce esta usando o $hardversion"; echo ""
-      echo "Prosseguindo com o Modelo Linite 1.0 de instalação Manual..."; sleep 2
-      linite0
+      echo "Prosseguindo com o Modelo Linite de instalação Manual..."; sleep 2
+      menuB
     }
   }
 }
@@ -547,7 +547,7 @@ function menuB {
 4 'Virtual Machine [No VM nor SoC]' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
-1) essentials0  ;;
+1) essentials0 ;;
 2) raspbian0 ;;
 3) server0 ;;
 4) VMs0 ;;
@@ -596,6 +596,7 @@ $list00" 25 40
 menuB
 }
 
+# WIP
 function diskfun0 {
   UUID0=$(lsblk -o NAME,MOUNTPOINT | grep -v 'MOUNTPOINT' | awk '$2 == "" {print $1}')
   sudo mkfs.ext4 -FF -m 0 /dev/"$UUID0"
@@ -605,28 +606,13 @@ function diskfun0 {
 
 # ======================================================================================================================================================== #
 
-function aarcharm0 {
-  welcome0 "ARM v1.0"
-  bashconf0
-  mkswap0
-  timezone0
-  useless0
-  update1
-  netplan1
-  sysctl0
-  motd0
-  journal0
-  smbconf0
-  the_end0
-}
-
 function linite0 {
   welcome0 "Generico v2.0"
   bashconf0
   mkswap0
   timezone0
-  useless0
   update0
+  useless0
   pfsense0 "pfsense.img"
   sysctl0
   motd0
@@ -638,13 +624,28 @@ function linite0 {
   the_end0
 }
 
+function aarcharm0 {
+  welcome0 "ARM v1.0"
+  bashconf0
+  mkswap0
+  timezone0
+  update1
+  useless0
+  netplan1
+  sysctl0
+  motd0
+  journal0
+  smbconf0
+  the_end0
+}
+
 function appliance0 {
   welcome0 "Appliance v3.0"
   bashconf0
   passmgr0
   timezone0
-  useless0
   update0
+  useless0
   pfsense0 "pfsense-modelo.img"
   macvlan0
   docker0
@@ -658,11 +659,7 @@ function appliance0 {
   the_end0
 }
 
-function start0 {
-  root_check0
-  sys_check0
-  hard_check0
-}
+root_check0
+hardsys0
 
-start0
 exit 1
