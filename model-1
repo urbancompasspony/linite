@@ -199,7 +199,7 @@ function update1 {
     sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear
 
     echo "Instalando pacotes...."
-    sudo apt install "$list05" "$package_2204" --no-install-recommends -y &&
+    sudo apt install $list05 $package_2204 --no-install-recommends -y &&
     sync &&
 
     sudo usermod -aG docker administrador
@@ -570,7 +570,7 @@ function essentials0 {
 dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
 $list01" 25 40
 [ $? = 0 ] && {
-  installer "$list01"
+  sudo apt install $list01 --no-install-recommends -y &&
   menuB
   }
 menuB
@@ -578,9 +578,9 @@ menuB
 
 function raspbian0 {
 dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
-$list05" 25 40
+$list05 $package_2404" 25 40
 [ $? = 0 ] && {
-  installer "$list05 $package_2404"
+  sudo apt install $list05 $package_2404 --no-install-recommends -y &&
   menuB
 }
 menuB
@@ -590,7 +590,7 @@ function server0 {
 dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
 $list02" 25 40
 [ $? = 0 ] && {
-  installer "$list02"
+  sudo apt install $list02 --no-install-recommends -y &&
   menuB
   }
 menuB
@@ -600,7 +600,7 @@ function VMs0 {
 dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
 $list00" 25 40
 [ $? = 0 ] && {
-  installer "$list00"
+  sudo apt install $list00 --no-install-recommends -y &&
   sudo usermod -aG libvirt "$USER"; sudo usermod -aG libvirt-qemu "$USER"
   menuB
   }
