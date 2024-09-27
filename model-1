@@ -90,7 +90,7 @@ function hard_check0 {
 }
 
 function welcome0 {
-  clear; echo ""; echo "Preparo de Servidor by SuitIT®: $1"; echo ""
+  clear; echo ""; echo "Preparo de Servidor $1 by SuitIT®"; echo ""
 
   [ -f "$pathsrv"/finished ] || [ -f /home/$USER/.installed ] && {
     clear; echo ""; echo "Este servidor ja foi configurado previamente. Entrando no menu Linite manual..."; sleep 3
