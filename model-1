@@ -15,12 +15,12 @@ export lanhost="http://$serverip"
 export wanhost="http://z.net-freaks.com:3434"
 export usern4me="admin"; export passw0rd="isorulez"
 export mainrelease="DISTRIB_RELEASE=22.04"; export mainhard="Celeron(R) J4125"
+export newrelease="DISTRIB_RELEASE=24.04"
 
 export NEEDRESTART_MODE=a; export DEBIAN_FRONTEND=noninteractive
 export pathsrv="/srv/containers/scripts/config/install"; export destpath="/var/lib/libvirt/images"
 export github="https://raw.githubusercontent.com/urbancompasspony/docker/main/"
 
-# Main Script
 export package_list="docker.io docker-buildx \
 net-tools speedtest-cli whois w3m w3m-img netdiscover figlet iperf arp-scan traceroute sshpass fail2ban network-manager \
 libatasmart-bin smartmontools zip unzip p7zip-full 7zip p7zip cifs-utils rsnapshot rclone iotop pluma \
@@ -47,45 +47,47 @@ aisleriot gnome-mines gnome-mahjongg kpat fluidsynth cmatrix"
 
 # Raspbian & Tools
 export list05="openvpn curl nmap parallel zip unzip dialog iperf traceroute arp-scan net-tools netdiscover speedtest-cli iotop whois docker.io unrar"
+export package_2204="linux-modules-extra-raspi"
+export package_2404="docker-buildx"
 
 # ======================================================================================================================================================== #
-
-function menu_arch0 { exit; }
 
 function root_check0 {
   [ "$EUID" -ne 0 ] || {
     clear
-    echo "Não execute este script como Root! DICA: Remova o SUDO do comando ou execute-o como administrador."; echo ""
+    echo "Não execute este script como Root! DICA: Remova o SUDO do comando ou execute-o como usuario local."; echo ""
     exit
   }
 }
 
 function sys_check0 {
   sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print $1}')
+  export sysversion
   [ "$sysversion" = "$mainrelease" ] && {
     echo . >/dev/null
   } || {
-    [ -f /usr/bin/pacman ] && {
-      menu_arch0
-    } || {
-      clear; echo ""
-      echo "SISTEMA OPERACIONAL INADEQUADO DETECTADO!"; echo ""
-      echo "O automatismo deste script exige o sistema 'Ubuntu Server 22.04 LTS' e voce esta usando o $sysversion"; echo ""
-      echo "Prosseguindo com o Modelo Linite 1.0 de instalação Manual..."; sleep 2
-      linite0
-    }
+    clear; echo ""
+    echo "SISTEMA OPERACIONAL INADEQUADO DETECTADO!"; echo ""
+    echo "O automatismo deste script exige o sistema 'Ubuntu Server 22.04 LTS' e voce esta usando o $sysversion"; echo ""
+    echo "Prosseguindo com o Modelo Linite 1.0 de instalação Manual..."; sleep 2
+    linite0
   }
 }
 
 function hard_check0 {
   hardversion=$(cat /proc/cpuinfo | grep 'model name' | head -n 1 | awk -F: '{ print $2 }' | cut -d ' ' -f 3,4)
+  export hardversion
   [ "$hardversion" = "$mainhard" ] && {
     appliance0
   } || {
-    clear; echo ""; echo "HARDWARE FORA DE PADRAO DETECTADO!"; echo ""
-    echo "O automatismo deste script exige o hardware 'Appliance 4x Gigabit Celeron J4125' e voce esta usando o $hardversion"; echo ""
-    echo "Prosseguindo com o Modelo Linite 1.0 de instalação Manual..."; sleep 2
-    linite0
+    [ $(arch) = "aarch64" ] && {
+      aarcharm0
+    } || {
+      clear; echo ""; echo "HARDWARE FORA DE PADRAO DETECTADO!"; echo ""
+      echo "O automatismo deste script exige o hardware 'Appliance 4x Gigabit Celeron J4125' e voce esta usando o $hardversion"; echo ""
+      echo "Prosseguindo com o Modelo Linite 1.0 de instalação Manual..."; sleep 2
+      linite0
+    }
   }
 }
 
@@ -176,6 +178,23 @@ function update0 {
     sudo usermod -aG libvirt-qemu administrador
     sudo usermod -aG docker administrador
     sudo touch "$pathsrv"/update_ok
+  }
+}
+
+function update1 {
+  [ -f "$pathsrv"/updatearm_ok ] && {
+    clear; echo "O sistema ja foi atualizado e os pacotes necessarios instalados. Continuando."; echo ""; sleep 2
+  } || {
+    clear; echo "Atualizando o sistema"; echo ""
+    sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear
+
+    echo "Instalando pacotes...."
+    sudo apt install "$list05" "$package_2204" --no-install-recommends -y &&
+    sync &&
+
+    sudo usermod -aG docker administrador
+
+    sudo touch "$pathsrv"/updatearm_ok
   }
 }
 
@@ -552,8 +571,7 @@ function raspbian0 {
 dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
 $list05" 25 40
 [ $? = 0 ] && {
-  installer "$list05"
-  clear; echo "Install docker-buildx linux-modules-extra-raspi if using Ubuntu Server!"; sleep 5
+  installer "$list05 $package_2404"
   menuB
 }
 menuB
@@ -574,8 +592,7 @@ dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
 $list00" 25 40
 [ $? = 0 ] && {
   installer "$list00"
-  sudo usermod -aG libvirt "$USER"
-  sudo usermod -aG libvirt-qemu "$USER"
+  sudo usermod -aG libvirt "$USER"; sudo usermod -aG libvirt-qemu "$USER"
   menuB
   }
 menuB
@@ -589,6 +606,21 @@ function diskfun0 {
 }
 
 # ======================================================================================================================================================== #
+
+function aarcharm0 {
+  welcome0 "ARM v1.0"
+  bashconf0
+  mkswap0
+  timezone0
+  useless0
+  update1
+  netplan1
+  sysctl0
+  motd0
+  journal0
+  smbconf0
+  the_end0
+}
 
 function linite0 {
   welcome0 "Generico v2.0"
