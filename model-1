@@ -313,11 +313,13 @@ function docker0 {
     clear; echo "Os containers ja foram configurados. Continuando."; echo ""; sleep 2
   } || {
     sleep 3; clear; echo "Inicializando containers!"
+
     pihole0 &&
     myspeed0 &&
     xpra0 &&
     scriptsrv0 &&
     openspeed0 &&
+
     sudo touch "$pathsrv"/docker_ok
   }
 }
@@ -458,7 +460,7 @@ function pihole0 {
   echo "pihole" | sudo tee -a /srv/containers/pihole/Information
   echo "macvlan" | sudo tee -a /srv/containers/pihole/Information
 
-  sudo wget "$github"01-pihole -O pihole
+  sudo wget "$github"01-pihole -O /tmp/pihole
   sudo chmod +x /tmp/pihole
   sudo bash /tmp/pihole
 }
@@ -470,7 +472,7 @@ function myspeed0 {
   echo "myspeed-tracker" | sudo tee /srv/containers/myspeed-tracker/Information
   echo "172.25.0.4" | sudo tee -a /srv/containers/myspeed-tracker/Information
 
-  sudo wget "$github"20-myspeed-tracker -O myspeed-tracker
+  sudo wget "$github"20-myspeed-tracker -O /tmp/myspeed-tracker
   sudo chmod +x /tmp/myspeed-tracker
   sudo bash /tmp/myspeed-tracker
 }
@@ -485,7 +487,7 @@ function xpra0 {
   echo "9876" | sudo tee -a /srv/containers/xpra-virt-manager/Information
   echo "172.25.0.5" | sudo tee -a /srv/containers/xpra-virt-manager/Information
 
-  sudo wget "$github"45-xpra-virt-manager -O xpra-virt-manager
+  sudo wget "$github"45-xpra-virt-manager -O /tmp/xpra-virt-manager
   sudo chmod +x /tmp/xpra-virt-manager
   sudo bash /tmp/xpra-virt-manager
 }
@@ -497,7 +499,7 @@ function scriptsrv0 {
   echo "script-server" | sudo tee /srv/containers/script-server/Information
   echo "172.25.0.6" | sudo tee -a /srv/containers/script-server/Information
 
-  sudo wget "$github"70-script-server -O script-server
+  sudo wget "$github"70-script-server -O /tmp/script-server
   sudo chmod +x /tmp/script-server
   sudo bash /tmp/script-server
 }
