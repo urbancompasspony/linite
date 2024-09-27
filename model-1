@@ -564,15 +564,14 @@ function menuB {
   var0=$(dialog --title 'Linite' --backtitle "L I N I T E" --menu " " 0 0 0 \
 1 'Linux Essentials [All]' \
 2 'RaspbberryPi & Tools [SoC Only]' \
-3 'Server [No VM nor SoC]' \
-4 'Virtual Machine [No VM nor SoC]' \
-5 'Default Services [All]' \
+3 'Virtual Machines [No VM nor SoC]' \
+4 'Default Configs [All]' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
 1) essentials0 ;;
 2) raspbian0 ;;
-3) server0 ;;
-4) VMs0 ;;
+3) VMs0 ;;
+4) basicsys0 ;;
 X) exit ;;
 esac
 }
@@ -594,16 +593,6 @@ $list01 $package_2404" 25 40
   sudo apt install $list01 $package_2404 --no-install-recommends -y &&
   menuB
 }
-menuB
-}
-
-function server0 {
-dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
-$list02" 25 40
-[ $? = 0 ] && {
-  sudo apt install $list02 --no-install-recommends -y &&
-  menuB
-  }
 menuB
 }
 
