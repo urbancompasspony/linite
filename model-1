@@ -451,161 +451,67 @@ function canceled_by_user {
 function pihole0 {
   sudo mkdir -p /srv/containers/pihole/{etc,log,dnsmasq.d}
   sudo touch /srv/containers/pihole/Information
+
   echo "172.25.0.2" | sudo tee /srv/containers/pihole/Information
   echo "$var1" | sudo tee -a /srv/containers/pihole/Information
   echo "0.0.0.0" | sudo tee -a /srv/containers/pihole/Information
   echo "pihole" | sudo tee -a /srv/containers/pihole/Information
   echo "macvlan" | sudo tee -a /srv/containers/pihole/Information
 
-  sudo docker run -d \
---name=pihole \
---network macvlan \
---ip=172.25.0.2 \
---dns=1.1.1.1  \
---hostname=pihole \
---no-healthcheck \
---restart=unless-stopped \
---shm-size=512m \
--e SERVERIP=172.25.0.2 \
--e WEBPASSWORD="$var1" \
--v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/pihole/etc/:/etc/pihole \
--v /srv/containers/pihole/dnsmasq.d/:/etc/dnsmasq.d \
--v /srv/containers/pihole/log/:/var/log/pihole \
--p 80:80 \
--p 443:443 \
--p 67:67/tcp \
--p 67:67/udp \
--p 53:53/tcp \
--p 53:53/udp \
-pihole/pihole:latest
-
-docker start pihole
-docker exec pihole rm /etc/pihole/pihole-FTL.conf
-docker exec pihole touch /etc/pihole/pihole-FTL.conf
-docker exec pihole bash -c "echo 'LOCAL_IPV4=0.0.0.0' >> /etc/pihole/pihole-FTL.conf"
-docker exec pihole bash -c "echo 'RATE_LIMIT=0/0' >> /etc/pihole/pihole-FTL.conf"
-
-  [ -f /srv/containers/pihole/dnsmasq.d/02-custom-settings.conf ] || {
-    docker exec pihole bash -c "echo '# domain forward lookups' > /etc/dnsmasq.d/02-custom-settings.conf"
-    docker exec pihole bash -c "echo '#server=/ad.domain.local/191.168.0.10' >> /etc/dnsmasq.d/02-custom-settings.conf"
-    docker exec pihole bash -c "echo '# domain PTR/reverse lookups' >> /etc/dnsmasq.d/02-custom-settings.conf"
-    docker exec pihole bash -c "echo '#server=/0.168.192.in-addr.arpa/192.168.0.10' >> /etc/dnsmasq.d/02-custom-settings.conf"
-    docker exec pihole bash -c "echo '# Custom DNS Max Queries and Cache' >> /etc/dnsmasq.d/02-custom-settings.conf"
-    docker exec pihole bash -c "echo 'dns-forward-max=5096' >> /etc/dnsmasq.d/02-custom-settings.conf"
-    docker exec pihole bash -c "echo 'min-cache-ttl=300' >> /etc/dnsmasq.d/02-custom-settings.conf"
-    docker exec pihole bash -c "echo 'rebind-domain-ok=' >> /etc/dnsmasq.d/02-custom-settings.conf"
-  } && {
-    echo "." >/dev/null
-  }
+  sudo wget "$github"01-pihole -O pihole
+  sudo chmod +x /tmp/pihole
+  sudo bash /tmp/pihole
 }
 
 function myspeed0 {
   sudo mkdir -p /srv/containers/myspeed-tracker/data
   sudo touch /srv/containers/myspeed-tracker/Information
+
   echo "myspeed-tracker" | sudo tee /srv/containers/myspeed-tracker/Information
   echo "172.25.0.4" | sudo tee -a /srv/containers/myspeed-tracker/Information
 
-  sudo docker run -d \
---name=myspeed-tracker \
---network macvlan \
---ip=172.25.0.4 \
---dns=1.1.1.1  \
---dns=127.0.0.1 \
---hostname=myspeed-tracker \
---no-healthcheck \
---restart=unless-stopped \
--p 5216:5216 \
--v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/myspeed/data:/myspeed/data \
-germannewsmaker/myspeed
+  sudo wget "$github"20-myspeed-tracker -O myspeed-tracker
+  sudo chmod +x /tmp/myspeed-tracker
+  sudo bash /tmp/myspeed-tracker
 }
 
 function xpra0 {
   sudo mkdir -p /srv/containers/xpra-virt-manager/home
   sudo touch /srv/containers/xpra-virt-manager/Information
+
   echo "xpra-virt-manager" | sudo tee /srv/containers/xpra-virt-manager/Information
   echo "$var2" | sudo tee -a /srv/containers/xpra-virt-manager/Information
   echo "1920x1080" | sudo tee -a /srv/containers/xpra-virt-manager/Information
   echo "9876" | sudo tee -a /srv/containers/xpra-virt-manager/Information
   echo "172.25.0.5" | sudo tee -a /srv/containers/xpra-virt-manager/Information
 
-  sudo docker run -d \
---privileged \
---name=xpra-virt-manager \
---network macvlan \
---ip=172.25.0.5 \
---dns=1.1.1.1  \
---dns=127.0.0.1 \
---hostname=xpra-virt-manager \
---no-healthcheck \
---restart=unless-stopped \
---device /dev/kvm:/dev/kvm \
--e DARK_MODE=true \
--e HOSTS="['qemu:///system']" \
--e passw0rd="$var2" \
--e resolution=1920x1080 \
--e PORTS=9876 \
--v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/xpra-virt-manager/home:/home \
--v /var/lib/libvirt/images:/var/lib/libvirt/images \
--v /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock \
--v /dev/disk/by-id:/dev/disk/by-id \
-urbancompasspony/xpra-virt-manager:latest
-
-  sudo chmod 777 /var/run/libvirt/libvirt-sock
-  sudo chmod 777 -R /srv/containers/xpra-virt-manager/home
+  sudo wget "$github"45-xpra-virt-manager -O xpra-virt-manager
+  sudo chmod +x /tmp/xpra-virt-manager
+  sudo bash /tmp/xpra-virt-manager
 }
 
 function scriptsrv0 {
   sudo mkdir -p /srv/containers/script-server/{scripts,runners}
   sudo touch /srv/containers/script-server/Information
+
   echo "script-server" | sudo tee /srv/containers/script-server/Information
   echo "172.25.0.6" | sudo tee -a /srv/containers/script-server/Information
 
-  sudo docker run -d \
---name=script-server \
---network macvlan \
---ip=172.25.0.6 \
---dns=1.1.1.1  \
---dns=127.0.0.1 \
---hostname=script-server \
---no-healthcheck \
---restart=unless-stopped \
--p 5000:5000 \
--v /etc/localtime:/etc/localtime:ro \
--v /srv/containers/script-server/runners/:/app/conf/runners \
--v /srv/containers/script-server/scripts/:/app/scripts/ \
-bugy/script-server:latest
+  sudo wget "$github"70-script-server -O script-server
+  sudo chmod +x /tmp/script-server
+  sudo bash /tmp/script-server
 }
 
 function openspeed0 {
-  wget "$github"16-openspeedtest -O /tmp/speedtest
-  source /tmp/speedtest
-  VALUE1="$NOMECONTAINER"
-  VALUE2="172.25.0.7"
-  create
-}
-
-function openspeed00 {
   sudo mkdir -p /srv/containers/openspeedtest
   sudo touch /srv/containers/openspeedtest/Information
+
   echo "openspeedtest" | sudo tee /srv/containers/openspeedtest/Information
   echo "172.25.0.7" | sudo tee -a /srv/containers/openspeedtest/Information
 
-  sudo docker run -d \
---name=openspeedtest \
---network macvlan \
---ip=172.25.0.7 \
---dns=1.1.1.1  \
---dns=127.0.0.1 \
---hostname=openspeedtest \
---no-healthcheck \
---restart=unless-stopped \
--p 3000:3000 \
--p 3001:3001 \
--v /etc/localtime:/etc/localtime:ro \
-openspeedtest/latest
+  sudo wget "$github"16-openspeedtest -O /tmp/speedtest
+  sudo chmod +x /tmp/speedtest
+  sudo bash /tmp/speedtest
 }
 
 function menuB {
