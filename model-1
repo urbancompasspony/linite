@@ -65,14 +65,19 @@ function hardsys0 {
         linite0
       }
     } || {
-      # Se o sistema não é adequado e o hardware é genérico, prosseguir com cautela.
-      clear; echo ""
-      echo "SISTEMA OU HARDWARE INADEQUADO(S) DETECTADO!"; echo ""
-      echo "O automatismo deste script exige o sistema 'Ubuntu Server 22.04 LTS' e voce esta usando o $sysversion"; echo ""
-      echo "Da mesma forma este script exige o hardware 'Appliance 4x Gigabit Celeron J4125' e voce esta usando o $hardversion"; echo ""
-      echo "Prosseguindo tentando os scripts basicos e o Modelo Linite de instalação Manual..."; echo ""; sleep 2
-      basicsys0
-      menuB
+      # Se o sistema não é adequado e o hardware é genérico, talvez seja o Endeavour:
+      [ -f /usr/bin/pacman ] && {
+        endeavour0S
+      } || {
+        # Se o sistema não é adequado, não é EndeavourOS e o hardware é genérico, prosseguir com cautela.
+        clear; echo ""
+        echo "SISTEMA OU HARDWARE INADEQUADO(S) DETECTADO!"; echo ""
+        echo "O automatismo deste script exige o sistema 'Ubuntu Server 22.04 LTS' e voce esta usando o $sysversion"; echo ""
+        echo "Da mesma forma este script exige o hardware 'Appliance 4x Gigabit Celeron J4125' e voce esta usando o $hardversion"; echo ""
+        echo "Prosseguindo tentando os scripts basicos e o Modelo Linite de instalação Manual..."; echo ""; sleep 2
+        basicsys0
+        menuB
+      }
     }
   }
 }
@@ -587,6 +592,33 @@ $list00" 25 40
   menuB
   }
 menuB
+}
+
+function endeavour0S {
+  sudo pacman -S docker-buildx docker \
+qemu-full qemu-base libvirt-dbus bridge-utils virt-manager ovmf dnsmasq \
+filelight smb4k plasma-disks kolourpaint granatier okteta krename timeshift kget \
+iperf traceroute lib32-pipewire arp-scan speedtest-cli samba rsync rclone sshpass curl rclone openvpn qbittorrent nmap yt-dlp smartmontools \
+p7zip cronie zip unzip dialog btrfs-progs cifs-utils inxi btop iotop cmatrix parallel rdesktop rpi-imager ciano android-tools webp-pixbuf-loader gthumb bash-language-server \
+torbrowser-launcher gparted gnome-disk-utility k3b audacity thunderbird libreoffice libreoffice-fresh-pt-br thunderbird-i18n-pt-br vlc remmina kpat gimp blender obs-studio kdenlive wine \
+minetest steam lib32-pipewire
+
+  yay -S upscayl-appimage freetube-bin anydesk-bin drawio-desktop-appimage ventoy-bin \
+microsoft-edge-stable-bin google-chrome opera zen-browser-avx2-bin woeusb-ng
+
+  echo -e "[General]
+InputMethod=qtvirtualkeyboard" | sudo tee /etc/sddm.conf.d/virtualkbd.conf
+
+  sudo cp ~/.config/kwinoutputconfig.json /var/lib/sddm/.config/
+  sudo chown sddm:sddm /var/lib/sddm/.config/kwinoutputconfig.json
+
+  sudo usermod -aG libvirt-qemu ztge; sudo usermod -aG libvirt ztge
+  sudo usermod -aG docker ztge
+
+  sudo systemctl enable --now sshd; sudo systemctl enable --now cronie; sudo systemctl enable --now docker; sudo systemctl enable --now libvirtd
+
+  echo -e "
+//172.20.0.2/particular /mnt/particular cifs credentials=/home/ztge/.smb,iocharset=utf8,file_mode=0777,dir_mode=0777,noperm,user,vers=2.1,nofail,x-systemd.automount,x-systemd.requires=network-online.target,x-systemd.device-timeout=3 0 0" | sudo tee -a /etc/fstab
 }
 
 # WIP
