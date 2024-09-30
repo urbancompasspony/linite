@@ -146,8 +146,6 @@ function useless0 {
   } || {
     clear; echo "Removendo pacotes e desativando servicos inuteis"; echo ""
     sudo apt purge needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolution-data-server bluez blueman bluetooth -y
-    sudo systemctl disable NetworkManager-wait-online.service
-    sudo systemctl mask NetworkManager-wait-online.service
     sudo systemctl disable systemd-networkd-wait-online.service
     sudo systemctl mask systemd-networkd-wait-online.service
     sudo touch "$pathsrv"/useless_services
@@ -164,6 +162,9 @@ function update0 {
     echo "Instalando pacotes...."
     sudo apt install $list00 $list01 $package_2204 --no-install-recommends -y &&
     sync &&
+
+    sudo systemctl disable NetworkManager-wait-online.service
+    sudo systemctl mask NetworkManager-wait-online.service
 
     sudo usermod -aG libvirt administrador
     sudo usermod -aG libvirt-qemu administrador
@@ -183,6 +184,9 @@ function update1 {
     sudo apt install $list01 $package_2204 --no-install-recommends -y &&
     sync &&
 
+    sudo systemctl disable NetworkManager-wait-online.service
+    sudo systemctl mask NetworkManager-wait-online.service
+
     sudo usermod -aG docker administrador
     sudo touch "$pathsrv"/updatearm_ok
   }
@@ -198,6 +202,9 @@ function update2 {
     echo "Instalando pacotes...."
     sudo apt install $list01 --no-install-recommends -y &&
     sync &&
+
+    sudo systemctl disable NetworkManager-wait-online.service
+    sudo systemctl mask NetworkManager-wait-online.service
 
     sudo usermod -aG docker administrador
     sudo touch "$pathsrv"/update_ok
@@ -594,7 +601,7 @@ $list00" 25 40
 menuB
 }
 
-function endeavour0S {
+function endeavour1S {
   sudo pacman -S docker-buildx docker \
 qemu-full qemu-base libvirt-dbus bridge-utils virt-manager ovmf dnsmasq \
 filelight smb4k plasma-disks kolourpaint granatier okteta krename timeshift kget \
@@ -631,13 +638,23 @@ function diskfun0 {
 
 # ======================================================================================================================================================== #
 
+function endeavour0S {
+  endeavour1S
+  bashconf0
+  mkswap0
+  timezone0
+  sysctl0
+  beep0
+  the_end0
+}
+
 function basicsys0 {
   welcome0 "Basic v1.0"
   bashconf0
   mkswap0
   timezone0
-  update2
   useless0
+  update2
   sysctl0
   the_end0
 }
@@ -647,8 +664,8 @@ function aarcharm0 {
   bashconf0
   mkswap0
   timezone0
-  update1
   useless0
+  update1
   netplan1
   sysctl0
   motd0
@@ -662,8 +679,8 @@ function linite0 {
   bashconf0
   mkswap0
   timezone0
-  update0
   useless0
+  update0
   pfsense0 "pfsense.img"
   sysctl0
   motd0
@@ -680,8 +697,8 @@ function appliance0 {
   bashconf0
   passmgr0
   timezone0
-  update0
   useless0
+  update0
   pfsense0 "pfsense-modelo.img"
   macvlan0
   docker0
