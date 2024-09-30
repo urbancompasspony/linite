@@ -160,7 +160,7 @@ function update0 {
     sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear
 
     echo "Instalando pacotes...."
-    sudo apt install $list00 $list01 $package_2204 --no-install-recommends -y &&
+    sudo apt install $list00 $list01 $package_2404 --no-install-recommends -y &&
     sync &&
 
     sudo systemctl disable NetworkManager-wait-online.service
@@ -173,7 +173,7 @@ function update0 {
   }
 }
 
-function update1 {
+function update_arm {
   [ -f "$pathsrv"/updatearm_ok ] && {
     clear; echo "O sistema ja foi atualizado e os pacotes necessarios instalados. Continuando."; echo ""; sleep 2
   } || {
@@ -192,7 +192,7 @@ function update1 {
   }
 }
 
-function update2 {
+function update_basic {
   [ -f "$pathsrv"/update_ok ] && {
     clear; echo "O sistema ja foi atualizado e os pacotes necessarios instalados. Continuando."; echo ""; sleep 2
   } || {
@@ -654,7 +654,7 @@ function basicsys0 {
   mkswap0
   timezone0
   useless0
-  update2
+  update_basic
   sysctl0
   the_end0
 }
@@ -665,7 +665,7 @@ function aarcharm0 {
   mkswap0
   timezone0
   useless0
-  update1
+  update_arm
   netplan1
   sysctl0
   motd0
