@@ -484,6 +484,7 @@ function pihole0 {
     sudo bash /tmp/pihole
 
     sudo touch "$pathsrv"/pihole_ok
+  }
 }
 
 function myspeed0 {
@@ -501,6 +502,7 @@ function myspeed0 {
     sudo bash /tmp/myspeed-tracker
 
     sudo touch "$pathsrv"/myspeed_ok
+  }
 }
 
 function xpra0 {
@@ -521,6 +523,7 @@ function xpra0 {
     sudo bash /tmp/xpra-virt-manager
 
     sudo touch "$pathsrv"/xpra_ok
+  }
 }
 
 function scriptsrv0 {
@@ -538,6 +541,7 @@ function scriptsrv0 {
     sudo bash /tmp/script-server
 
     sudo touch "$pathsrv"/scriptsrv_ok
+  }
 }
 
 function openspeed0 {
@@ -554,6 +558,7 @@ function openspeed0 {
     sudo chmod +x /tmp/speedtest
     sudo bash /tmp/speedtest
     sudo touch "$pathsrv"/speed_ok
+  }
 }
 
 function menuB {
