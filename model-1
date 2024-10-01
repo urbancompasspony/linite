@@ -86,11 +86,14 @@ function welcome0 {
   clear; echo ""; echo "Preparo de Servidor $1 by SuitIT®"; echo ""
 
   [ -f "$pathsrv"/finished ] || [ -f /home/administrador/.installed ] && {
-    clear; echo ""; echo "Este servidor ja foi configurado previamente. Entrando no menu Linite manual..."; sleep 3
+    clear; echo ""; echo "Este servidor ja foi configurado previamente. Entrando no menu Linite Manual..."; sleep 3
     menuB
   } || {
-    echo "Insira a senha padrao a seguir: ubuntu"; echo ""
-    sudo echo . >/dev/null
+    [ -f "$pathsrv"/information ] && {
+      echo "A senha foi previamente alterada. Use a nova senha!"; echo ""
+    } || {
+      echo "Insira a senha padrao: ubuntu"; echo ""
+    }
   }
 
   echo ""; echo "5"; sleep 1; echo "4"; sleep 1; echo "3"; sleep 1; echo "2"; sleep 1; echo "1"; sleep 1
