@@ -466,92 +466,94 @@ function canceled_by_user {
   exit
 }
 
-function docker0 {
-  [ -f "$pathsrv"/dockers_ok ] && {
-    clear; echo "Os containers ja foram configurados. Continuando."; echo ""; sleep 2
-  } || {
-    sleep 3; clear; echo "Instalando e inicializando containers!"
-
-    pihole0
-    myspeed0
-    xpra0
-    scriptsrv0
-    openspeed0
-
-    # Devem haver 5 containers listados!
-    dkn=$(docker ps -aq | wc -l)
-    [ "$dkn" == "5" ] && {
-      sudo touch "$pathsrv"/dockers_ok
-    } || {
-      echo . >/dev/null
-    }
-  }
-}
-
 function pihole0 {
-  sudo mkdir -p /srv/containers/pihole/{etc,log,dnsmasq.d}
-  sudo touch /srv/containers/pihole/Information
+  [ -f "$pathsrv"/pihole_ok ] && {
+    clear; echo "O PiHole ja foi iniciado. Continuando."; echo ""; sleep 2
+  } || {
+    sudo mkdir -p /srv/containers/pihole/{etc,log,dnsmasq.d}
+    sudo touch /srv/containers/pihole/Information
 
-  echo "172.25.0.2" | sudo tee /srv/containers/pihole/Information
-  echo "$var1" | sudo tee -a /srv/containers/pihole/Information
-  echo "0.0.0.0" | sudo tee -a /srv/containers/pihole/Information
-  echo "pihole" | sudo tee -a /srv/containers/pihole/Information
-  echo "macvlan" | sudo tee -a /srv/containers/pihole/Information
+    echo "172.25.0.2" | sudo tee /srv/containers/pihole/Information
+    echo "$var1" | sudo tee -a /srv/containers/pihole/Information
+    echo "0.0.0.0" | sudo tee -a /srv/containers/pihole/Information
+    echo "pihole" | sudo tee -a /srv/containers/pihole/Information
+    echo "macvlan" | sudo tee -a /srv/containers/pihole/Information
 
-  sudo wget "$github"01-pihole -O /tmp/pihole
-  sudo chmod +x /tmp/pihole
-  sudo bash /tmp/pihole
+    sudo wget "$github"01-pihole -O /tmp/pihole
+    sudo chmod +x /tmp/pihole
+    sudo bash /tmp/pihole
+
+    sudo touch "$pathsrv"/pihole_ok
 }
 
 function myspeed0 {
-  sudo mkdir -p /srv/containers/myspeed-tracker/data
-  sudo touch /srv/containers/myspeed-tracker/Information
+  [ -f "$pathsrv"/myspeed_ok ] && {
+    clear; echo "O MySpeed ja foi iniciado. Continuando."; echo ""; sleep 2
+  } || {
+    sudo mkdir -p /srv/containers/myspeed-tracker/data
+    sudo touch /srv/containers/myspeed-tracker/Information
 
-  echo "myspeed-tracker" | sudo tee /srv/containers/myspeed-tracker/Information
-  echo "172.25.0.4" | sudo tee -a /srv/containers/myspeed-tracker/Information
+    echo "myspeed-tracker" | sudo tee /srv/containers/myspeed-tracker/Information
+    echo "172.25.0.4" | sudo tee -a /srv/containers/myspeed-tracker/Information
 
-  sudo wget "$github"20-myspeed-tracker -O /tmp/myspeed-tracker
-  sudo chmod +x /tmp/myspeed-tracker
-  sudo bash /tmp/myspeed-tracker
+    sudo wget "$github"20-myspeed-tracker -O /tmp/myspeed-tracker
+    sudo chmod +x /tmp/myspeed-tracker
+    sudo bash /tmp/myspeed-tracker
+
+    sudo touch "$pathsrv"/myspeed_ok
 }
 
 function xpra0 {
-  sudo mkdir -p /srv/containers/xpra-virt-manager/home
-  sudo touch /srv/containers/xpra-virt-manager/Information
+  [ -f "$pathsrv"/xpra_ok ] && {
+    clear; echo "O XPRA ja foi iniciado. Continuando."; echo ""; sleep 2
+  } || {
+    sudo mkdir -p /srv/containers/xpra-virt-manager/home
+    sudo touch /srv/containers/xpra-virt-manager/Information
 
-  echo "xpra-virt-manager" | sudo tee /srv/containers/xpra-virt-manager/Information
-  echo "$var2" | sudo tee -a /srv/containers/xpra-virt-manager/Information
-  echo "1920x1080" | sudo tee -a /srv/containers/xpra-virt-manager/Information
-  echo "9876" | sudo tee -a /srv/containers/xpra-virt-manager/Information
-  echo "172.25.0.5" | sudo tee -a /srv/containers/xpra-virt-manager/Information
+    echo "xpra-virt-manager" | sudo tee /srv/containers/xpra-virt-manager/Information
+    echo "$var2" | sudo tee -a /srv/containers/xpra-virt-manager/Information
+    echo "1920x1080" | sudo tee -a /srv/containers/xpra-virt-manager/Information
+    echo "9876" | sudo tee -a /srv/containers/xpra-virt-manager/Information
+    echo "172.25.0.5" | sudo tee -a /srv/containers/xpra-virt-manager/Information
 
-  sudo wget "$github"45-xpra-virt-manager -O /tmp/xpra-virt-manager
-  sudo chmod +x /tmp/xpra-virt-manager
-  sudo bash /tmp/xpra-virt-manager
+    sudo wget "$github"45-xpra-virt-manager -O /tmp/xpra-virt-manager
+    sudo chmod +x /tmp/xpra-virt-manager
+    sudo bash /tmp/xpra-virt-manager
+
+    sudo touch "$pathsrv"/xpra_ok
 }
 
 function scriptsrv0 {
-  sudo mkdir -p /srv/containers/script-server/{scripts,runners}
-  sudo touch /srv/containers/script-server/Information
+  [ -f "$pathsrv"/scriptsrv_ok ] && {
+    clear; echo "O ScriptSRV ja foi iniciado. Continuando."; echo ""; sleep 2
+  } || {
+    sudo mkdir -p /srv/containers/script-server/{scripts,runners}
+    sudo touch /srv/containers/script-server/Information
 
-  echo "script-server" | sudo tee /srv/containers/script-server/Information
-  echo "172.25.0.6" | sudo tee -a /srv/containers/script-server/Information
+    echo "script-server" | sudo tee /srv/containers/script-server/Information
+    echo "172.25.0.6" | sudo tee -a /srv/containers/script-server/Information
 
-  sudo wget "$github"70-script-server -O /tmp/script-server
-  sudo chmod +x /tmp/script-server
-  sudo bash /tmp/script-server
+    sudo wget "$github"70-script-server -O /tmp/script-server
+    sudo chmod +x /tmp/script-server
+    sudo bash /tmp/script-server
+
+    sudo touch "$pathsrv"/scriptsrv_ok
 }
 
 function openspeed0 {
-  sudo mkdir -p /srv/containers/openspeedtest
-  sudo touch /srv/containers/openspeedtest/Information
+  [ -f "$pathsrv"/speed_ok ] && {
+    clear; echo "O SpeedTestLAN ja foi iniciado. Continuando."; echo ""; sleep 2
+  } || {
+    sudo mkdir -p /srv/containers/openspeedtest
+    sudo touch /srv/containers/openspeedtest/Information
 
-  echo "openspeedtest" | sudo tee /srv/containers/openspeedtest/Information
-  echo "172.25.0.7" | sudo tee -a /srv/containers/openspeedtest/Information
+    echo "openspeedtest" | sudo tee /srv/containers/openspeedtest/Information
+    echo "172.25.0.7" | sudo tee -a /srv/containers/openspeedtest/Information
 
-  sudo wget "$github"16-openspeedtest -O /tmp/speedtest
-  sudo chmod +x /tmp/speedtest
-  sudo bash /tmp/speedtest
+    sudo wget "$github"16-openspeedtest -O /tmp/speedtest
+    sudo chmod +x /tmp/speedtest
+    sudo bash /tmp/speedtest
+    sudo touch "$pathsrv"/speed_ok
 }
 
 function menuB {
@@ -628,6 +630,14 @@ InputMethod=qtvirtualkeyboard" | sudo tee /etc/sddm.conf.d/virtualkbd.conf
 //172.20.0.2/particular /mnt/particular cifs credentials=/home/ztge/.smb,iocharset=utf8,file_mode=0777,dir_mode=0777,noperm,user,vers=2.1,nofail,x-systemd.automount,x-systemd.requires=network-online.target,x-systemd.device-timeout=3 0 0" | sudo tee -a /etc/fstab
 }
 
+function containers0 {
+  pihole0
+  myspeed0
+  xpra0
+  openspeed0
+  scriptsrv0
+}
+
 # WIP
 function diskfun0 {
   UUID0=$(lsblk -o NAME,MOUNTPOINT | grep -v 'MOUNTPOINT' | awk '$2 == "" {print $1}')
@@ -699,16 +709,16 @@ function appliance0 {
   timezone0
   useless0
   update0
-  pfsense0 "pfsense-modelo.img"
+  pfsense0 "pfsense-modelo.img"; clear; echo "Esperando o pfSense inicializar! t=45s"; sleep 45
+  netplan0
   macvlan0
-  docker0
+  containers0
   sysctl0
   motd0
   journal0
   fstab0
   smbconf0
   beep0
-  netplan0
   the_end0
 }
 
