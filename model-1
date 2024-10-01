@@ -715,7 +715,6 @@ function appliance0 {
   useless0
   update0
   pfsense0 "pfsense-modelo.img"; clear; echo "Esperando o pfSense inicializar! t=45s"; sleep 45
-  netplan0
   macvlan0
   containers0
   sysctl0
@@ -723,6 +722,7 @@ function appliance0 {
   journal0
   fstab0
   smbconf0
+  netplan0
   beep0
   the_end0
 }
