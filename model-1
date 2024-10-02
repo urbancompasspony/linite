@@ -130,10 +130,40 @@ function passmgr0 {
     menu0
     sudo touch "$pathsrv"/information
     echo "$var1" | sudo tee "$pathsrv"/information
-    echo "$var2" | sudo tee -a "$pathsrv"/information
-    echo "$var3" | sudo tee -a "$pathsrv"/information
+    [ "$var2" = "" ] && { echo "$var1" | sudo tee -a "$pathsrv"/information; } || { echo "$var2" | sudo tee -a "$pathsrv"/information; }
+    [ "$var3" = "" ] && { echo "$var1" | sudo tee -a "$pathsrv"/information; } || { echo "$var3" | sudo tee -a "$pathsrv"/information; }
     password0
   }
+}
+
+function menu0 {
+  VALUE1="Passw0rd"; VALUE2=""; VALUE3=""
+
+  VALUE0=$(dialog --cancel-label "Sair da Instalacao" --ok-label "Iniciar Instalacao" --title "Novo Servidor" --form "Defina as SENHAS a seguir, nao deixe em branco:" 11 50 0 \
+"Senha  PiHole:" 1 1 "$VALUE1" 1 15 40 0 \
+"Senha do XPRA:" 2 1 "$VALUE2" 2 15 40 0 \
+"Administrador:" 3 1 "$VALUE3" 3 15 40 0 \
+3>&1 1>&2 2>&3 3>&- > /dev/tty)
+
+  [ $? -ne 0 ] && canceled_by_user
+  var1=$(echo "$VALUE0" | sed -n 1p)
+  var2=$(echo "$VALUE0" | sed -n 2p)
+  var3=$(echo "$VALUE0" | sed -n 3p)
+  check0
+}
+
+function check0 {
+  [ "$var1" = "" ] && {
+    clear; echo ""; echo "Nao deixe o primeiro campo em branco!"; sleep 2;
+    menu0
+  } || {
+    echo . >/dev/null
+  }
+}
+
+function canceled_by_user {
+  clear; echo ""; echo "A INSTALACAO FOI CANCELADA PELO USUARIO."; echo ""
+  exit
 }
 
 function timezone0 {
@@ -439,36 +469,6 @@ function smbconf0 {
   clear; echo "Adicionando modelo SAMBA AD"
   sudo mkdir -p /srv/containers/scripts/
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/SAMBA_Model/smbAD.conf | sudo tee /srv/containers/scripts/SMB-AD-Model.conf
-}
-
-function menu0 {
-  VALUE1="passw0rd"; VALUE2="P4sswrd"; VALUE3="Psswd0"
-
-  VALUE0=$(dialog --cancel-label "Sair da Instalacao" --ok-label "Iniciar Instalacao" --title "Novo Servidor" --form "Defina as SENHAS a seguir, nao deixe em branco:" 11 50 0 \
-"Senha  PiHole:" 1 1 "$VALUE1" 1 15 40 0 \
-"Senha do XPRA:" 2 1 "$VALUE2" 2 15 40 0 \
-"Administrador:" 3 1 "$VALUE3" 3 15 40 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
-
-  [ $? -ne 0 ] && canceled_by_user
-  var1=$(echo "$VALUE0" | sed -n 1p)
-  var2=$(echo "$VALUE0" | sed -n 2p)
-  var3=$(echo "$VALUE0" | sed -n 3p)
-  check0
-}
-
-function check0 {
-  [ "$var1" = "" ] || [ "$var2" = "" ] || [ "$var3" = "" ] && {
-    clear; echo ""; echo "Nao deixe nenhum campo em branco!"; sleep 2;
-    menu0
-  } || {
-    echo . >/dev/null
-  }
-}
-
-function canceled_by_user {
-  clear; echo ""; echo "A INSTALACAO FOI CANCELADA PELO USUARIO."; echo ""
-  exit
 }
 
 function pihole0 {
