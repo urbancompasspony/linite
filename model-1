@@ -127,7 +127,7 @@ function passmgr0 {
     var3=$(sed -n '3p' "$pathsrv"/information)
     password0
   } || {
-    menu0
+    menupass0
     sudo touch "$pathsrv"/information
     echo "$var1" | sudo tee "$pathsrv"/information
     [ "$var2" = "" ] && { echo "$var1" | sudo tee -a "$pathsrv"/information; } || { echo "$var2" | sudo tee -a "$pathsrv"/information; }
@@ -136,16 +136,17 @@ function passmgr0 {
   }
 }
 
-function menu0 {
+function menupass0 {
   VALUE1="Passw0rd"; VALUE2=""; VALUE3=""
 
-  VALUE0=$(dialog --cancel-label "Sair da Instalacao" --ok-label "Iniciar Instalacao" --title "Novo Servidor" --form "Defina as SENHAS a seguir, nao deixe em branco:" 11 50 0 \
-"Senha  PiHole:" 1 1 "$VALUE1" 1 15 40 0 \
-"Senha do XPRA:" 2 1 "$VALUE2" 2 15 40 0 \
-"Administrador:" 3 1 "$VALUE3" 3 15 40 0 \
+  VALUE0=$(dialog --cancel-label "Sair da Instalacao" --ok-label "Iniciar Instalacao" --title "Novo Servidor" --form "Defina a senha do Administrador e as demais, caso fiquem em branco, serao a mesma:" 11 50 0 \
+"Administrador:" 1 1 "$VALUE1" 1 15 40 0 \
+"Senha    XPRA:" 2 1 "$VALUE2" 2 15 40 0 \
+"Senha  PiHole:" 3 1 "$VALUE3" 3 15 40 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
 
-  [ $? -ne 0 ] && canceled_by_user
+  [ $? -ne 0 ] && cancel_user
+
   var1=$(echo "$VALUE0" | sed -n 1p)
   var2=$(echo "$VALUE0" | sed -n 2p)
   var3=$(echo "$VALUE0" | sed -n 3p)
@@ -161,7 +162,7 @@ function check0 {
   }
 }
 
-function canceled_by_user {
+function cancel_user {
   clear; echo ""; echo "A INSTALACAO FOI CANCELADA PELO USUARIO."; echo ""
   exit
 }
@@ -251,7 +252,7 @@ function password0 {
     clear; echo "Senha substituida anteriormente. Continuando."; echo ""; sleep 2
   } || {
     clear; echo "Trocando a senha do usuario ADMINISTRADOR deste servidor!"
-    echo "administrador:$var3" | sudo chpasswd && sudo touch "$pathsrv"/password_ok
+    echo "administrador:$var1" | sudo chpasswd && sudo touch "$pathsrv"/password_ok
   }
 }
 
@@ -471,6 +472,29 @@ function smbconf0 {
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/SAMBA_Model/smbAD.conf | sudo tee /srv/containers/scripts/SMB-AD-Model.conf
 }
 
+function xpra0 {
+  [ -f "$pathsrv"/xpra_ok ] && {
+    clear; echo "O XPRA ja foi iniciado. Continuando."; echo ""; sleep 2
+  } || {
+    sudo mkdir -p /srv/containers/xpra-virt-manager/home
+    sudo touch /srv/containers/xpra-virt-manager/Information
+
+    [ "$var2" = "" ] && { var2="$var1"; } || { echo . >/dev/null; }
+
+    echo "xpra-virt-manager" | sudo tee /srv/containers/xpra-virt-manager/Information
+    echo "$var2" | sudo tee -a /srv/containers/xpra-virt-manager/Information
+    echo "1920x1080" | sudo tee -a /srv/containers/xpra-virt-manager/Information
+    echo "9876" | sudo tee -a /srv/containers/xpra-virt-manager/Information
+    echo "172.25.0.5" | sudo tee -a /srv/containers/xpra-virt-manager/Information
+
+    sudo wget "$github"45-xpra-virt-manager -O /tmp/xpra-virt-manager
+    sudo chmod +x /tmp/xpra-virt-manager
+    sudo bash /tmp/xpra-virt-manager
+
+    sudo touch "$pathsrv"/xpra_ok
+  }
+}
+
 function pihole0 {
   [ -f "$pathsrv"/pihole_ok ] && {
     clear; echo "O PiHole ja foi iniciado. Continuando."; echo ""; sleep 2
@@ -478,8 +502,10 @@ function pihole0 {
     sudo mkdir -p /srv/containers/pihole/{etc,log,dnsmasq.d}
     sudo touch /srv/containers/pihole/Information
 
+    [ "$var3" = "" ] && { var2="$var1"; } || { echo . >/dev/null; }
+
     echo "172.25.0.2" | sudo tee /srv/containers/pihole/Information
-    echo "$var1" | sudo tee -a /srv/containers/pihole/Information
+    echo "$var3" | sudo tee -a /srv/containers/pihole/Information
     echo "0.0.0.0" | sudo tee -a /srv/containers/pihole/Information
     echo "pihole" | sudo tee -a /srv/containers/pihole/Information
     echo "macvlan" | sudo tee -a /srv/containers/pihole/Information
@@ -507,29 +533,6 @@ function myspeed0 {
     sudo bash /tmp/myspeed-tracker
 
     sudo touch "$pathsrv"/myspeed_ok
-  }
-}
-
-function xpra0 {
-  [ -f "$pathsrv"/xpra_ok ] && {
-    clear; echo "O XPRA ja foi iniciado. Continuando."; echo ""; sleep 2
-  } || {
-    sudo mkdir -p /srv/containers/xpra-virt-manager/home
-    sudo touch /srv/containers/xpra-virt-manager/Information
-
-    [ "$var2" = "" ] && { var2="$var1"; } || { echo . >/dev/null; }
-
-    echo "xpra-virt-manager" | sudo tee /srv/containers/xpra-virt-manager/Information
-    echo "$var2" | sudo tee -a /srv/containers/xpra-virt-manager/Information
-    echo "1920x1080" | sudo tee -a /srv/containers/xpra-virt-manager/Information
-    echo "9876" | sudo tee -a /srv/containers/xpra-virt-manager/Information
-    echo "172.25.0.5" | sudo tee -a /srv/containers/xpra-virt-manager/Information
-
-    sudo wget "$github"45-xpra-virt-manager -O /tmp/xpra-virt-manager
-    sudo chmod +x /tmp/xpra-virt-manager
-    sudo bash /tmp/xpra-virt-manager
-
-    sudo touch "$pathsrv"/xpra_ok
   }
 }
 
