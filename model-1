@@ -502,7 +502,7 @@ function pihole0 {
     sudo mkdir -p /srv/containers/pihole/{etc,log,dnsmasq.d}
     sudo touch /srv/containers/pihole/Information
 
-    [ "$var3" = "" ] && { var2="$var1"; } || { echo . >/dev/null; }
+    [ "$var3" = "" ] && { var3="$var1"; } || { echo . >/dev/null; }
 
     echo "172.25.0.2" | sudo tee /srv/containers/pihole/Information
     echo "$var3" | sudo tee -a /srv/containers/pihole/Information
