@@ -517,6 +517,8 @@ function xpra0 {
     sudo mkdir -p /srv/containers/xpra-virt-manager/home
     sudo touch /srv/containers/xpra-virt-manager/Information
 
+    [ "$var2" = "" ] && { var2="$var1"; } || { echo . >/dev/null; }
+
     echo "xpra-virt-manager" | sudo tee /srv/containers/xpra-virt-manager/Information
     echo "$var2" | sudo tee -a /srv/containers/xpra-virt-manager/Information
     echo "1920x1080" | sudo tee -a /srv/containers/xpra-virt-manager/Information
