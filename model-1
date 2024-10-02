@@ -91,8 +91,10 @@ function welcome0 {
   } || {
     [ -f "$pathsrv"/information ] && {
       echo "A senha foi previamente alterada. Use a nova senha!"; echo ""
+      sudo echo . >/dev/null
     } || {
       echo "Insira a senha padrao: ubuntu"; echo ""
+      sudo echo . >/dev/null
     }
   }
 
