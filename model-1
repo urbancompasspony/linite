@@ -172,6 +172,7 @@ function timezone0 {
     clear; echo "TimeZone ja foi configurado. Continuando."; echo ""; sleep 2
   } || {
     sudo timedatectl set-timezone Etc/GMT+3
+    sudo timedatectl set-local-rtc 1
     sudo touch "$pathsrv"/timezone_ok
   }
 }
