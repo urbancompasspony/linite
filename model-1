@@ -629,7 +629,7 @@ torbrowser-launcher gparted gnome-disk-utility k3b audacity thunderbird libreoff
 minetest steam lib32-pipewire wacomtablet
 
   yay -S upscayl-appimage freetube-bin anydesk-bin drawio-desktop-appimage ventoy-bin \
-microsoft-edge-stable-bin google-chrome opera zen-browser-avx2-bin woeusb-ng
+microsoft-edge-stable-bin google-chrome opera woeusb-ng
 
   echo -e "[General]
 InputMethod=qtvirtualkeyboard" | sudo tee /etc/sddm.conf.d/virtualkbd.conf
