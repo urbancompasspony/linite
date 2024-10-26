@@ -27,7 +27,7 @@ docker.io genisoimage"
 export list01="net-tools speedtest-cli whois w3m w3m-img netdiscover figlet iperf arp-scan traceroute sshpass fail2ban network-manager \
 libatasmart-bin smartmontools zip unzip p7zip-full 7zip p7zip cifs-utils rsnapshot rclone iotop pluma \
 haveged beep stress lm-sensors cmatrix btop inxi tree hwloc figlet dialog fail2ban btrfs-progs \
-gpm tmux xinit xorg openbox pavucontrol caja epiphany-browser gparted cmatrix gnome-disk-utility terminator rdesktop unrar \
+gpm tmux xinit xorg openbox pavucontrol caja epiphany-browser gparted cmatrix gnome-disk-utility terminator rdesktop unrar tree \
 openvpn curl nmap parallel rsnapshot rclone openssh-server samba samba-dsdb-modules samba-vfs-modules build-essential"
 
 # ARM64
@@ -630,7 +630,7 @@ filelight smb4k plasma-disks kolourpaint granatier okteta krename timeshift kget
 iperf traceroute lib32-pipewire arp-scan speedtest-cli samba rsync rclone sshpass curl rclone openvpn qbittorrent nmap yt-dlp smartmontools \
 p7zip cronie zip unzip dialog btrfs-progs cifs-utils inxi btop iotop cmatrix parallel rdesktop rpi-imager ciano android-tools webp-pixbuf-loader gthumb bash-language-server \
 torbrowser-launcher gparted gnome-disk-utility k3b audacity thunderbird libreoffice libreoffice-fresh-pt-br thunderbird-i18n-pt-br vlc remmina kpat gimp blender obs-studio kdenlive wine \
-minetest steam lib32-pipewire lib32-libpulse wacomtablet
+minetest steam lib32-pipewire lib32-libpulse wacomtablet tree
 
   yay -S upscayl-appimage freetube-bin anydesk-bin drawio-desktop-appimage ventoy-bin \
 microsoft-edge-stable-bin google-chrome opera woeusb-ng
