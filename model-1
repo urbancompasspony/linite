@@ -19,18 +19,17 @@ export NEEDRESTART_MODE=a; export DEBIAN_FRONTEND=noninteractive
 export pathsrv="/srv/containers/scripts/config/install"; export destpath="/var/lib/libvirt/images"
 export github="https://raw.githubusercontent.com/urbancompasspony/docker/main/"
 
-# VM & Docker Only
+# VM Only
 export list00="qemu-system qemu-utils qemu-user qemu-kvm qemu-guest-agent \
 libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq \
-docker.io genisoimage"
+genisoimage"
 
-export list01="net-tools speedtest-cli whois netdiscover iperf arp-scan traceroute sshpass network-manager \
+export list01="docker.io net-tools speedtest-cli whois netdiscover iperf arp-scan traceroute sshpass network-manager \
 libatasmart-bin smartmontools zip unzip p7zip-full 7zip p7zip cifs-utils rsnapshot rclone iotop \
-haveged beep stress lm-sensors cmatrix btop inxi tree hwloc dialog btrfs-progs build-essential unrar \
-openvpn curl nmap parallel rclone openssh-server samba samba-dsdb-modules samba-vfs-modules \
-gpm tmux xinit xorg openbox pavucontrol caja epiphany-browser gparted cmatrix gnome-disk-utility terminator rdesktop pluma terminator"
+haveged stress lm-sensors cmatrix btop inxi tree dialog btrfs-progs build-essential unrar \
+openvpn curl nmap parallel rclone openssh-server samba samba-dsdb-modules samba-vfs-modules"
 
-export list02="gpm tmux xinit xorg openbox pavucontrol caja epiphany-browser gparted cmatrix gnome-disk-utility terminator rdesktop pluma terminator"
+export list02="gpm tmux xinit xorg openbox pavucontrol caja epiphany-browser gparted cmatrix gnome-disk-utility terminator rdesktop pluma terminator beep"
 
 # ARM64
 export package_2204="linux-modules-extra-raspi"
@@ -47,7 +46,9 @@ function root_check0 {
 }
 
 function hardsys0 {
-  export sysmain="DISTRIB_RELEASE=22.04"
+  export sysmain1="DISTRIB_RELEASE=22.04"
+  export sysmain2="DISTRIB_RELEASE=24.04"
+
   sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print $1}')
 
   export hardmain="Celeron(R) J4125"
@@ -58,7 +59,7 @@ function hardsys0 {
     appliance0
   } || {
     # Se não é o Appliance, mas o Ubuntu é o adequado, verificar hardware...
-    [ "$sysversion" = "$sysmain" ] && {
+    [ "$sysversion" = "$sysmain1" ] && {
       # ...que pode ser aarch64...
       [ $(arch) = "aarch64" ] && {
         aarcharm0
@@ -67,22 +68,16 @@ function hardsys0 {
         linite0
       }
     } || {
-      # Se o sistema não é adequado e o hardware é genérico, talvez seja o Endeavour:
-      [ -f /usr/bin/pacman ] && {
-        endeavour0S
-      } || {
-        # Se o sistema não é adequado, não é EndeavourOS e o hardware é genérico, prosseguir com cautela.
-        clear; echo ""
-        echo "SISTEMA OU HARDWARE INADEQUADO(S) DETECTADO!"; echo ""
-        echo "O automatismo deste script exige o sistema 'Ubuntu Server 22.04 LTS' e voce esta usando o $sysversion"; echo ""
-        echo "Da mesma forma este script exige o hardware 'Appliance 4x Gigabit Celeron J4125' e voce esta usando o $hardversion"; echo ""
-        echo "Prosseguindo tentando os scripts basicos e o Modelo Linite de instalação Manual..."; echo ""; sleep 2
-        basicsys0
-        menuB
+      clear; echo ""
+      echo "SISTEMA OU HARDWARE INADEQUADO(S) DETECTADO!"; echo ""
+      echo "O automatismo deste script exige o sistema 'Ubuntu Server 22.04 LTS' e voce esta usando o $sysversion"; echo ""
+      echo "Da mesma forma este script exige o hardware 'Appliance 4x Gigabit Celeron J4125' e voce esta usando o $hardversion"; echo ""
+      echo "Prosseguindo tentando os scripts basicos e o Modelo Linite de instalação Manual..."; echo ""; sleep 2
+      basicsys0
+      menuB
       }
     }
   }
-}
 
 function welcome0 {
   clear; echo ""; echo "Preparo de Servidor $1 by SuitIT®"; echo ""
@@ -625,33 +620,6 @@ $list00" 25 40
 menuB
 }
 
-function endeavour1S {
-sudo pacman -S docker-buildx docker \
-qemu-full qemu-base libvirt-dbus bridge-utils virt-manager ovmf dnsmasq \
-filelight smb4k plasma-disks kolourpaint granatier okteta krename timeshift kget gnome-nettool \
-iperf traceroute lib32-pipewire terminator lib32-libpulse arp-scan speedtest-cli samba rsync rclone sshpass curl rclone openvpn qbittorrent nmap yt-dlp smartmontools \
-p7zip cronie zip unzip dialog btrfs-progs cifs-utils inxi btop iotop cmatrix parallel rdesktop rpi-imager ciano android-tools webp-pixbuf-loader gthumb bash-language-server \
-torbrowser-launcher tree gparted gnome-disk-utility k3b audacity thunderbird libreoffice libreoffice-fresh-pt-br thunderbird-i18n-pt-br vlc remmina kpat gimp blender obs-studio kdenlive wine \
-luanti steam v4l2loopback-dkms
-
-  yay -S upscayl-appimage freetube-bin anydesk-bin drawio-desktop-appimage ventoy-bin \
-microsoft-edge-stable-bin google-chrome opera woeusb-ng
-
-  echo -e "[General]
-InputMethod=qtvirtualkeyboard" | sudo tee /etc/sddm.conf.d/virtualkbd.conf
-
-  sudo cp ~/.config/kwinoutputconfig.json /var/lib/sddm/.config/
-  sudo chown sddm:sddm /var/lib/sddm/.config/kwinoutputconfig.json
-
-  sudo usermod -aG libvirt-qemu ztge; sudo usermod -aG libvirt ztge
-  sudo usermod -aG docker ztge
-
-  sudo systemctl enable --now sshd; sudo systemctl enable --now cronie; sudo systemctl enable --now docker; sudo systemctl enable --now libvirtd
-
-  echo -e "
-//172.20.0.2/particular /mnt/particular cifs credentials=/home/ztge/.smb,iocharset=utf8,file_mode=0777,dir_mode=0777,noperm,user,vers=2.1,nofail,x-systemd.automount,x-systemd.requires=network-online.target,x-systemd.device-timeout=3 0 0" | sudo tee -a /etc/fstab
-}
-
 function containers0 {
   pihole0
   myspeed0
@@ -660,25 +628,7 @@ function containers0 {
   scriptsrv0
 }
 
-# WIP
-function diskfun0 {
-  UUID0=$(lsblk -o NAME,MOUNTPOINT | grep -v 'MOUNTPOINT' | awk '$2 == "" {print $1}')
-  sudo mkfs.ext4 -FF -m 0 /dev/"$UUID0"
-  UUID1=$(lsblk -f | grep "$UUID0" | awk '{print $4}')
-  export UUID1
-}
-
 # ======================================================================================================================================================== #
-
-function endeavour0S {
-  endeavour1S
-  bashconf0
-  mkswap0
-  timezone0
-  sysctl0
-  beep0
-  the_end0
-}
 
 function basicsys0 {
   welcome0 "Basic v1.0"
