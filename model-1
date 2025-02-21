@@ -678,7 +678,7 @@ function linite0 {
   mkswap0
   timezone0
   useless0
-  update0
+  update1
   pfsense0 "pfsense.img"
   sysctl0
   motd0
