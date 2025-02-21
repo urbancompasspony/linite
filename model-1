@@ -26,9 +26,9 @@ libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq gen
 export list01="docker.io net-tools speedtest-cli whois netdiscover iperf arp-scan traceroute sshpass network-manager \
 libatasmart-bin smartmontools zip unzip p7zip-full 7zip p7zip cifs-utils rsnapshot rclone iotop \
 haveged stress lm-sensors cmatrix btop inxi tree dialog btrfs-progs build-essential unrar \
-openvpn curl nmap parallel rclone openssh-server samba samba-dsdb-modules samba-vfs-modules"
+openvpn curl nmap parallel rclone openssh-server samba samba-dsdb-modules samba-vfs-modules beep"
 
-export list02="gpm tmux xinit xorg openbox pavucontrol caja epiphany-browser gparted cmatrix gnome-disk-utility terminator rdesktop pluma terminator beep"
+export list02="gpm tmux xinit xorg openbox pavucontrol caja epiphany-browser gparted cmatrix gnome-disk-utility terminator rdesktop pluma terminator"
 
 # ARM64
 export package_2204="linux-modules-extra-raspi"
@@ -230,7 +230,11 @@ function update_arm {
     clear; echo "Atualizando o sistema"; echo ""
     sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear
 
-    echo "Instalando pacotes...."
+    echo "Tentando pacotes 24.04...."
+    sudo apt install $list01 $package_2404 --no-install-recommends -y &&
+    sync &&
+
+    echo "Tentando pacotes 22.04...."
     sudo apt install $list01 $package_2204 --no-install-recommends -y &&
     sync &&
 
@@ -239,25 +243,6 @@ function update_arm {
 
     sudo usermod -aG docker administrador
     sudo touch "$pathsrv"/updatearm_ok
-  }
-}
-
-function update_basic {
-  [ -f "$pathsrv"/update_ok ] && {
-    clear; echo "O sistema ja foi atualizado e os pacotes necessarios instalados. Continuando."; echo ""; sleep 2
-  } || {
-    clear; echo "Atualizando o sistema"; echo ""
-    sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear
-
-    echo "Instalando pacotes...."
-    sudo apt install $list01 --no-install-recommends -y &&
-    sync &&
-
-    sudo systemctl disable NetworkManager-wait-online.service
-    sudo systemctl mask NetworkManager-wait-online.service
-
-    sudo usermod -aG docker administrador
-    sudo touch "$pathsrv"/update_ok
   }
 }
 
@@ -652,7 +637,7 @@ function basicsys0 {
   mkswap0
   timezone0
   useless0
-  update_basic
+  update0
   sysctl0
   the_end0
 }
