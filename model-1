@@ -26,9 +26,9 @@ libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq gen
 export list01="docker.io net-tools speedtest-cli whois netdiscover iperf arp-scan traceroute sshpass network-manager \
 libatasmart-bin smartmontools zip unzip p7zip-full 7zip p7zip cifs-utils rsnapshot rclone iotop \
 haveged stress lm-sensors cmatrix btop inxi tree dialog btrfs-progs build-essential unrar \
-openvpn curl nmap parallel rclone openssh-server samba samba-dsdb-modules samba-vfs-modules beep"
+openvpn curl nmap parallel rclone openssh-server samba samba-dsdb-modules samba-vfs-modules beep xinit xorg openbox"
 
-export list02="gpm tmux xinit xorg openbox pavucontrol caja epiphany-browser gparted cmatrix gnome-disk-utility terminator rdesktop pluma terminator"
+export list02="gpm tmux pavucontrol caja epiphany-browser gparted cmatrix gnome-disk-utility terminator rdesktop pluma terminator"
 
 # ARM64
 export package_2204="linux-modules-extra-raspi"
@@ -189,7 +189,7 @@ function update0 {
     sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear
 
     echo "Instalando pacotes...."
-    sudo apt install $list00 $list01 $package_2404 --no-install-recommends -y &&
+    sudo apt install $list00 $list01 $package_2404 -y &&
     sync &&
 
     sudo systemctl disable NetworkManager-wait-online.service
@@ -210,7 +210,7 @@ function update1 {
     sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear
 
     echo "Instalando pacotes...."
-    sudo apt install $list00 $list01 $list02 $package_2404 --no-install-recommends -y &&
+    sudo apt install $list00 $list01 $list02 $package_2404 -y &&
     sync &&
 
     sudo systemctl disable NetworkManager-wait-online.service
@@ -231,11 +231,11 @@ function update_arm {
     sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear
 
     echo "Tentando pacotes 24.04...."
-    sudo apt install $list01 $package_2404 --no-install-recommends -y &&
+    sudo apt install $list01 $package_2404 -y &&
     sync &&
 
     echo "Tentando pacotes 22.04...."
-    sudo apt install $list01 $package_2204 --no-install-recommends -y &&
+    sudo apt install $list01 $package_2204 -y &&
     sync &&
 
     sudo systemctl disable NetworkManager-wait-online.service
@@ -594,7 +594,7 @@ function essentials0 {
 dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
 $list01" 25 40
 [ $? = 0 ] && {
-  sudo apt install $list01 --no-install-recommends -y &&
+  sudo apt install $list01 -y &&
   menuB
   }
 menuB
@@ -604,7 +604,7 @@ function raspbian0 {
 dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
 $list01 $package_2404" 25 40
 [ $? = 0 ] && {
-  sudo apt install $list01 $package_2404 --no-install-recommends -y &&
+  sudo apt install $list01 $package_2404 -y &&
   menuB
 }
 menuB
@@ -614,7 +614,7 @@ function VMs0 {
 dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
 $list00" 25 40
 [ $? = 0 ] && {
-  sudo apt install $list00 --no-install-recommends -y &&
+  sudo apt install $list00 -y &&
   sudo usermod -aG libvirt administrador; sudo usermod -aG libvirt-qemu administrador
   menuB
   }
