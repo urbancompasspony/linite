@@ -182,15 +182,6 @@ echo -e "
   }
 }
 
-function macvlan0 {
-  [ -f "$pathsrv"/macvlan_ok ] && {
-    clear; echo "A MAVLAN ja foi configurada. Continuando."; echo ""; sleep 2
-  } || {
-    sleep 3; clear; echo "Definindo MACVLAN para os containers"
-    sudo docker network create -d macvlan --subnet="172.25.0.0"/24 --gateway="172.25.0.1" -o parent="enp4s0" macvlan && sudo touch "$pathsrv"/macvlan_ok
-  }
-}
-
 function sysctl0 {
   [ -f "$pathsrv"/sysctl_ok ] && {
     clear; echo "O SYSCTL ja foi modificado. Continuando."; echo ""; sleep 2
