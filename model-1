@@ -30,10 +30,6 @@ openvpn curl nmap parallel rclone openssh-server samba samba-dsdb-modules samba-
 
 export list02="gpm tmux pavucontrol caja epiphany-browser gparted cmatrix gnome-disk-utility terminator rdesktop pluma terminator"
 
-# ARM64
-export package_2204="linux-modules-extra-raspi"
-export package_2404="docker-buildx"
-
 # ======================================================================================================================================================== #
 
 function root_check0 {
@@ -55,13 +51,7 @@ function hardsys0 {
   } || {
     # Se não é o Appliance, mas o Ubuntu é o adequado, verificar hardware...
     [ "$sysversion" = "$sysmain1" ] && {
-      # ...que pode ser aarch64...
-      [ $(arch) = "aarch64" ] && {
-        aarcharm0
-      } || {
-        # ...ou generico.
-        linite0
-      }
+      linite0
     } || {
       clear; echo ""
       echo "SISTEMA OU HARDWARE INADEQUADO(S) DETECTADO!"; echo ""
@@ -220,29 +210,6 @@ function update1 {
     sudo usermod -aG libvirt-qemu administrador
     sudo usermod -aG docker administrador
     sudo touch "$pathsrv"/update_ok
-  }
-}
-
-function update_arm {
-  [ -f "$pathsrv"/updatearm_ok ] && {
-    clear; echo "O sistema ja foi atualizado e os pacotes necessarios instalados. Continuando."; echo ""; sleep 2
-  } || {
-    clear; echo "Atualizando o sistema"; echo ""
-    sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear
-
-    echo "Tentando pacotes 24.04...."
-    sudo apt install $list01 $package_2404 -y &&
-    sync &&
-
-    echo "Tentando pacotes 22.04...."
-    sudo apt install $list01 $package_2204 -y &&
-    sync &&
-
-    sudo systemctl disable NetworkManager-wait-online.service
-    sudo systemctl mask NetworkManager-wait-online.service
-
-    sudo usermod -aG docker administrador
-    sudo touch "$pathsrv"/updatearm_ok
   }
 }
 
@@ -577,15 +544,13 @@ function openspeed0 {
 function menuB {
   var0=$(dialog --title 'Linite' --backtitle "L I N I T E" --menu " " 0 0 0 \
 1 'Linux Essentials [All]' \
-2 'RaspbberryPi & Tools [SoC Only]' \
-3 'Virtual Machines [No VM nor SoC]' \
-4 'Default Configs [All]' \
+2 'Virtual Machines [No VM nor SoC]' \
+3 'Default Configs [All]' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
 1) essentials0 ;;
-2) raspbian0 ;;
-3) VMs0 ;;
-4) basicsys0 ;;
+2) VMs0 ;;
+3) basicsys0 ;;
 X) exit ;;
 esac
 }
@@ -597,16 +562,6 @@ $list01" 25 40
   sudo apt install $list01 -y &&
   menuB
   }
-menuB
-}
-
-function raspbian0 {
-dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
-$list01 $package_2404" 25 40
-[ $? = 0 ] && {
-  sudo apt install $list01 $package_2404 -y &&
-  menuB
-}
 menuB
 }
 
@@ -639,21 +594,6 @@ function basicsys0 {
   useless0
   update0
   sysctl0
-  the_end0
-}
-
-function aarcharm0 {
-  welcome0 "ARM v1.0"
-  bashconf0
-  mkswap0
-  timezone0
-  useless0
-  update_arm
-  netplan1
-  sysctl0
-  motd0
-  journal0
-  smbconf0
   the_end0
 }
 
