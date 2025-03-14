@@ -25,20 +25,8 @@ function root_check0 {
 
 function welcome0 {
   clear; echo ""; echo "Preparo de Servidor $1 by SuitIT®"; echo ""
-
-  [ -f "$pathsrv"/finished ] || [ -f /home/administrador/.installed ] && {
-    clear; echo ""; echo "Este servidor ja foi configurado previamente. Entrando no menu Linite Manual..."; sleep 3
-    menuB
-  } || {
-    [ -f "$pathsrv"/information ] && {
-      echo "A senha foi previamente alterada. Use a nova senha!"; echo ""
-      sudo echo . >/dev/null
-    } || {
-      echo "Insira a senha padrao: ubuntu"; echo ""
-      sudo echo . >/dev/null
-    }
-  }
-
+  echo "Insira a senha padrao: ubuntu"; echo ""
+  sudo echo . >/dev/null
   echo ""; echo "5"; sleep 1; echo "4"; sleep 1; echo "3"; sleep 1; echo "2"; sleep 1; echo "1"; sleep 1
 }
 
@@ -61,31 +49,20 @@ function mkswap0 {
 }
 
 function timezone0 {
-  [ -f "$pathsrv"/timezone_ok ] && {
-    clear; echo "TimeZone ja foi configurado. Continuando."; echo ""; sleep 2
-  } || {
-    sudo timedatectl set-timezone Etc/GMT+3
-    sudo timedatectl set-local-rtc 1
-    sudo touch "$pathsrv"/timezone_ok
-  }
+  sudo timedatectl set-timezone Etc/GMT+3
+  sudo timedatectl set-local-rtc 1
+  sudo touch "$pathsrv"/timezone_ok
 }
 
 function useless0 {
-  [ -f "$pathsrv"/useless_services ] && {
-    clear; echo "Os pacotes inuteis ja foram removidos e desativados. Continuando."; echo ""; sleep 2
-  } || {
-    clear; echo "Removendo pacotes e desativando servicos inuteis"; echo ""
-    sudo apt purge needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolution-data-server bluez blueman bluetooth -y
-    sudo systemctl disable systemd-networkd-wait-online.service
-    sudo systemctl mask systemd-networkd-wait-online.service
-    sudo touch "$pathsrv"/useless_services
-  }
+  clear; echo "Removendo pacotes e desativando servicos inuteis"; echo ""
+  sudo apt purge needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolution-data-server bluez blueman bluetooth -y
+  sudo systemctl disable systemd-networkd-wait-online.service
+  sudo systemctl mask systemd-networkd-wait-online.service
+  sudo touch "$pathsrv"/useless_services
 }
 
 function update_arm {
-  [ -f "$pathsrv"/updatearm_ok ] && {
-    clear; echo "O sistema ja foi atualizado e os pacotes necessarios instalados. Continuando."; echo ""; sleep 2
-  } || {
     clear; echo "Atualizando o sistema"; echo ""
     sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear
 
@@ -102,13 +79,9 @@ function update_arm {
 
     sudo usermod -aG docker administrador
     sudo touch "$pathsrv"/updatearm_ok
-  }
 }
 
 function netplan0 {
-  [ -f "$pathsrv"/netplan_ok ] && {
-    clear; echo "O Netplan ja foi ajustado. Continuando."; echo ""; sleep 2
-  } || {
     sleep 3; clear; echo "Ajustando Netplan"
     echo -e "
 # This is the network config written by 'linite model-1' script
@@ -137,13 +110,9 @@ network:
         addresses: [1.1.1.1, 8.8.8.8]
   version: 2" | sudo tee /etc/netplan/00-installer-config.yaml
     sudo netplan apply && sudo touch "$pathsrv"/netplan_ok
-  }
 }
 
 function netplan1 {
-  [ -f "$pathsrv"/netplan_ok ] && {
-    clear; echo "O Netplan ja foi ajustado. Continuando."; echo ""; sleep 2
-  } || {
     echo -e "
 #
 #network:
@@ -179,13 +148,9 @@ echo -e "
 #  version: 2" | sudo tee -a /etc/netplan/00-installer-config.yaml
 
     sudo touch "$pathsrv"/netplan_ok
-  }
 }
 
 function sysctl0 {
-  [ -f "$pathsrv"/sysctl_ok ] && {
-    clear; echo "O SYSCTL ja foi modificado. Continuando."; echo ""; sleep 2
-  } || {
     sleep 3; clear; echo "Aplicando recursos extras ao SYSCTL"
     echo -e "kernel.sysrq=1
 vm.panic_on_oom=1
@@ -195,13 +160,9 @@ kernel.panic=5
 #net.ipv6.conf.all.disable_ipv6=1
 #net.ipv6.conf.default.disable_ipv6=1" | sudo tee -a /etc/sysctl.conf &&
     sudo touch "$pathsrv"/sysctl_ok
-  }
 }
 
 function motd0 {
-  [ -f "$pathsrv"/motd_ok ] && {
-    clear; echo "O MOTD ja foi substituido. Continuando."; echo ""; sleep 2
-  } || {
     sleep 3; clear; echo "Ajustando tela de boas vindas do servidor"
     sudo rm -R /etc/update-motd.d/*
     curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/00-header | sudo tee /etc/update-motd.d/00-header
@@ -209,26 +170,18 @@ function motd0 {
     curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/90-dynamic-motd | sudo tee /etc/update-motd.d/90-dynamic-motd
     sudo chmod +x /etc/update-motd.d/*
     sudo touch "$pathsrv"/motd_ok
-  }
 }
 
 function journal0 {
-  [ -f "$pathsrv"/journal_ok ] && {
-    clear; echo "O JournalCTL ja foi ajustado. Continuando."; echo ""; sleep 2
-  } || {
     sleep 3; clear; echo "Ajustando JOURNAL"
     echo -e "
 Storage=persistent
 SystemMaxUse=5G
 SystemKeepFree=10G" | sudo tee -a /etc/systemd/journald.conf &&
     sudo touch "$pathsrv"/journal_ok
-  }
 }
 
 function fstab0 {
-  [ -f "$pathsrv"/fstab_ok ] && {
-    clear; echo "O fstab ja foi ajustado de acordo. Continuando."; echo ""; sleep 2
-  } || {
     sudo mkdir /mnt/main
     sudo mkdir /mnt/backup
 
@@ -249,7 +202,6 @@ tmpfs /var/tmp tmpfs defaults 0 0
 # //172.25.0.X/folder /mnt/folder cifs credentials=/home/administrador/.smb,iocharset=utf8,file_mode=0777,dir_mode=0777,noperm,user,vers=2.1,nofail,x-systemd.automount,x-systemd.requires=network-online.target,x-systemd.device-timeout=3 0 0" | sudo tee -a /etc/fstab &&
 
     sudo touch "$pathsrv"/fstab_ok
-  }
 }
 
 function the_end0 {
