@@ -37,17 +37,6 @@ function bashconf0 {
   . .bashrc
 }
 
-function mkswap0 {
-  [ -f /swapfile ] && {
-    echo "." >/dev/zero
-  } || {
-    sudo dd if=/dev/zero of=/swapfile bs=1k count=1000000
-    sudo chmod 0600 /swapfile
-    sudo mkswap /swapfile; sudo swapon /swapfile
-    echo "/swapfile none swap sw 0 0" | sudo tee -a /etc/fstab
-  }
-}
-
 function timezone0 {
   sudo timedatectl set-timezone Etc/GMT+3
   sudo timedatectl set-local-rtc 1
@@ -222,7 +211,6 @@ function smbconf0 {
 root_check0
 welcome0 "ARM v1.0"
 bashconf0
-mkswap0
 timezone0
 useless0
 update_arm
