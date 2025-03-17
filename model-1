@@ -21,7 +21,7 @@ export github="https://raw.githubusercontent.com/urbancompasspony/docker/main/"
 
 # VM Only
 export list00="qemu-system qemu-utils qemu-user qemu-kvm qemu-guest-agent \
-libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq genisoimage"
+libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq genisoimage guestfs-tools"
 
 export list01="docker.io net-tools speedtest-cli whois netdiscover iperf arp-scan traceroute sshpass network-manager \
 libatasmart-bin smartmontools zip unzip p7zip-full 7zip p7zip cifs-utils rsnapshot rclone iotop \
