@@ -56,11 +56,11 @@ function update_arm {
     sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear
 
     echo "Tentando pacotes 24.04...."
-    sudo apt install $list02 $package_2404 -y &&
+    sudo apt install $list01 $package_2404 -y &&
     sync &&
 
     echo "Tentando pacotes 22.04...."
-    sudo apt install $list02 $package_2204 -y &&
+    sudo apt install $list01 $package_2204 -y &&
     sync &&
 
     sudo systemctl disable NetworkManager-wait-online.service
