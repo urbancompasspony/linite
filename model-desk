@@ -109,7 +109,7 @@ Pin-Priority: 1000
 }
 
 function appsflat0 {
-  flatpak install com.anydesk.Anydesk com.thincast.client org.remmina.Remmina com.usebottles.bottles
+  sudo flatpak install com.anydesk.Anydesk com.thincast.client org.remmina.Remmina com.usebottles.bottles org.mozilla.Thunderbird -y
 }
 
 # ======================================================================================================================================================== #
