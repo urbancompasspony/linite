@@ -155,7 +155,5 @@ browsers0
 appsflat0
 token0
 
-echo "Reiniciando sistema..."; sleep 3
 sudo reboot
-
 exit 1
