@@ -66,24 +66,19 @@ kernel.panic=5
 }
 
 function fstab0 {
-    sudo mkdir /mnt/main
-    sudo mkdir /mnt/backup
-
-    sleep 3; clear; echo "Adicionando entradas extras ao fstab"
-
-    echo -e "
+echo -e "
 # Temp to ram!
 tmpfs /tmp tmpfs defaults 0 0
-tmpfs /var/tmp tmpfs defaults 0 0
+tmpfs /var/tmp tmpfs defaults 0 0" | sudo tee -a /etc/fstab
+}
 
-# Main Disk
-# /dev/disk/by-uuid/ /mnt/main ext4 defaults 0 0
+function flatpak0 {
+  sudo apt install flatpak
+  sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+}
 
-# Backup
-# /dev/disk/by-uuid/ /mnt/backup ext4 defaults 0 0
-
-# Acesso Externo
-# //172.25.0.X/folder /mnt/folder cifs credentials=/home/administrador/.smb,iocharset=utf8,file_mode=0777,dir_mode=0777,noperm,user,vers=2.1,nofail,x-systemd.automount,x-systemd.requires=network-online.target,x-systemd.device-timeout=3 0 0" | sudo tee -a /etc/fstab &&
+function plasma0 {
+  echo 0
 }
 
 # ======================================================================================================================================================== #
@@ -95,7 +90,9 @@ timezone0
 useless0
 update0
 sysctl0
-
+fstab0
+flatpak0
+plasma0
 echo "Reiniciando sistema..."; sleep 3
 sudo reboot
 
