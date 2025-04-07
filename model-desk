@@ -109,7 +109,7 @@ Pin-Priority: 1000
 }
 
 function appsflat0 {
-  sudo flatpak install com.anydesk.Anydesk com.thincast.client org.remmina.Remmina com.usebottles.bottles org.mozilla.Thunderbird org.onlyoffice.desktopeditors com.github.tchx84.Flatseal -y
+  sudo flatpak install com.anydesk.Anydesk com.thincast.client org.remmina.Remmina com.usebottles.bottles org.mozilla.Thunderbird org.onlyoffice.desktopeditors com.github.tchx84.Flatseal net.codelogistics.webapps -y
 }
 
 function token0 {
