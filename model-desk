@@ -109,7 +109,8 @@ Pin-Priority: 1000
 }
 
 function appsflat0 {
-  sudo flatpak install com.anydesk.Anydesk com.thincast.client org.remmina.Remmina com.usebottles.bottles org.mozilla.Thunderbird org.onlyoffice.desktopeditors com.github.tchx84.Flatseal net.codelogistics.webapps -y
+  sudo flatpak install com.anydesk.Anydesk us.zoom.Zoom com.thincast.client org.remmina.Remmina com.usebottles.bottles org.mozilla.Thunderbird org.onlyoffice.desktopeditors com.ktechpit.whatsie \
+  com.github.tchx84.Flatseal net.codelogistics.webapps com.skype.Client -y
 }
 
 function token0 {
