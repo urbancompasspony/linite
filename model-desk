@@ -1,0 +1,224 @@
+#!/usr/bin/env bash
+
+# ======================================================================================================================================================== #
+# curl -L marm.linuxuniverse.com.br | bash
+# ======================================================================================================================================================== #
+
+export list01="docker.io net-tools speedtest-cli whois netdiscover iperf arp-scan traceroute sshpass \
+libatasmart-bin smartmontools zip unzip p7zip-full 7zip p7zip cifs-utils rsnapshot rclone iotop \
+haveged stress lm-sensors cmatrix btop inxi tree dialog btrfs-progs build-essential unrar \
+openvpn curl nmap parallel openssh-server samba samba-dsdb-modules samba-vfs-modules xinit xorg openbox xdotool"
+
+# ARM64
+export package_2204="linux-modules-extra-raspi network-manager"
+export package_2404="docker-buildx"
+
+# ======================================================================================================================================================== #
+
+function root_check0 {
+  [ "$EUID" -ne 0 ] || {
+    clear
+    echo "Não execute este script como Root! DICA: Remova o SUDO do comando ou execute-o como usuario local."; echo ""
+    exit
+  }
+}
+
+function welcome0 {
+  clear; echo ""; echo "Preparo de Servidor $1 by SuitIT®"; echo ""
+  echo "Insira a senha padrao: ubuntu"; echo ""
+  sudo echo . >/dev/null
+  echo ""; echo "5"; sleep 1; echo "4"; sleep 1; echo "3"; sleep 1; echo "2"; sleep 1; echo "1"; sleep 1
+}
+
+function bashconf0 {
+  clear; echo "Preparando sistema e configurando BASH"; echo ""
+  sudo mkdir -p "$destpath"; sudo chmod 777 -R "$destpath"; sudo mkdir -p "$pathsrv"
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
+  . .bashrc
+}
+
+function timezone0 {
+  sudo timedatectl set-timezone Etc/GMT+3
+  sudo timedatectl set-local-rtc 1
+  sudo touch "$pathsrv"/timezone_ok
+}
+
+function useless0 {
+  clear; echo "Removendo pacotes e desativando servicos inuteis"; echo ""
+  sudo apt purge needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolution-data-server bluez blueman bluetooth -y
+  sudo systemctl disable systemd-networkd-wait-online.service
+  sudo systemctl mask systemd-networkd-wait-online.service
+  sudo touch "$pathsrv"/useless_services
+}
+
+function update_arm {
+    clear; echo "Atualizando o sistema"; echo ""
+    sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear
+
+    echo "Tentando pacotes 24.04...."
+    sudo apt install $list01 $package_2404 -y &&
+    sync &&
+
+    echo "Tentando pacotes 22.04...."
+    sudo apt install $list01 $package_2204 -y &&
+    sync &&
+
+    sudo systemctl disable NetworkManager-wait-online.service
+    sudo systemctl mask NetworkManager-wait-online.service
+
+    sudo usermod -aG docker administrador
+    sudo touch "$pathsrv"/updatearm_ok
+}
+
+function netplan0 {
+    sleep 3; clear; echo "Ajustando Netplan"
+    echo -e "
+# This is the network config written by 'linite model-1' script
+network:
+  ethernets:
+#    renderer: NetworkManager
+    eno1:
+      dhcp4: true
+      nameservers:
+        addresses: [1.1.1.1, 8.8.8.8]
+    enp1s0:
+      dhcp4: true
+      nameservers:
+        addresses: [1.1.1.1, 8.8.8.8]
+    enp2s0:
+      dhcp4: true
+      nameservers:
+        addresses: [1.1.1.1, 8.8.8.8]
+    enp4s0:
+      dhcp4: false
+      addresses: [172.25.0.3/24]
+      routes:
+      - to: default
+        via: 192.168.0.1
+      nameservers:
+        addresses: [1.1.1.1, 8.8.8.8]
+  version: 2" | sudo tee /etc/netplan/00-installer-config.yaml
+    sudo netplan apply && sudo touch "$pathsrv"/netplan_ok
+}
+
+function netplan1 {
+    echo -e "
+#
+#network:
+#    ethernets:
+#        renderer: NetworkManager
+#        enp4s0:
+#            addresses: [192.168.250.10/24]
+#            routes:
+#            - to: default
+#              via: 192.168.120.254
+#            dhcp4: no
+##           optional: true
+#            nameservers:
+#              addresses: [192.168.250.1]
+#              #addresses: [200.225.197.34, 200.225.197.37] 
+#              #addresses: [200.175.89.139, 200.175.5.139]
+#              #addresses: [8.8.4.4, 8.8.8.8]
+#              #addresses: [1.1.1.1, 1.0.0.1]
+#    version: 2" | sudo tee -a /etc/netplan/00-installer-config.yaml
+
+echo -e "
+#
+#network:
+#  ethernets:
+#    eth0:
+#      dhcp4: true
+#      optional: true
+
+#    eth1: # THIS!
+#      dhcp4: no
+#      optional: true
+#      addresses: [172.16.1.2/24]
+#  version: 2" | sudo tee -a /etc/netplan/00-installer-config.yaml
+
+    sudo touch "$pathsrv"/netplan_ok
+}
+
+function sysctl0 {
+    sleep 3; clear; echo "Aplicando recursos extras ao SYSCTL"
+    echo -e "kernel.sysrq=1
+vm.panic_on_oom=1
+vm.swappiness=10
+kernel.panic=5
+#net.ipv4.ip_forward=1
+#net.ipv6.conf.all.disable_ipv6=1
+#net.ipv6.conf.default.disable_ipv6=1" | sudo tee -a /etc/sysctl.conf &&
+    sudo touch "$pathsrv"/sysctl_ok
+}
+
+function motd0 {
+    sleep 3; clear; echo "Ajustando tela de boas vindas do servidor"
+    sudo rm -R /etc/update-motd.d/*
+    curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/00-header | sudo tee /etc/update-motd.d/00-header
+    curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/20-sysinfo | sudo tee /etc/update-motd.d/20-sysinfo
+    curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/90-dynamic-motd | sudo tee /etc/update-motd.d/90-dynamic-motd
+    sudo chmod +x /etc/update-motd.d/*
+    sudo touch "$pathsrv"/motd_ok
+}
+
+function journal0 {
+    sleep 3; clear; echo "Ajustando JOURNAL"
+    echo -e "
+Storage=persistent
+SystemMaxUse=5G
+SystemKeepFree=10G" | sudo tee -a /etc/systemd/journald.conf &&
+    sudo touch "$pathsrv"/journal_ok
+}
+
+function fstab0 {
+    sudo mkdir /mnt/main
+    sudo mkdir /mnt/backup
+
+    sleep 3; clear; echo "Adicionando entradas extras ao fstab"
+
+    echo -e "
+# Temp to ram!
+tmpfs /tmp tmpfs defaults 0 0
+tmpfs /var/tmp tmpfs defaults 0 0
+
+# Main Disk
+# /dev/disk/by-uuid/ /mnt/main ext4 defaults 0 0
+
+# Backup
+# /dev/disk/by-uuid/ /mnt/backup ext4 defaults 0 0
+
+# Acesso Externo
+# //172.25.0.X/folder /mnt/folder cifs credentials=/home/administrador/.smb,iocharset=utf8,file_mode=0777,dir_mode=0777,noperm,user,vers=2.1,nofail,x-systemd.automount,x-systemd.requires=network-online.target,x-systemd.device-timeout=3 0 0" | sudo tee -a /etc/fstab &&
+
+    sudo touch "$pathsrv"/fstab_ok
+}
+
+function the_end0 {
+  sudo touch "$pathsrv"/finished
+  clear; echo "Instalação concluida!"
+  echo "Reiniciando sistema..."; sleep 3
+  sudo reboot
+}
+
+function smbconf0 {
+  clear; echo "Adicionando modelo SAMBA AD"
+  sudo mkdir -p /srv/containers/scripts/
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/SAMBA_Model/smbAD.conf | sudo tee /srv/containers/scripts/SMB-AD-Model.conf
+}
+
+# ======================================================================================================================================================== #
+
+root_check0
+welcome0 "ARM v1.0"
+bashconf0
+timezone0
+useless0
+update_arm
+netplan1
+sysctl0
+motd0
+journal0
+smbconf0
+the_end0
+
+exit 1
