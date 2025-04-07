@@ -73,9 +73,8 @@ tmpfs /var/tmp tmpfs defaults 0 0" | sudo tee -a /etc/fstab
 }
 
 function flatpak0 {
-  sudo apt install flatpak
+  sudo apt install flatpak plasma-discover-backend-flatpak
   sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-  sudo apt install plasma-discover-backend-flatpak
 }
 
 function plasma0 {
