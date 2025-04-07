@@ -78,7 +78,38 @@ function flatpak0 {
 }
 
 function plasma0 {
-  echo 0
+  # Wallpaper:
+  wallpath0="/usr/share/wallpapers/Next/contents/images_dark/1280x800"
+  kwriteconfig5 --file plasma-org.kde.plasma.desktop-appletsrc --group Containments --group 1 --group Wallpaper --group org.kde.image --group General --key Image "$wallpath0"
+  qdbus org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript 'var allDesktops = desktops();for (i=0;i<allDesktops.length;i++) {d = allDesktops[i];d.wallpaperPlugin="org.kde.image";d.currentConfigGroup=["Wallpaper","org.kde.image","General"];d.writeConfig("Image", "file://$wallpath0")}'
+}
+
+function apps0 {
+  # Google Chrome
+  wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+  sudo dpkg -i ./google-chrome*.deb; sudo rm google-chrome*.deb
+
+  # Microsoft Edge
+  wget https://packages.microsoft.com/repos/edge/pool/main/m/microsoft-edge-stable/microsoft-edge-stable_135.0.3179.54-1_amd64.deb
+  sudo dpkg -i microsoft-edge-stable_135.0.3179.54-1_amd64.deb; sudo rm microsoft-edge*.deb
+
+  # Firefox
+  sudo install -d -m 0755 /etc/apt/keyrings
+  wget -q https://packages.mozilla.org/apt/repo-signing-key.gpg -O- | sudo tee /etc/apt/keyrings/packages.mozilla.org.asc > /dev/null
+  gpg -n -q --import --import-options import-show /etc/apt/keyrings/packages.mozilla.org.asc | awk '/pub/{getline; gsub(/^ +| +$/,""); if($0 == "35BAA0B33E9EB396F59CA838C0BA5CE6DC6315A3") print "\nThe key fingerprint matches ("$0").\n"; else print "\nVerification failed: the fingerprint ("$0") does not match the expected one.\n"}'
+  echo "deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.asc] https://packages.mozilla.org/apt mozilla main" | sudo tee -a /etc/apt/sources.list.d/mozilla.list > /dev/null
+
+echo '
+Package: *
+Pin: origin packages.mozilla.org
+Pin-Priority: 1000
+' | sudo tee /etc/apt/preferences.d/mozilla
+
+  sudo apt install firefox
+}
+
+function appsflat0 {
+  flatpak install com.anydesk.Anydesk com.thincast.client org.remmina.Remmina com.usebottles.bottles
 }
 
 # ======================================================================================================================================================== #
@@ -93,6 +124,8 @@ sysctl0
 fstab0
 flatpak0
 plasma0
+apps0
+appsflat0
 echo "Reiniciando sistema..."; sleep 3
 sudo reboot
 
