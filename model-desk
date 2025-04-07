@@ -38,7 +38,7 @@ function timezone0 {
 
 function useless0 {
   clear; echo "Removendo pacotes e desativando servicos inuteis"; echo ""
-  sudo apt purge unattended-upgrades -y
+  sudo apt purge unattended-upgrades plasma-discover-backend-snap -y
   sudo systemctl disable systemd-networkd-wait-online.service
   sudo systemctl mask systemd-networkd-wait-online.service
 }
@@ -62,7 +62,7 @@ vm.swappiness=10
 kernel.panic=5
 #net.ipv4.ip_forward=1
 #net.ipv6.conf.all.disable_ipv6=1
-#net.ipv6.conf.default.disable_ipv6=1" | sudo tee -a /etc/sysctl.conf &&
+#net.ipv6.conf.default.disable_ipv6=1" | sudo tee -a /etc/sysctl.conf
 }
 
 function fstab0 {
@@ -75,6 +75,7 @@ tmpfs /var/tmp tmpfs defaults 0 0" | sudo tee -a /etc/fstab
 function flatpak0 {
   sudo apt install flatpak
   sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+  sudo apt install plasma-discover-backend-flatpak
 }
 
 function plasma0 {
