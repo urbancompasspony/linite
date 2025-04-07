@@ -5,7 +5,7 @@
 # ======================================================================================================================================================== #
 
 export list01="docker.io ubuntu-restricted-extras ubuntu-restricted-addons net-tools speedtest-cli whois netdiscover iperf arp-scan traceroute trippy \
-cifs-utils iotop liblchown-perl p7zip rclone rsnapshot stress lm-sensors cmatrix btop inxi tree dialog btrfs-progs build-essential unrar openvpn curl \
+cifs-utils iotop liblchown-perl p7zip rclone rsnapshot stress lm-sensors cmatrix btop inxi tree dialog btrfs-progs build-essential unrar openvpn curl smb4k filelight vlc \
 qemu-system qemu-utils qemu-user qemu-kvm qemu-guest-agent libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq genisoimage guestfs-tools"
 
 # ======================================================================================================================================================== #
@@ -84,7 +84,7 @@ function plasma0 {
   qdbus org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript 'var allDesktops = desktops();for (i=0;i<allDesktops.length;i++) {d = allDesktops[i];d.wallpaperPlugin="org.kde.image";d.currentConfigGroup=["Wallpaper","org.kde.image","General"];d.writeConfig("Image", "file://$wallpath0")}'
 }
 
-function apps0 {
+function browsers0 {
   # Google Chrome
   wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
   sudo dpkg -i ./google-chrome*.deb; sudo rm google-chrome*.deb
@@ -109,7 +109,7 @@ Pin-Priority: 1000
 }
 
 function appsflat0 {
-  sudo flatpak install com.anydesk.Anydesk com.thincast.client org.remmina.Remmina com.usebottles.bottles org.mozilla.Thunderbird -y
+  sudo flatpak install com.anydesk.Anydesk com.thincast.client org.remmina.Remmina com.usebottles.bottles org.mozilla.Thunderbird org.onlyoffice.desktopeditors -y
 }
 
 # ======================================================================================================================================================== #
@@ -124,8 +124,9 @@ sysctl0
 fstab0
 flatpak0
 plasma0
-apps0
+browsers0
 appsflat0
+
 echo "Reiniciando sistema..."; sleep 3
 sudo reboot
 
