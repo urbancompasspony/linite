@@ -4,7 +4,7 @@
 # curl -L desk.linuxuniverse.com.br | bash
 # ======================================================================================================================================================== #
 
-export list01="docker.io ubuntu-restricted-extras ubuntu-restricted-addons net-tools speedtest-cli whois \
+export list01="docker.io ubuntu-restricted-extras ubuntu-restricted-addons net-tools speedtest-cli whois lz4 \
 netdiscover iperf arp-scan traceroute gparted gnome-disk-utility openssh-server libssl3 lsb printer-driver-escpr \
 cifs-utils iotop liblchown-perl p7zip rclone rsnapshot stress lm-sensors cmatrix btop inxi tree hplip printer-driver-all \
 dialog btrfs-progs build-essential unrar openvpn curl smb4k filelight vlc kolourpaint pcscd opensc \
