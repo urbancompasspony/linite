@@ -142,6 +142,13 @@ function token0 {
   sudo dpkg -i webpki.deb; sudo rm webpki.deb
 }
 
+function dwservice0 {
+  clear
+  wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/administrador/dwagent_x86.sh
+  chmod +x dwagent_x86.sh
+  sudo bash dwagent_x86.sh
+}
+
 # ======================================================================================================================================================== #
 
 root_check0
@@ -157,6 +164,7 @@ plasma0
 browsers0
 appsflat0
 token0
+dwservice0
 
 sudo reboot
 exit 1
