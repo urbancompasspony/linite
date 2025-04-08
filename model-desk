@@ -7,7 +7,7 @@
 export list01="docker.io ubuntu-restricted-extras ubuntu-restricted-addons net-tools speedtest-cli whois lz4 \
 netdiscover iperf arp-scan traceroute gparted gnome-disk-utility openssh-server libssl3 lsb printer-driver-escpr \
 cifs-utils iotop liblchown-perl p7zip rclone rsnapshot stress lm-sensors cmatrix btop inxi tree hplip printer-driver-all \
-dialog btrfs-progs build-essential unrar openvpn curl smb4k filelight vlc kolourpaint pcscd opensc \
+dialog btrfs-progs build-essential unrar openvpn curl smb4k filelight vlc kolourpaint pcscd opensc xrdp xorgxrdp freerdp2-x11 \
 qemu-system qemu-utils qemu-user qemu-kvm qemu-guest-agent libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq genisoimage guestfs-tools"
 
 # ======================================================================================================================================================== #
