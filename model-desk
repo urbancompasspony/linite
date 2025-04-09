@@ -36,7 +36,6 @@ function welcome0 {
 function bashconf0 {
   clear; echo "Configurando BASH"; echo ""
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
-  . .bashrc
 }
 
 function timezone0 {
@@ -56,11 +55,11 @@ function update0 {
     sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear
 
     echo "Instalando pacotes..."
-    sudo apt install $list01 -y &&
+    sudo apt install "$list01" -y &&
 
     sync &&
 
-    sudo -E usermod -aG docker $USER
+    sudo -E usermod -aG docker "$USER"
 }
 
 function sysctl0 {
@@ -103,13 +102,6 @@ function appsflat0 {
   com.github.tchx84.Flatseal net.codelogistics.webapps com.skype.Client -y
 
 #not used:  org.onlyoffice.desktopeditors
-}
-
-function plasma0 {
-  # Wallpaper:
-  wallpath0="/usr/share/wallpapers/Next/contents/images_dark/1280x800"
-  kwriteconfig5 --file plasma-org.kde.plasma.desktop-appletsrc --group Containments --group 1 --group Wallpaper --group org.kde.image --group General --key Image "$wallpath0"
-  qdbus org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript 'var allDesktops = desktops();for (i=0;i<allDesktops.length;i++) {d = allDesktops[i];d.wallpaperPlugin="org.kde.image";d.currentConfigGroup=["Wallpaper","org.kde.image","General"];d.writeConfig("Image", "file://$wallpath0")}'
 }
 
 function browsers0 {
@@ -189,7 +181,8 @@ function ADDCJoin0 {
 
 function onlyoffice0 {
   [ -f /etc/.officeok ] || {
-    mkdir -p -m 700 ~/.gnupg; gpg --no-default-keyring --keyring gnupg-ring:/tmp/onlyoffice.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys CB2DE8E5
+    mkdir -p 700 ~/.gnupg
+    gpg --no-default-keyring --keyring gnupg-ring:/tmp/onlyoffice.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys CB2DE8E5
     chmod 644 /tmp/onlyoffice.gpg; sudo chown root:root /tmp/onlyoffice.gpg; sudo mv /tmp/onlyoffice.gpg /usr/share/keyrings/onlyoffice.gpg
 
     echo 'deb [signed-by=/usr/share/keyrings/onlyoffice.gpg] https://download.onlyoffice.com/repo/debian squeeze main' | sudo tee -a /etc/apt/sources.list.d/onlyoffice.list
@@ -213,7 +206,6 @@ update0
 sysctl0
 fstab0
 flatpak0
-#plasma0
 browsers0
 appsflat0
 token0
