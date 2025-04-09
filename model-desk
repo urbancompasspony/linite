@@ -221,5 +221,16 @@ dwservice0
 ADDCJoin0
 onlyoffice0
 
+clear; echo ""; echo "O SISTEMA VAI REINICIAR AGORA. Ao voltar, execute este comando e aceite os termos de uso:"
+echo ""
+echo "sudo apt install ttf-mscorefonts-installer"
+echo ""
+echo "para ter as Fontes da Microsoft como Arial, Times New Roman e outras."
+echo ""; echo "5"; sleep 1; echo "4"; sleep 1; echo "3"; sleep 1; echo "2"; sleep 1; echo "1"; sleep 1
+
+clear
+echo ""; echo "O sistema será reiniciado agora!"
+sleep 2
+
 sudo reboot
 exit 1
