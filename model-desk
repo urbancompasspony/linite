@@ -94,7 +94,7 @@ tmpfs /var/tmp tmpfs defaults 0 0" | sudo tee -a /etc/fstab
 }
 
 function flatpak0 {
-  sudo apt install flatpak plasma-discover-backend-flatpak
+  sudo apt install flatpak plasma-discover-backend-flatpak -y &&
   sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 }
 
@@ -134,7 +134,7 @@ Pin: origin packages.mozilla.org
 Pin-Priority: 1000
 ' | sudo tee /etc/apt/preferences.d/mozilla
 
-    sudo apt install firefox
+    sudo apt install firefox -y
 
     sudo touch /etc/.browserok
   } && {
