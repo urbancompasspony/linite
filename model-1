@@ -87,7 +87,6 @@ function bashconf0 {
   clear; echo "Preparando sistema e configurando BASH"; echo ""
   sudo mkdir -p "$destpath"; sudo chmod 777 -R "$destpath"; sudo mkdir -p "$pathsrv"
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
-  . .bashrc
 }
 
 function mkswap0 {
@@ -160,15 +159,21 @@ function timezone0 {
 }
 
 function useless0 {
-  [ -f "$pathsrv"/useless_services ] && {
-    clear; echo "Os pacotes inuteis ja foram removidos e desativados. Continuando."; echo ""; sleep 2
-  } || {
     clear; echo "Removendo pacotes e desativando servicos inuteis"; echo ""
     sudo apt purge needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolution-data-server bluez blueman bluetooth -y
+
+    cat <<EOF | sudo tee /etc/apt/preferences.d/nosnap.pref
+# To prevent repository packages from triggering the installation of Snap,
+# this file forbids snapd from being installed by APT.
+# For more information: https://linuxmint-user-guide.readthedocs.io/en/latest/snap.html
+Package: snapd
+Pin: release a=*
+Pin-Priority: -10
+EOF
+
+    sudo apt-mark hold snapd
     sudo systemctl disable systemd-networkd-wait-online.service
     sudo systemctl mask systemd-networkd-wait-online.service
-    sudo touch "$pathsrv"/useless_services
-  }
 }
 
 function update0 {
