@@ -166,9 +166,6 @@ function token0 {
 
     cd ~; modutil -dbdir sql:.pki/nssdb/ -add "Safenet 5110" -libfile "/usr/lib/libeToken.so"
 
-    wget https://get.webpkiplugin.com/Downloads/2.13.3/setup-deb-64.deb
-    sudo dpkg -i webpki.deb; sudo rm webpki.deb
-
     sudo touch /etc/.tokenok
   } && {
     echo . >/dev/null
