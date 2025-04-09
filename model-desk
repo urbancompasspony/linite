@@ -4,7 +4,7 @@
 # curl -L desk.linuxuniverse.com.br | bash
 # ======================================================================================================================================================== #
 
-export list01="build-essential \
+export list01="build-essential wine-stable \
 net-tools netdiscover iperf arp-scan traceroute speedtest-cli whois openvpn curl \
 gparted gnome-disk-utility vlc kolourpaint \
 cifs-utils liblchown-perl p7zip unrar lz4 rclone rsnapshot iotop \
