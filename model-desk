@@ -4,7 +4,7 @@
 # curl -L desk.linuxuniverse.com.br | bash
 # ======================================================================================================================================================== #
 
-export list01="build-essential ubuntu-restricted-extras ubuntu-restricted-addons \
+export list01="build-essential \
 net-tools netdiscover iperf arp-scan traceroute speedtest-cli whois openvpn curl \
 gparted gnome-disk-utility vlc kolourpaint \
 cifs-utils liblchown-perl p7zip unrar lz4 rclone rsnapshot iotop \
@@ -56,6 +56,10 @@ function update0 {
 
     echo "Instalando pacotes..."
     sudo apt install $list01 -y &&
+
+    echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | sudo debconf-set-selections
+    sudo apt install -y ubuntu-restricted-extras ubuntu-restricted-addons
+
     sync &&
 
     sudo -E usermod -aG docker $USER
