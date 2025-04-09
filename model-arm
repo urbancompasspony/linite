@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # ======================================================================================================================================================== #
-# curl -L marm.linuxuniverse.com.br | bash
+# curl -L arm.linuxuniverse.com.br | bash
 # ======================================================================================================================================================== #
 
 export list01="docker.io net-tools speedtest-cli whois netdiscover iperf arp-scan traceroute sshpass \
