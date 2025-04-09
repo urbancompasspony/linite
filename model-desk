@@ -148,10 +148,12 @@ function token0 {
 }
 
 function dwservice0 {
-  clear
   wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/administrador/dwagent_x86.sh
   chmod +x dwagent_x86.sh
-  sudo bash dwagent_x86.sh
+}
+
+function ADDCJoin0 {
+  sudo pam-auth-update --enable mkhomedir
 }
 
 # ======================================================================================================================================================== #
@@ -170,6 +172,7 @@ browsers0
 appsflat0
 token0
 dwservice0
+ADDCJoin0
 
 sudo reboot
 exit 1
