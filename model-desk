@@ -64,8 +64,9 @@ Pin-Priority: -10
 EOF
 
     sudo apt-mark hold snapd
+
     echo "Instalando pacotes..."
-    sudo apt install "$list01" -y &&
+    sudo apt install $list01 -y
     sync &&
 
     sudo -E usermod -aG docker "$USER"
