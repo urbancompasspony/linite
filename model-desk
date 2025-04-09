@@ -100,6 +100,13 @@ function flatpak0 {
   sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 }
 
+function appsflat0 {
+  sudo flatpak install com.anydesk.Anydesk us.zoom.Zoom com.thincast.client org.remmina.Remmina com.usebottles.bottles org.mozilla.Thunderbird com.ktechpit.whatsie \
+  com.github.tchx84.Flatseal net.codelogistics.webapps com.skype.Client -y
+
+#not used:  org.onlyoffice.desktopeditors
+}
+
 function plasma0 {
   # Wallpaper:
   wallpath0="/usr/share/wallpapers/Next/contents/images_dark/1280x800"
@@ -135,11 +142,6 @@ Pin-Priority: 1000
   } && {
     echo . >/dev/null
   }
-}
-
-function appsflat0 {
-  sudo flatpak install com.anydesk.Anydesk us.zoom.Zoom com.thincast.client org.remmina.Remmina com.usebottles.bottles org.mozilla.Thunderbird org.onlyoffice.desktopeditors com.ktechpit.whatsie \
-  com.github.tchx84.Flatseal net.codelogistics.webapps com.skype.Client -y
 }
 
 function token0 {
@@ -187,6 +189,21 @@ function ADDCJoin0 {
   sudo pam-auth-update --enable mkhomedir
 }
 
+function onlyoffice0 {
+  [ -f /etc/.officeok ] || {
+    mkdir -p -m 700 ~/.gnupg; gpg --no-default-keyring --keyring gnupg-ring:/tmp/onlyoffice.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys CB2DE8E5
+    chmod 644 /tmp/onlyoffice.gpg; sudo chown root:root /tmp/onlyoffice.gpg; sudo mv /tmp/onlyoffice.gpg /usr/share/keyrings/onlyoffice.gpg
+
+    echo 'deb [signed-by=/usr/share/keyrings/onlyoffice.gpg] https://download.onlyoffice.com/repo/debian squeeze main' | sudo tee -a /etc/apt/sources.list.d/onlyoffice.list
+
+    sudo apt update; sudo apt install onlyoffice-desktopeditors -y
+
+    sudo touch /etc/.officeok
+  } && {
+    echo . >/dev/null
+  }
+}
+
 # ======================================================================================================================================================== #
 
 root_check0
@@ -204,6 +221,7 @@ appsflat0
 token0
 dwservice0
 ADDCJoin0
+onlyoffice0
 
 sudo reboot
 exit 1
