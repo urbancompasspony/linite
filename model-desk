@@ -223,7 +223,7 @@ onlyoffice0
 
 clear; echo ""; echo "O SISTEMA VAI REINICIAR AGORA. Ao voltar, execute este comando e aceite os termos de uso:"
 echo ""
-echo "sudo apt install ttf-mscorefonts-installer"
+echo "sudo apt install ttf-mscorefonts-installer -y"
 echo ""
 echo "para ter as Fontes da Microsoft como Arial, Times New Roman e outras."
 echo ""; echo "5"; sleep 1; echo "4"; sleep 1; echo "3"; sleep 1; echo "2"; sleep 1; echo "1"; sleep 1
