@@ -54,9 +54,18 @@ function update0 {
     clear; echo "Atualizando o sistema"; echo ""
     sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear
 
+    cat <<EOF | sudo tee /etc/apt/preferences.d/nosnap.pref
+# To prevent repository packages from triggering the installation of Snap,
+# this file forbids snapd from being installed by APT.
+# For more information: https://linuxmint-user-guide.readthedocs.io/en/latest/snap.html
+Package: snapd
+Pin: release a=*
+Pin-Priority: -10
+EOF
+
+    sudo apt-mark hold snapd
     echo "Instalando pacotes..."
     sudo apt install "$list01" -y &&
-
     sync &&
 
     sudo -E usermod -aG docker "$USER"
