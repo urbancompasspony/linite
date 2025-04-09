@@ -5,12 +5,13 @@
 # ======================================================================================================================================================== #
 
 export list01="build-essential wine-stable \
+cabextract chromium-codecs-ffmpeg-extra fonts-liberation gstreamer1.0-libav gstreamer1.0-plugins-ugly gstreamer1.0-vaapi liba52-0.7.4 libaribb24-0 libavcodec-extra \
 net-tools netdiscover iperf arp-scan traceroute speedtest-cli whois openvpn curl \
 gparted gnome-disk-utility vlc kolourpaint \
 cifs-utils liblchown-perl p7zip unrar lz4 rclone rsnapshot iotop \
 printer-driver-escpr hplip printer-driver-all \
 stress lm-sensors cmatrix btop inxi tree dialog btrfs-progs filelight \
-libssl3 lsb pcscd opensc \
+libssl3 pcscd opensc \
 xrdp xorgxrdp freerdp2-x11 openssh-server \
 adsys adsys-windows sssd-ad sssd-tools realmd adcli smb4k \
 docker.io qemu-system qemu-utils qemu-user qemu-kvm qemu-guest-agent libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq genisoimage guestfs-tools"
@@ -56,9 +57,6 @@ function update0 {
 
     echo "Instalando pacotes..."
     sudo apt install $list01 -y &&
-
-    echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | sudo debconf-set-selections
-    sudo apt install -y ubuntu-restricted-extras ubuntu-restricted-addons
 
     sync &&
 
