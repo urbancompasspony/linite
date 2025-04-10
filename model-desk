@@ -143,7 +143,7 @@ function token0 {
     wget http://archive.ubuntu.com/ubuntu/pool/universe/g/gdk-pixbuf-xlib/libgdk-pixbuf2.0-0_2.40.2-2build4_amd64.deb
     sudo dpkg -i libgdk-pixbuf2.0-0_2.40.2-2build4_amd64.deb; sudo rm libgdk*.deb
 
-    sudo apt upgrade -y
+    sudo apt update; sudo apt upgrade -y
  
     cd /tmp; wget https://www.globalsign.com/en/safenet-drivers/USB/10.7/Safenet_Linux_Installer_DEB_x64.zip
     unzip Safenet_Linux_Installer_DEB_x64.zip
@@ -151,7 +151,7 @@ function token0 {
 
     sudo apt install libnss3-tools -y
 
-    rm -fr ~/.pki/nssdb; mkdir -p ~/.pki/nssdb; certutil -d ~/.pki/nssdb -N
+    rm -fr ~/.pki/nssdb; mkdir -p ~/.pki/nssdb; certutil -d ~/.pki/nssdb -N -f <(echo -n "")
 
     cd ~; modutil -dbdir sql:.pki/nssdb/ -add "Safenet 5110" -libfile "/usr/lib/libeToken.so"
 
@@ -192,30 +192,27 @@ function flatpak0 {
 }
 
 function appsflat0 {
-  sudo flatpak install com.anydesk.Anydesk us.zoom.Zoom com.thincast.client org.remmina.Remmina com.usebottles.bottles org.mozilla.Thunderbird com.ktechpit.whatsie \
-  com.github.tchx84.Flatseal net.codelogistics.webapps com.skype.Client -y
+  sudo flatpak install com.anydesk.Anydesk us.zoom.Zoom com.thincast.client org.remmina.Remmina com.usebottles.bottles org.mozilla.Thunderbird com.ktechpit.whatsie com.github.tchx84.Flatseal net.codelogistics.webapps com.skype.Client -y
 }
 
 # ======================================================================================================================================================== #
 
 root_check0
 welcome0
-bashconf0
-timezone0
 useless0
 update0
+token0
+bashconf0
+timezone0
 sysctl0
 fstab0
 browsers0
-token0
 dwservice0
 ADDCJoin0
-onlyoffice0
 flatpak0
 appsflat0
-
-echo ""; echo "O sistema será reiniciado agora!"
-echo ""; echo "5"; sleep 1; echo "4"; sleep 1; echo "3"; sleep 1; echo "2"; sleep 1; echo "1"; sleep 1
+onlyoffice0
 
 sudo reboot
+
 exit 1
