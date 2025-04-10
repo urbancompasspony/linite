@@ -180,7 +180,16 @@ function flatpak0 {
 }
 
 function appsflat0 {
-  flatpak install com.anydesk.Anydesk us.zoom.Zoom com.thincast.client org.remmina.Remmina com.usebottles.bottles org.mozilla.Thunderbird com.ktechpit.whatsie com.github.tchx84.Flatseal net.codelogistics.webapps com.skype.Client -y &&
+  flatpak install com.anydesk.Anydesk -y
+  flatpak install us.zoom.Zoom -y
+  flatpak install com.thincast.client -y
+  flatpak install org.remmina.Remmina -y
+  flatpak install com.usebottles.bottles -y
+  flatpak install org.mozilla.Thunderbird -y
+  flatpak install com.ktechpit.whatsie -y
+  flatpak install com.github.tchx84.Flatseal -y
+  flatpak install net.codelogistics.webapps -y
+  flatpak install com.skype.Client -y
   clear
 }
 
@@ -236,10 +245,10 @@ fstab0
 browsers0
 dwservice0
 ADDCJoin0
-flatpak0
-appsflat0
 onlyoffice0
 message2
+flatpak0
+appsflat0
 sudo reboot
 
 exit 1
