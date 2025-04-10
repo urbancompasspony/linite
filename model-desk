@@ -246,9 +246,10 @@ browsers0
 dwservice0
 ADDCJoin0
 onlyoffice0
-message2
 flatpak0
 appsflat0
+message2
+
 sudo reboot
 
 exit 1
