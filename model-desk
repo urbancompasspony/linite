@@ -203,18 +203,20 @@ function onlyoffice0 {
 }
 
 function message0 {
-  dialog --title "Confirmacao" --msgbox "A seguir sera perguntado se deseja instalar o certificado.\n\nApenas pressione ENTER." 10 40
+  dialog --title "Informacao" --msgbox "A seguir sera perguntado se deseja instalar o suporte a certificado Token A3 nos navegadores.\n\nApenas pressione ENTER para confirmar." 10 40
   clear
 }
 
 function message1 {
-  dialog --title "Confirmacao" --msgbox "A seguir voce deve aceitar os termos de uso do Microsoft Core Fonts.\n\nNas proximas telas, pressione Enter, selecione com TAB e escolha YES quando surgir a opcao." 10 40
+  dialog --title "Informacao" --msgbox "A seguir vamos instalar o pacote Office com o Microsoft Core Fonts.\n\nNa tela que surgir pressione TAB e tecle Enter para escolher OK.\n\nNa segunda tela pressione TAB e escolha SIM." 12 40
+  clear
 }
 
 function message2 {
   clear
   echo ""; echo""
   echo "INSTALACAO CONCLUIDA!"
+  echo ""
   echo "O SISTEMA SERA REINICIADO EM 5 segundos."
   echo ""; echo ""
   sleep 5
