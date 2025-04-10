@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # ======================================================================================================================================================== #
-# curl -L desk.linuxuniverse.com.br | bash
+# wget -O- desk.linuxuniverse.com.br | bash
 # ======================================================================================================================================================== #
 
 export list01="build-essential wine-stable \
@@ -102,18 +102,6 @@ tmpfs /var/tmp tmpfs defaults 0 0" | sudo tee -a /etc/fstab
   }
 }
 
-function flatpak0 {
-  sudo apt install flatpak plasma-discover-backend-flatpak -y &&
-  sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-}
-
-function appsflat0 {
-  sudo flatpak install com.anydesk.Anydesk us.zoom.Zoom com.thincast.client org.remmina.Remmina com.usebottles.bottles org.mozilla.Thunderbird com.ktechpit.whatsie \
-  com.github.tchx84.Flatseal net.codelogistics.webapps com.skype.Client -y
-
-#not used:  org.onlyoffice.desktopeditors
-}
-
 function browsers0 {
   [ -f /etc/.browserok ] || {
     # Google Chrome
@@ -161,7 +149,7 @@ function token0 {
     unzip Safenet_Linux_Installer_DEB_x64.zip
     sudo dpkg -i safenetauthenticationclient_10.7.77_amd64.deb
 
-    sudo apt -y install libnss3-tools
+    sudo apt install libnss3-tools -y
 
     rm -fr ~/.pki/nssdb; mkdir -p ~/.pki/nssdb; certutil -d ~/.pki/nssdb -N
 
@@ -174,12 +162,8 @@ function token0 {
 }
 
 function dwservice0 {
-  [ -f /home/administrador/dwagent_x86.sh ] || {
-    wget https://www.dwservice.net/download/dwagent_x86.sh -O /home/administrador/dwagent_x86.sh
+    wget https://www.dwservice.net/download/dwagent_x86.sh -O ~/dwagent_x86.sh
     chmod +x dwagent_x86.sh
-  } && {
-    echo . >/dev/null
-  }
 }
 
 function ADDCJoin0 {
@@ -202,6 +186,16 @@ function onlyoffice0 {
   }
 }
 
+function flatpak0 {
+  sudo apt install flatpak plasma-discover-backend-flatpak -y
+  sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+}
+
+function appsflat0 {
+  sudo flatpak install com.anydesk.Anydesk us.zoom.Zoom com.thincast.client org.remmina.Remmina com.usebottles.bottles org.mozilla.Thunderbird com.ktechpit.whatsie \
+  com.github.tchx84.Flatseal net.codelogistics.webapps com.skype.Client -y
+}
+
 # ======================================================================================================================================================== #
 
 root_check0
@@ -212,24 +206,16 @@ useless0
 update0
 sysctl0
 fstab0
-flatpak0
 browsers0
-appsflat0
 token0
 dwservice0
 ADDCJoin0
 onlyoffice0
+flatpak0
+appsflat0
 
-clear; echo ""; echo "O SISTEMA VAI REINICIAR AGORA. Ao voltar, execute este comando e aceite os termos de uso:"
-echo ""
-echo "sudo apt install ttf-mscorefonts-installer -y"
-echo ""
-echo "para ter as Fontes da Microsoft como Arial, Times New Roman e outras."
-echo ""; echo "5"; sleep 1; echo "4"; sleep 1; echo "3"; sleep 1; echo "2"; sleep 1; echo "1"; sleep 1
-
-clear
 echo ""; echo "O sistema será reiniciado agora!"
-sleep 2
+echo ""; echo "5"; sleep 1; echo "4"; sleep 1; echo "3"; sleep 1; echo "2"; sleep 1; echo "1"; sleep 1
 
 sudo reboot
 exit 1
