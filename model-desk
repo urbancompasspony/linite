@@ -204,6 +204,7 @@ function onlyoffice0 {
 
 function message0 {
   dialog --title "Confirmacao" --msgbox "A seguir sera perguntado se deseja instalar o certificado.\n\nApenas pressione ENTER." 10 40
+  clear
 }
 
 function message1 {
