@@ -187,12 +187,15 @@ function onlyoffice0 {
 }
 
 function flatpak0 {
-  sudo apt install flatpak plasma-discover-backend-flatpak -y
-  sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+  sudo apt install flatpak plasma-discover-backend-flatpak -y &&
+  clear
+  sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo &&
+  clear
 }
 
 function appsflat0 {
-  sudo flatpak install com.anydesk.Anydesk us.zoom.Zoom com.thincast.client org.remmina.Remmina com.usebottles.bottles org.mozilla.Thunderbird com.ktechpit.whatsie com.github.tchx84.Flatseal net.codelogistics.webapps com.skype.Client -y
+  sudo flatpak install com.anydesk.Anydesk us.zoom.Zoom com.thincast.client org.remmina.Remmina com.usebottles.bottles org.mozilla.Thunderbird com.ktechpit.whatsie com.github.tchx84.Flatseal net.codelogistics.webapps com.skype.Client -y &&
+  clear
 }
 
 # ======================================================================================================================================================== #
