@@ -33,16 +33,6 @@ function welcome0 {
   echo ""; echo "5"; sleep 1; echo "4"; sleep 1; echo "3"; sleep 1; echo "2"; sleep 1; echo "1"; sleep 1
 }
 
-function bashconf0 {
-  clear; echo "Configurando BASH"; echo ""
-  curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
-}
-
-function timezone0 {
-  sudo timedatectl set-timezone Etc/GMT+3
-  sudo timedatectl set-local-rtc 1
-}
-
 function useless0 {
   clear; echo "Removendo pacotes e desativando servicos inuteis"; echo ""
   sudo apt purge unattended-upgrades plasma-discover-backend-snap -y
@@ -70,6 +60,47 @@ EOF
     sync &&
 
     sudo -E usermod -aG docker "$USER"
+}
+
+function token0 {
+  [ -f /etc/.tokenok ] || {
+    wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1-1ubuntu2.1~18.04.23_amd64.deb
+    sudo dpkg -i libssl1.1_1.1.1-1ubuntu2.1~18.04.23_amd64.deb; sudo rm libssl1*.deb
+
+    wget http://archive.ubuntu.com/ubuntu/pool/main/g/gdk-pixbuf-xlib/libgdk-pixbuf-xlib-2.0-0_2.40.2-2build4_amd64.deb
+    sudo dpkg -i libgdk-pixbuf-xlib-2.0-0_2.40.2-2build4_amd64.deb; sudo rm libgdk*.deb
+
+    wget http://archive.ubuntu.com/ubuntu/pool/universe/g/gdk-pixbuf-xlib/libgdk-pixbuf2.0-0_2.40.2-2build4_amd64.deb
+    sudo dpkg -i libgdk-pixbuf2.0-0_2.40.2-2build4_amd64.deb; sudo rm libgdk*.deb
+
+    sudo apt update; sudo apt upgrade -y
+ 
+    cd /tmp; wget https://www.globalsign.com/en/safenet-drivers/USB/10.7/Safenet_Linux_Installer_DEB_x64.zip
+    unzip Safenet_Linux_Installer_DEB_x64.zip
+    sudo dpkg -i safenetauthenticationclient_10.7.77_amd64.deb
+
+    sudo apt install libnss3-tools -y
+
+    message0
+
+    rm -fr ~/.pki/nssdb; mkdir -p ~/.pki/nssdb; certutil -d ~/.pki/nssdb -N -f <(echo -n "")
+
+    cd ~; modutil -dbdir sql:.pki/nssdb/ -add "Safenet 5110" -libfile "/usr/lib/libeToken.so"
+
+    sudo touch /etc/.tokenok
+  } && {
+    echo . >/dev/null
+  }
+}
+
+function bashconf0 {
+  clear; echo "Configurando BASH"; echo ""
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
+}
+
+function timezone0 {
+  sudo timedatectl set-timezone Etc/GMT+3
+  sudo timedatectl set-local-rtc 1
 }
 
 function sysctl0 {
@@ -132,35 +163,6 @@ Pin-Priority: 1000
   }
 }
 
-function token0 {
-  [ -f /etc/.tokenok ] || {
-    wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1-1ubuntu2.1~18.04.23_amd64.deb
-    sudo dpkg -i libssl1.1_1.1.1-1ubuntu2.1~18.04.23_amd64.deb; sudo rm libssl1*.deb
-
-    wget http://archive.ubuntu.com/ubuntu/pool/main/g/gdk-pixbuf-xlib/libgdk-pixbuf-xlib-2.0-0_2.40.2-2build4_amd64.deb
-    sudo dpkg -i libgdk-pixbuf-xlib-2.0-0_2.40.2-2build4_amd64.deb; sudo rm libgdk*.deb
-
-    wget http://archive.ubuntu.com/ubuntu/pool/universe/g/gdk-pixbuf-xlib/libgdk-pixbuf2.0-0_2.40.2-2build4_amd64.deb
-    sudo dpkg -i libgdk-pixbuf2.0-0_2.40.2-2build4_amd64.deb; sudo rm libgdk*.deb
-
-    sudo apt update; sudo apt upgrade -y
- 
-    cd /tmp; wget https://www.globalsign.com/en/safenet-drivers/USB/10.7/Safenet_Linux_Installer_DEB_x64.zip
-    unzip Safenet_Linux_Installer_DEB_x64.zip
-    sudo dpkg -i safenetauthenticationclient_10.7.77_amd64.deb
-
-    sudo apt install libnss3-tools -y
-
-    rm -fr ~/.pki/nssdb; mkdir -p ~/.pki/nssdb; certutil -d ~/.pki/nssdb -N -f <(echo -n "")
-
-    cd ~; modutil -dbdir sql:.pki/nssdb/ -add "Safenet 5110" -libfile "/usr/lib/libeToken.so"
-
-    sudo touch /etc/.tokenok
-  } && {
-    echo . >/dev/null
-  }
-}
-
 function dwservice0 {
     wget https://www.dwservice.net/download/dwagent_x86.sh -O ~/dwagent_x86.sh
     chmod +x dwagent_x86.sh
@@ -168,22 +170,6 @@ function dwservice0 {
 
 function ADDCJoin0 {
   sudo pam-auth-update --enable mkhomedir
-}
-
-function onlyoffice0 {
-  [ -f /etc/.officeok ] || {
-    mkdir -p 700 ~/.gnupg
-    gpg --no-default-keyring --keyring gnupg-ring:/tmp/onlyoffice.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys CB2DE8E5
-    chmod 644 /tmp/onlyoffice.gpg; sudo chown root:root /tmp/onlyoffice.gpg; sudo mv /tmp/onlyoffice.gpg /usr/share/keyrings/onlyoffice.gpg
-
-    echo 'deb [signed-by=/usr/share/keyrings/onlyoffice.gpg] https://download.onlyoffice.com/repo/debian squeeze main' | sudo tee -a /etc/apt/sources.list.d/onlyoffice.list
-
-    sudo apt update; sudo apt install onlyoffice-desktopeditors -y
-
-    sudo touch /etc/.officeok
-  } && {
-    echo . >/dev/null
-  }
 }
 
 function flatpak0 {
@@ -196,6 +182,51 @@ function flatpak0 {
 function appsflat0 {
   sudo flatpak install com.anydesk.Anydesk us.zoom.Zoom com.thincast.client org.remmina.Remmina com.usebottles.bottles org.mozilla.Thunderbird com.ktechpit.whatsie com.github.tchx84.Flatseal net.codelogistics.webapps com.skype.Client -y &&
   clear
+}
+
+function onlyoffice0 {
+  [ -f /etc/.officeok ] || {
+    mkdir -p 700 ~/.gnupg
+    gpg --no-default-keyring --keyring gnupg-ring:/tmp/onlyoffice.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys CB2DE8E5
+    chmod 644 /tmp/onlyoffice.gpg; sudo chown root:root /tmp/onlyoffice.gpg; sudo mv /tmp/onlyoffice.gpg /usr/share/keyrings/onlyoffice.gpg
+
+    echo 'deb [signed-by=/usr/share/keyrings/onlyoffice.gpg] https://download.onlyoffice.com/repo/debian squeeze main' | sudo tee -a /etc/apt/sources.list.d/onlyoffice.list
+
+    sudo apt update
+    message1
+    sudo apt install onlyoffice-desktopeditors -y
+
+    sudo touch /etc/.officeok
+  } && {
+    echo . >/dev/null
+  }
+}
+
+function message0 {
+  clear
+  echo ""; echo""
+  echo "A SEGUIR SERÁ PERGUNTADO SE DESEJA CONTINUAR A INSTALAÇÃO DO CERTIFICADO."
+  echo "APENAS PRESSIONE ENTER."
+  echo ""; echo ""
+  sleep 5
+}
+
+function message1 {
+  clear
+  echo ""; echo""
+  echo "A SEGUIR VOCE DEVERA ACEITAR OS TERMOS DE USO PARA INSTALAR O MICROSOFT COREFONTS!"
+  echo "APENAS PRESSIONE ENTER, QUANDO PERGUNTADO YES OU NO, MARQUE YES E PRESSIONE ENTER NOVAMENTE."
+  echo ""; echo ""
+  sleep 5
+}
+
+function message2 {
+  clear
+  echo ""; echo""
+  echo "INSTALACAO CONCLUIDA!"
+  echo "O SISTEMA SERA REINICIADO EM 5 segundos."
+  echo ""; echo ""
+  sleep 5
 }
 
 # ======================================================================================================================================================== #
@@ -215,7 +246,7 @@ ADDCJoin0
 flatpak0
 appsflat0
 onlyoffice0
-
+message2
 sudo reboot
 
 exit 1
