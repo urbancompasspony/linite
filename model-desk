@@ -6,7 +6,7 @@
 
 export list01="build-essential wine-stable \
 cabextract chromium-codecs-ffmpeg-extra fonts-liberation gstreamer1.0-libav gstreamer1.0-plugins-ugly gstreamer1.0-vaapi liba52-0.7.4 libaribb24-0 libavcodec-extra \
-net-tools netdiscover iperf arp-scan traceroute speedtest-cli whois openvpn curl \
+net-tools netdiscover iperf arp-scan traceroute speedtest-cli whois openvpn curl dialog \
 gparted gnome-disk-utility vlc kolourpaint \
 cifs-utils samba smbclient liblchown-perl p7zip unrar lz4 rclone rsnapshot iotop \
 printer-driver-escpr hplip printer-driver-all \
@@ -203,21 +203,11 @@ function onlyoffice0 {
 }
 
 function message0 {
-  clear
-  echo ""; echo""
-  echo "A SEGUIR SERÁ PERGUNTADO SE DESEJA CONTINUAR A INSTALAÇÃO DO CERTIFICADO."
-  echo "APENAS PRESSIONE ENTER."
-  echo ""; echo ""
-  sleep 5
+  dialog --title "Confirmacao" --msgbox "A seguir sera perguntado se deseja instalar o certificado.\n\nApenas pressione ENTER." 10 40
 }
 
 function message1 {
-  clear
-  echo ""; echo""
-  echo "A SEGUIR VOCE DEVERA ACEITAR OS TERMOS DE USO PARA INSTALAR O MICROSOFT COREFONTS!"
-  echo "APENAS PRESSIONE ENTER EM 'OK', QUANDO PERGUNTADO 'YES' OU 'NO', USE TAB PARA SELECIONAR 'YES' E PRESSIONE ENTER NOVAMENTE."
-  echo ""; echo ""
-  sleep 5
+  dialog --title "Confirmacao" --msgbox "A seguir voce deve aceitar os termos de uso do Microsoft Core Fonts.\n\nNas proximas telas, pressione Enter, selecione com TAB e escolha YES quando surgir a opcao." 10 40
 }
 
 function message2 {
