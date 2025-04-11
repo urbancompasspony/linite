@@ -202,8 +202,17 @@ function onlyoffice0 {
     echo 'deb [signed-by=/usr/share/keyrings/onlyoffice.gpg] https://download.onlyoffice.com/repo/debian squeeze main' | sudo tee -a /etc/apt/sources.list.d/onlyoffice.list
 
     sudo apt update
-    message1
-    sudo apt install onlyoffice-desktopeditors -y
+
+    # no message since will not install ttf-mscore-fonts
+    #message1
+
+    sudo apt install onlyoffice-desktopeditors --no-install-recommends -y
+
+    wget https://cs.linuxuniverse.com.br/public.php/dav/files/JTZj9ZKRHCSJSJE/?accept=zip -O mscorefonts.zip
+    sudo mkdir -p /usr/share/fonts/All
+    sudo unzip mscorefonts.zip -d /usr/share/fonts/All
+    rm mscorefonts.zip
+    fc-cache --force
 
     sudo touch /etc/.officeok
   } && {
