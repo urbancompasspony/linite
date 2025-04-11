@@ -189,9 +189,7 @@ function appsflat0 {
   com.ktechpit.whatsie \
   com.github.tchx84.Flatseal \
   net.codelogistics.webapps \
-  com.skype.Client \
-  com.github.IsmaelMartinez.teams_for_linux \
-  org.onlyoffice.desktopeditors --nointeract -y
+  com.skype.Client --noninteractive -y
   clear
 }
 
@@ -247,9 +245,9 @@ fstab0
 browsers0
 dwservice0
 ADDCJoin0
-#onlyoffice0
 flatpak0
 appsflat0
+onlyoffice0
 message2
 
 sudo reboot
