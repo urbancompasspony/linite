@@ -188,8 +188,7 @@ function appsflat0 {
   org.mozilla.Thunderbird \
   com.ktechpit.whatsie \
   com.github.tchx84.Flatseal \
-  net.codelogistics.webapps \
-  com.skype.Client --noninteractive -y
+  net.codelogistics.webapps --noninteractive -y
   clear
 }
 
