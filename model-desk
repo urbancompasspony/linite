@@ -189,8 +189,7 @@ function appsflat0 {
   com.ktechpit.whatsie \
   com.github.tchx84.Flatseal \
   net.codelogistics.webapps \
-  com.github.IsmaelMartinez.teams_for_linux \
-  --noninteractive -y
+  com.github.IsmaelMartinez.teams_for_linux --noninteractive -y
   clear
 }
 
