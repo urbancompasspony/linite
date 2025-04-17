@@ -13,7 +13,7 @@ printer-driver-escpr hplip printer-driver-all \
 stress lm-sensors cmatrix btop inxi tree dialog btrfs-progs filelight \
 libssl3 pcscd opensc \
 xrdp xorgxrdp freerdp2-x11 openssh-server \
-adsys adsys-windows sssd-ad sssd-tools realmd adcli smb4k \
+adsys adsys-windows samba-ad-dc sssd-ad sssd-tools realmd adcli smb4k \
 docker.io qemu-system qemu-utils qemu-user qemu-kvm qemu-guest-agent libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq genisoimage guestfs-tools"
 
 # ======================================================================================================================================================== #
