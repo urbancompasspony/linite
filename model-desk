@@ -192,7 +192,6 @@ function appsflat0 {
   uno.platform.uno-calculator \
   io.missioncenter.MissionCenter \
   org.kde.kpat \
-  com.popcornfx.PopcornFXEditor \
   net.codelogistics.webapps --noninteractive -y
   clear
 }
