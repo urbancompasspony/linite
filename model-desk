@@ -189,6 +189,10 @@ function appsflat0 {
   org.mozilla.Thunderbird \
   com.ktechpit.whatsie \
   com.github.tchx84.Flatseal \
+  uno.platform.uno-calculator \
+  io.missioncenter.MissionCenter \
+  org.kde.kpat \
+  com.popcornfx.PopcornFXEditor \
   net.codelogistics.webapps --noninteractive -y
   clear
 }
