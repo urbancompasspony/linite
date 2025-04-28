@@ -7,7 +7,7 @@
 export list01="build-essential wine-stable \
 cabextract chromium-codecs-ffmpeg-extra fonts-liberation gstreamer1.0-libav gstreamer1.0-plugins-ugly gstreamer1.0-vaapi liba52-0.7.4 libaribb24-0 libavcodec-extra \
 net-tools netdiscover iperf arp-scan traceroute speedtest-cli whois openvpn curl dialog duf \
-gparted gnome-disk-utility vlc kolourpaint \
+gparted gnome-disk-utility vlc kolourpaint cpu-x \
 cifs-utils samba smbclient liblchown-perl p7zip unrar lz4 rclone rsnapshot iotop \
 printer-driver-escpr hplip printer-driver-all \
 stress lm-sensors cmatrix btop inxi tree dialog btrfs-progs filelight \
