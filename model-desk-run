@@ -224,8 +224,8 @@ function onlyoffice0 {
 }
 
 function wine0 {
-  echo "deb https://download.opensuse.org/repositories/Emulators:/Wine:/Debian/xUbuntu_$(lsb_release -ds) ./" | sudo tee /etc/apt/sources.list.d/wine-obs.list
-  wget -qO- https://download.opensuse.org/repositories/Emulators:/Wine:/Debian/xUbuntu_$(lsb_release -ds)/Release.key | sudo tee /etc/apt/trusted.gpg.d/winehq.asc
+  echo "deb https://download.opensuse.org/repositories/Emulators:/Wine:/Debian/xUbuntu_$(lsb_release -r | awk {'print $2'}) ./" | sudo tee /etc/apt/sources.list.d/wine-obs.list
+  wget -qO- https://download.opensuse.org/repositories/Emulators:/Wine:/Debian/xUbuntu_$(lsb_release -r | awk {'print $2'})/Release.key | sudo tee /etc/apt/trusted.gpg.d/winehq.asc
   sudo apt update; sudo apt install -y wine-stable winetricks
 }
 
