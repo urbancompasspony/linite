@@ -229,6 +229,19 @@ function wine0 {
   sudo apt update; sudo apt install -y wine-stable winetricks
 }
 
+function pathwine0 {
+NEW_PATH="/opt/wine-stable/bin"
+
+# Check if the path is already in the file
+if grep -q "PATH=" /etc/environment; then
+    # Append the new path to the existing PATH variable
+    sudo sed -i "/^PATH=/ s|$|:$NEW_PATH|" /etc/environment
+else
+    # Add a new PATH variable if it doesn't exist
+    echo "PATH=\"$NEW_PATH\"" | sudo tee -a /etc/environment
+fi
+}
+
 function message0 {
   dialog --title "Informacao" --msgbox "A seguir sera perguntado se deseja instalar o suporte a certificado Token A3 nos navegadores.\n\nApenas pressione ENTER para confirmar." 10 40
   clear
@@ -267,6 +280,7 @@ flatpak0
 appsflat0
 onlyoffice0
 wine0
+pathwine0
 message2
 
 sudo reboot
