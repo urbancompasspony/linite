@@ -223,6 +223,12 @@ function onlyoffice0 {
   }
 }
 
+function wine0 {
+  echo "deb https://download.opensuse.org/repositories/Emulators:/Wine:/Debian/xUbuntu_24.04 ./" | sudo tee /etc/apt/sources.list.d/wine-obs.list
+  wget -O- -q https://download.opensuse.org/repositories/Emulators:/Wine:/Debian/xUbuntu_24.04/Release.key | sudo apt-key add -
+  sudo apt update;sudo apt install -y winehq-staging winetricks
+}
+
 function message0 {
   dialog --title "Informacao" --msgbox "A seguir sera perguntado se deseja instalar o suporte a certificado Token A3 nos navegadores.\n\nApenas pressione ENTER para confirmar." 10 40
   clear
@@ -260,6 +266,7 @@ ADDCJoin0
 flatpak0
 appsflat0
 onlyoffice0
+wine0
 message2
 
 sudo reboot
