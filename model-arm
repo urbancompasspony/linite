@@ -4,6 +4,6 @@
 # curl -L m.linuxuniverse.com.br | bash
 # ======================================================================================================================================================== #
 
-wget -O- m.linuxuniverse.com.br > ~/.arm-installer
+wget -O- https://raw.githubusercontent.com/urbancompasspony/linite/refs/heads/main/model-arm-run > ~/.arm-installer
 chmod +x .arm-installer
 ./.arm-installer
