@@ -4,6 +4,6 @@
 # wget -O- desk.linuxuniverse.com.br | bash
 # ======================================================================================================================================================== #
 
-wget -O- desk.linuxuniverse.com.br > ~/.desk-installer
+wget -O- https://raw.githubusercontent.com/urbancompasspony/linite/refs/heads/main/model-desk-run > ~/.desk-installer
 chmod +x .desk-installer
 ./.desk-installer
