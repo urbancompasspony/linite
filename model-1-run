@@ -398,8 +398,8 @@ function fstab0 {
   [ -f "$pathsrv"/fstab_ok ] && {
     clear; echo "O fstab ja foi ajustado de acordo. Continuando."; echo ""; sleep 2
   } || {
-    sudo mkdir /mnt/main
-    sudo mkdir /mnt/backup
+    sudo mkdir /mnt/disk01
+    sudo mkdir /mnt/disk02
 
     sleep 3; clear; echo "Adicionando entradas extras ao fstab"
 
@@ -409,10 +409,10 @@ tmpfs /tmp tmpfs defaults 0 0
 tmpfs /var/tmp tmpfs defaults 0 0
 
 # Main Disk
-# /dev/disk/by-uuid/ /mnt/main ext4 defaults 0 0
+# /dev/disk/by-uuid/ /mnt/disk01 ext4 defaults 0 0
 
 # Backup
-# /dev/disk/by-uuid/ /mnt/backup ext4 defaults 0 0
+# /dev/disk/by-uuid/ /mnt/disk02 ext4 defaults 0 0
 
 # Acesso Externo
 # //172.25.0.X/folder /mnt/folder cifs credentials=/home/administrador/.smb,iocharset=utf8,file_mode=0777,dir_mode=0777,noperm,user,vers=2.1,nofail,x-systemd.automount,x-systemd.requires=network-online.target,x-systemd.device-timeout=3 0 0" | sudo tee -a /etc/fstab &&
