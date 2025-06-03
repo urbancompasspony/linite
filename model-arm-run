@@ -11,7 +11,7 @@ openvpn curl nmap parallel openssh-server samba samba-dsdb-modules samba-vfs-mod
 
 # ARM64
 export package_2204="linux-modules-extra-raspi network-manager"
-export package_2404="docker-buildx"
+export package_2404="docker-buildx network-manager"
 
 # ======================================================================================================================================================== #
 
