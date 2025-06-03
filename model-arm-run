@@ -83,37 +83,6 @@ function update_arm {
 }
 
 function netplan0 {
-    sleep 3; clear; echo "Ajustando Netplan"
-    echo -e "
-# This is the network config written by 'linite model-1' script
-network:
-  ethernets:
-#    renderer: NetworkManager
-    eno1:
-      dhcp4: true
-      nameservers:
-        addresses: [1.1.1.1, 8.8.8.8]
-    enp1s0:
-      dhcp4: true
-      nameservers:
-        addresses: [1.1.1.1, 8.8.8.8]
-    enp2s0:
-      dhcp4: true
-      nameservers:
-        addresses: [1.1.1.1, 8.8.8.8]
-    enp4s0:
-      dhcp4: false
-      addresses: [172.25.0.3/24]
-      routes:
-      - to: default
-        via: 192.168.0.1
-      nameservers:
-        addresses: [1.1.1.1, 8.8.8.8]
-  version: 2" | sudo tee /etc/netplan/00-installer-config.yaml
-    sudo netplan apply && sudo touch "$pathsrv"/netplan_ok
-}
-
-function netplan1 {
     echo -e "
 #
 #network:
@@ -132,7 +101,17 @@ function netplan1 {
 #              #addresses: [200.175.89.139, 200.175.5.139]
 #              #addresses: [8.8.4.4, 8.8.8.8]
 #              #addresses: [1.1.1.1, 1.0.0.1]
-#    version: 2" | sudo tee -a /etc/netplan/00-installer-config.yaml
+#    wifis:
+#      wlan0:
+#        dhcp4: true
+#        dhcp6: false
+#        addresses:
+#        - 192.168.4.1/24
+#        optional: true
+#        access-points:
+#          "ctOS RPi":
+#            password: "5V06@uso"
+#            mode: ap" | sudo tee -a /etc/netplan/00-installer-config.yaml
 
 echo -e "
 #
@@ -226,7 +205,7 @@ bashconf0
 timezone0
 useless0
 update_arm
-netplan1
+netplan0
 sysctl0
 motd0
 journal0
