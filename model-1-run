@@ -20,16 +20,13 @@ export NEEDRESTART_MODE=a; export DEBIAN_FRONTEND=noninteractive
 export pathsrv="/srv/containers/scripts/config/install"; export destpath="/var/lib/libvirt/images"
 export github="https://raw.githubusercontent.com/urbancompasspony/docker/main/"
 
-# VM Only
 export list00="qemu-system qemu-utils qemu-user qemu-kvm qemu-guest-agent \
-libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq genisoimage guestfs-tools"
-
-export list01="docker.io net-tools speedtest-cli whois netdiscover iperf arp-scan traceroute sshpass network-manager \
+libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq genisoimage guestfs-tools \
+docker.io net-tools speedtest-cli whois netdiscover iperf arp-scan traceroute sshpass network-manager \
 libatasmart-bin smartmontools zip unzip p7zip-full 7zip p7zip cifs-utils rsnapshot rclone iotop \
 haveged stress lm-sensors cmatrix btop inxi tree dialog btrfs-progs build-essential unrar lz4 duf \
-openvpn curl nmap parallel rclone openssh-server samba samba-dsdb-modules samba-vfs-modules beep xinit xorg openbox xdotool"
-
-export list02="gpm tmux pavucontrol caja epiphany-browser gparted cmatrix gnome-disk-utility terminator rdesktop pluma terminator"
+openvpn curl nmap parallel rclone openssh-server samba samba-dsdb-modules samba-vfs-modules beep xinit xorg openbox xdotool \
+gpm tmux pavucontrol caja epiphany-browser gparted cmatrix gnome-disk-utility terminator rdesktop pluma terminator"
 
 # ======================================================================================================================================================== #
 
@@ -56,10 +53,9 @@ function hardsys0 {
 
 function welcome0 {
   clear; echo ""; echo "Preparo de Servidor $1 by SuitIT®"; echo ""
-
   [ -f "$pathsrv"/finished ] || [ -f /home/administrador/.installed ] && {
-    clear; echo ""; echo "Este servidor ja foi configurado previamente. Entrando no menu Linite Manual..."; sleep 3
-    menuB
+    clear; echo ""; echo "Este servidor ja foi configurado previamente."; sleep 3
+    exit
   } || {
     [ -f "$pathsrv"/information ] && {
       echo "A senha foi previamente alterada. Use a nova senha!"; echo ""
@@ -69,7 +65,6 @@ function welcome0 {
       sudo echo . >/dev/null
     }
   }
-
   echo ""; echo "5"; sleep 1; echo "4"; sleep 1; echo "3"; sleep 1; echo "2"; sleep 1; echo "1"; sleep 1
 }
 
@@ -109,15 +104,12 @@ function passmgr0 {
 
 function menupass0 {
   VALUE1="Passw0rd"; VALUE2=""; VALUE3=""
-
   VALUE0=$(dialog --cancel-label "Sair da Instalacao" --ok-label "Iniciar Instalacao" --title "Novo Servidor" --form "Defina a senha do Administrador e as demais, caso fiquem em branco, serao a mesma:" 11 50 0 \
 "Administrador:" 1 1 "$VALUE1" 1 15 40 0 \
 "Senha    XPRA:" 2 1 "$VALUE2" 2 15 40 0 \
 "Senha  PiHole:" 3 1 "$VALUE3" 3 15 40 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
-
   [ $? -ne 0 ] && cancel_user
-
   var1=$(echo "$VALUE0" | sed -n 1p)
   var2=$(echo "$VALUE0" | sed -n 2p)
   var3=$(echo "$VALUE0" | sed -n 3p)
@@ -151,7 +143,6 @@ function timezone0 {
 function useless0 {
     clear; echo "Removendo pacotes e desativando servicos inuteis"; echo ""
     sudo apt purge needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolution-data-server bluez blueman bluetooth -y
-
     cat <<EOF | sudo tee /etc/apt/preferences.d/nosnap.pref
 # To prevent repository packages from triggering the installation of Snap,
 # this file forbids snapd from being installed by APT.
@@ -162,6 +153,7 @@ Pin-Priority: -10
 EOF
 
     sudo apt-mark hold snapd
+    sudo systemctl stop systemd-networkd-wait-online.service
     sudo systemctl disable systemd-networkd-wait-online.service
     sudo systemctl mask systemd-networkd-wait-online.service
 }
@@ -174,36 +166,17 @@ function update0 {
     sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear
 
     echo "Instalando pacotes...."
-    sudo apt install $list00 $list01 $package_2404 -y &&
+    sudo apt install $list00 -y &&
     sync &&
 
+    sudo systemctl stop NetworkManager-wait-online.service
     sudo systemctl disable NetworkManager-wait-online.service
     sudo systemctl mask NetworkManager-wait-online.service
 
     sudo usermod -aG libvirt administrador
     sudo usermod -aG libvirt-qemu administrador
     sudo usermod -aG docker administrador
-    sudo touch "$pathsrv"/update_ok
-  }
-}
 
-function update1 {
-  [ -f "$pathsrv"/update_ok ] && {
-    clear; echo "O sistema ja foi atualizado e os pacotes necessarios instalados. Continuando."; echo ""; sleep 2
-  } || {
-    clear; echo "Atualizando o sistema"; echo ""
-    sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear
-
-    echo "Instalando pacotes...."
-    sudo apt install $list00 $list01 $list02 $package_2404 -y &&
-    sync &&
-
-    sudo systemctl disable NetworkManager-wait-online.service
-    sudo systemctl mask NetworkManager-wait-online.service
-
-    sudo usermod -aG libvirt administrador
-    sudo usermod -aG libvirt-qemu administrador
-    sudo usermod -aG docker administrador
     sudo touch "$pathsrv"/update_ok
   }
 }
@@ -311,8 +284,13 @@ function pfsense0 {
     } || {
       clear; sudo wget --user $usern4me --password $passw0rd $webadress/"$1" -O $destpath/"$1" &&
       sudo chmod 777 /var/run/libvirt/libvirt-sock
-    }
+      }
 
+    sudo touch "$pathsrv"/pfsense_ok
+  }
+}
+
+function pfsense1 {
     sudo virt-install --import \
 --name pfSense \
 --boot hd,cdrom,menu=on \
@@ -328,8 +306,6 @@ function pfsense0 {
 --import \
 --autostart 1>/dev/null 2>/dev/null &
     sleep 3; clear
-    sudo touch "$pathsrv"/pfsense_ok
-  }
 }
 
 function sysctl0 {
@@ -532,39 +508,6 @@ function openspeed0 {
   }
 }
 
-function menuB {
-  var0=$(dialog --title 'Linite' --backtitle "L I N I T E" --menu " " 0 0 0 \
-1 'Linux Essentials [All]' \
-2 'Virtual Machines [No VM nor SoC]' \
-X 'Sair' 2>&1 > /dev/tty )
-case "$var0" in
-1) essentials0 ;;
-2) VMs0 ;;
-X) exit ;;
-esac
-}
-
-function essentials0 {
-dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
-$list01" 25 40
-[ $? = 0 ] && {
-  sudo apt install $list01 -y &&
-  menuB
-  }
-menuB
-}
-
-function VMs0 {
-dialog --title "Menu" --yesno "Deseja instalar os seguintes pacotes? \n
-$list00" 25 40
-[ $? = 0 ] && {
-  sudo apt install $list00 -y &&
-  sudo usermod -aG libvirt administrador; sudo usermod -aG libvirt-qemu administrador
-  menuB
-  }
-menuB
-}
-
 function containers0 {
   pihole0
   myspeed0
@@ -581,8 +524,8 @@ function linite0 {
   mkswap0
   timezone0
   useless0
-  update1
-  #pfsense0 "pfsense.img"
+  update0
+  pfsense0 "pfsense.img"
   sysctl0
   yaml0
   motd0
@@ -600,8 +543,9 @@ function appliance0 {
   passmgr0
   timezone0
   useless0
-  update1
+  update0
   pfsense0 "pfsense-modelo.img"
+  pfsense1
   containers0
   sysctl0
   yaml0
