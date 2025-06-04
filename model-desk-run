@@ -242,6 +242,11 @@ else
 fi
 }
 
+function yaml0 {
+  sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq
+  sudo chmod +x /usr/local/bin/yq
+}
+
 function message0 {
   dialog --title "Informacao" --msgbox "A seguir sera perguntado se deseja instalar o suporte a certificado Token A3 nos navegadores.\n\nApenas pressione ENTER para confirmar." 10 40
   clear
@@ -281,6 +286,7 @@ appsflat0
 onlyoffice0
 wine0
 pathwine0
+yaml0
 message2
 
 sudo reboot
