@@ -576,7 +576,7 @@ function containers0 {
 # ======================================================================================================================================================== #
 
 function linite0 {
-  welcome0 "Generico v2.0"
+  welcome0 "Generico v3.0"
   bashconf0
   mkswap0
   timezone0
