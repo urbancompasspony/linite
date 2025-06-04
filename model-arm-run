@@ -142,6 +142,11 @@ kernel.panic=5
     sudo touch "$pathsrv"/sysctl_ok
 }
 
+function yaml0 {
+  sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_arm64 -O /usr/local/bin/yq
+  sudo chmod +x /usr/local/bin/yq
+}
+
 function motd0 {
     sleep 3; clear; echo "Ajustando tela de boas vindas do servidor"
     sudo rm -R /etc/update-motd.d/*
@@ -207,6 +212,7 @@ useless0
 update_arm
 netplan0
 sysctl0
+yaml0
 motd0
 journal0
 smbconf0
