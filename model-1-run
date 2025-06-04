@@ -16,6 +16,7 @@ export usern4me="admin"; export passw0rd="isorulez"
 export lanhost="http://$serverip"; export wanhost="http://z.net-freaks.com:3434"
 
 export NEEDRESTART_MODE=a; export DEBIAN_FRONTEND=noninteractive
+
 export pathsrv="/srv/containers/scripts/config/install"; export destpath="/var/lib/libvirt/images"
 export github="https://raw.githubusercontent.com/urbancompasspony/docker/main/"
 
@@ -45,24 +46,13 @@ function hardsys0 {
   sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print $1}')
   export hardmain="Celeron(R) J4125"; hardversion=$(cat /proc/cpuinfo | grep 'model name' | head -n 1 | awk -F: '{ print $2 }' | cut -d ' ' -f 3,4)
 
-  # Se hardware e sistema estão ok, é o Appliance!
+  # Se hardware e sistema estão ok, é o Appliance! Do contrario é generico.
   [ "$sysversion" = "$sysmain" ] && [ "$hardversion" = "$hardmain" ] && {
     appliance0
   } || {
-    # Se não é o Appliance, mas o Ubuntu é o adequado, verificar hardware...
-    [ "$sysversion" = "$sysmain1" ] && {
-      linite0
-    } || {
-      clear; echo ""
-      echo "SISTEMA OU HARDWARE INADEQUADO(S) DETECTADO!"; echo ""
-      echo "O automatismo deste script exige o sistema 'Ubuntu Server 22.04 LTS' e voce esta usando o $sysversion"; echo ""
-      echo "Da mesma forma este script exige o hardware 'Appliance 4x Gigabit Celeron J4125' e voce esta usando o $hardversion"; echo ""
-      echo "Prosseguindo tentando os scripts basicos e o Modelo Linite de instalação Manual..."; echo ""; sleep 2
-      basicsys0
-      menuB
-      }
+    linite0
     }
-  }
+}
 
 function welcome0 {
   clear; echo ""; echo "Preparo de Servidor $1 by SuitIT®"; echo ""
@@ -301,15 +291,6 @@ echo -e "
 #  version: 2" | sudo tee -a /etc/netplan/00-installer-config.yaml
 
     sudo touch "$pathsrv"/netplan_ok
-  }
-}
-
-function macvlan0 {
-  [ -f "$pathsrv"/macvlan_ok ] && {
-    clear; echo "A MAVLAN ja foi configurada. Continuando."; echo ""; sleep 2
-  } || {
-    sleep 3; clear; echo "Definindo MACVLAN para os containers"
-    sudo docker network create -d macvlan --subnet="172.25.0.0"/24 --gateway="172.25.0.1" -o parent="enp4s0" macvlan && sudo touch "$pathsrv"/macvlan_ok
   }
 }
 
@@ -555,12 +536,10 @@ function menuB {
   var0=$(dialog --title 'Linite' --backtitle "L I N I T E" --menu " " 0 0 0 \
 1 'Linux Essentials [All]' \
 2 'Virtual Machines [No VM nor SoC]' \
-3 'Default Configs [All]' \
 X 'Sair' 2>&1 > /dev/tty )
 case "$var0" in
 1) essentials0 ;;
 2) VMs0 ;;
-3) basicsys0 ;;
 X) exit ;;
 esac
 }
@@ -596,18 +575,6 @@ function containers0 {
 
 # ======================================================================================================================================================== #
 
-function basicsys0 {
-  welcome0 "Basic v1.0"
-  bashconf0
-  mkswap0
-  timezone0
-  useless0
-  update0
-  sysctl0
-  yaml0
-  the_end0
-}
-
 function linite0 {
   welcome0 "Generico v2.0"
   bashconf0
@@ -635,7 +602,6 @@ function appliance0 {
   useless0
   update1
   pfsense0 "pfsense-modelo.img"
-  macvlan0
   containers0
   sysctl0
   yaml0
