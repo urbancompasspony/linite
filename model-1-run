@@ -367,6 +367,11 @@ kernel.panic=5
   }
 }
 
+function yaml0 {
+  sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq
+  sudo chmod +x /usr/local/bin/yq
+}
+
 function motd0 {
   [ -f "$pathsrv"/motd_ok ] && {
     clear; echo "O MOTD ja foi substituido. Continuando."; echo ""; sleep 2
@@ -599,6 +604,7 @@ function basicsys0 {
   useless0
   update0
   sysctl0
+  yaml0
   the_end0
 }
 
@@ -611,6 +617,7 @@ function linite0 {
   update1
   #pfsense0 "pfsense.img"
   sysctl0
+  yaml0
   motd0
   journal0
   fstab0
@@ -631,6 +638,7 @@ function appliance0 {
   macvlan0
   containers0
   sysctl0
+  yaml0
   motd0
   journal0
   fstab0
