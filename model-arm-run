@@ -7,7 +7,7 @@
 export list01="docker.io net-tools speedtest-cli whois netdiscover iperf arp-scan traceroute sshpass network-manager \
 libatasmart-bin smartmontools zip unzip p7zip-full 7zip p7zip cifs-utils rsnapshot rclone iotop \
 haveged stress lm-sensors cmatrix btop inxi tree dialog btrfs-progs build-essential unrar duf \
-openvpn curl nmap parallel openssh-server samba samba-dsdb-modules samba-vfs-modules xinit xorg openbox xdotool"
+openvpn curl nmap parallel openssh-server samba samba-dsdb-modules samba-vfs-modules xinit xorg openbox xdotool xmlstarlet"
 
 # ARM64
 export package_2204="linux-modules-extra-raspi "
