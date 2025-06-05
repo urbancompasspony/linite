@@ -26,7 +26,7 @@ docker.io net-tools speedtest-cli whois netdiscover iperf arp-scan traceroute ss
 libatasmart-bin smartmontools zip unzip p7zip-full 7zip p7zip cifs-utils rsnapshot rclone iotop \
 haveged stress lm-sensors cmatrix btop inxi tree dialog btrfs-progs build-essential unrar lz4 duf \
 openvpn curl nmap parallel rclone openssh-server samba samba-dsdb-modules samba-vfs-modules beep xinit xorg openbox xdotool \
-gpm tmux pavucontrol caja epiphany-browser gparted cmatrix gnome-disk-utility terminator rdesktop pluma terminator"
+gpm tmux pavucontrol caja epiphany-browser gparted cmatrix gnome-disk-utility terminator rdesktop pluma terminator xmlstarlet"
 
 # ======================================================================================================================================================== #
 
