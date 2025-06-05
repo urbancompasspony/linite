@@ -61,7 +61,7 @@ function welcome0 {
       echo "A senha foi previamente alterada. Use a nova senha!"; echo ""
       sudo echo . >/dev/null
     } || {
-      echo "Insira a senha padrao: ubuntu"; echo ""
+      echo "Insira a senha padrao. Senha padrao: ubuntu"; echo ""
       sudo echo . >/dev/null
     }
   }
