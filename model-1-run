@@ -379,9 +379,12 @@ function beep0 {
     sleep 3; clear; echo "Criando um Beep bonitinho se tiver speaker no servidor!"
     wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh -O /home/administrador/.beep.sh
     clear; echo "Beep instalado. Testando..."; sudo bash /home/administrador/.beep.sh
-    sleep 2; echo "@reboot sleep 60; bash /home/administrador/.beep.sh" | sudo tee /tmp/crontab_new
-    sudo crontab -l | cat - /tmp/crontab_new | tee crontab.txt && sudo crontab crontab.txt
-    sudo rm crontab.txt; sudo touch "$pathsrv"/beep
+
+    #no sudo
+    #(crontab -l 2>/dev/null; echo '@reboot sleep 60; bash /home/administrador/.beep.sh') | sort -u | crontab -
+
+    #sudo
+    (sudo crontab -l 2>/dev/null; echo '@reboot sleep 60; bash /home/administrador/.beep.sh') | sort -u | sudo crontab -
   }
 }
 
