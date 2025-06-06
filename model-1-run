@@ -388,6 +388,12 @@ function beep0 {
   }
 }
 
+function install_date {
+  sudo touch /srv/settings.yaml
+  datetime0=$(date +"%d/%m/%Y - %H:%M")
+  sudo yq -i ".Informações.Instalação = \"${datetime0}\"" /srv/settings.yaml
+}
+
 function the_end0 {
   sudo touch "$pathsrv"/finished
   clear; echo "Instalação concluida!"
@@ -525,6 +531,7 @@ function linite0 {
   netplan1
   smbconf0
   beep0
+  install_date
   the_end0
 }
 
@@ -545,6 +552,7 @@ function appliance0 {
   smbconf0
   netplan0
   beep0
+  install_date
   the_end0
 }
 
