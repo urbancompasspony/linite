@@ -17,7 +17,7 @@ export lanhost="http://$serverip"; export wanhost="http://z.net-freaks.com:3434"
 
 export NEEDRESTART_MODE=a; export DEBIAN_FRONTEND=noninteractive
 
-export pathsrv="/srv/containers/scripts/config/install"; export destpath="/var/lib/libvirt/images"
+export pathsrv="/srv/install"; export destpath="/var/lib/libvirt/images"
 export github="https://raw.githubusercontent.com/urbancompasspony/docker/main/"
 
 export list00="qemu-system qemu-utils qemu-user qemu-kvm qemu-guest-agent \
@@ -75,9 +75,10 @@ function bashconf0 {
 }
 
 function mkswap0 {
-  [ -f /swapfile ] && {
+  [ -f /swapfile ] || [ -f /swap.img ] && {
     echo "." >/dev/zero
   } || {
+    clear; echo "Swap não encontrado, criando..."
     sudo dd if=/dev/zero of=/swapfile bs=1k count=1000000
     sudo chmod 0600 /swapfile
     sudo mkswap /swapfile; sudo swapon /swapfile
@@ -118,7 +119,7 @@ function menupass0 {
 
 function check0 {
   [ "$var1" = "" ] && {
-    clear; echo ""; echo "Nao deixe o primeiro campo em branco!"; sleep 2;
+    clear; echo ""; echo "Nao deixe nenhum campo em branco!"; sleep 2;
     menu0
   } || {
     echo . >/dev/null
@@ -131,18 +132,14 @@ function cancel_user {
 }
 
 function timezone0 {
-  [ -f "$pathsrv"/timezone_ok ] && {
-    clear; echo "TimeZone ja foi configurado. Continuando."; echo ""; sleep 2
-  } || {
-    sudo timedatectl set-timezone Etc/GMT+3
-    sudo timedatectl set-local-rtc 1
-    sudo touch "$pathsrv"/timezone_ok
-  }
+  sudo timedatectl set-timezone Etc/GMT+3
+  sudo timedatectl set-local-rtc 1
 }
 
 function useless0 {
     clear; echo "Removendo pacotes e desativando servicos inuteis"; echo ""
     sudo apt purge needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolution-data-server bluez blueman bluetooth -y
+
     cat <<EOF | sudo tee /etc/apt/preferences.d/nosnap.pref
 # To prevent repository packages from triggering the installation of Snap,
 # this file forbids snapd from being installed by APT.
@@ -159,26 +156,23 @@ EOF
 }
 
 function update0 {
-  [ -f "$pathsrv"/update_ok ] && {
-    clear; echo "O sistema ja foi atualizado e os pacotes necessarios instalados. Continuando."; echo ""; sleep 2
-  } || {
-    clear; echo "Atualizando o sistema"; echo ""
-    sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear
+  clear; echo "Atualizando o sistema"; echo ""
+  sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear
 
-    echo "Instalando pacotes...."
-    sudo apt install $list00 -y &&
-    sync &&
+  echo "Instalando pacotes...."
+  sudo apt install $list00 -y &&
+  sync &&
 
-    sudo systemctl stop NetworkManager-wait-online.service
-    sudo systemctl disable NetworkManager-wait-online.service
-    sudo systemctl mask NetworkManager-wait-online.service
+  sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq
+  sudo chmod +x /usr/local/bin/yq
 
-    sudo usermod -aG libvirt administrador
-    sudo usermod -aG libvirt-qemu administrador
-    sudo usermod -aG docker administrador
+  sudo systemctl stop NetworkManager-wait-online.service
+  sudo systemctl disable NetworkManager-wait-online.service
+  sudo systemctl mask NetworkManager-wait-online.service
 
-    sudo touch "$pathsrv"/update_ok
-  }
+  sudo usermod -aG libvirt administrador
+  sudo usermod -aG libvirt-qemu administrador
+  sudo usermod -aG docker administrador
 }
 
 function password0 {
@@ -322,11 +316,6 @@ kernel.panic=5
 #net.ipv6.conf.default.disable_ipv6=1" | sudo tee -a /etc/sysctl.conf &&
     sudo touch "$pathsrv"/sysctl_ok
   }
-}
-
-function yaml0 {
-  sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq
-  sudo chmod +x /usr/local/bin/yq
 }
 
 function motd0 {
@@ -527,7 +516,6 @@ function linite0 {
   update0
   pfsense0 "pfsense.img"
   sysctl0
-  yaml0
   motd0
   journal0
   fstab0
@@ -548,7 +536,6 @@ function appliance0 {
   pfsense1
   containers0
   sysctl0
-  yaml0
   motd0
   journal0
   fstab0
