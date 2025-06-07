@@ -385,6 +385,8 @@ function beep0 {
 
     #sudo
     (sudo crontab -l 2>/dev/null; echo '@reboot sleep 60; bash /home/administrador/.beep.sh') | sort -u | sudo crontab -
+
+    sudo yq -i ".Informacoes.Beep = \"Ativo\"" /srv/settings.yaml
   }
 }
 
