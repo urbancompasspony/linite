@@ -388,10 +388,50 @@ function beep0 {
   }
 }
 
+function adjusting0 {
+  sudo mkdir -p /srv/scripts/config
+
+  wget "https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/01-Backup"
+  cat 01-Backup | sudo tee /srv/scripts/backupcont
+  sudo rm -r 01-Backup
+
+  wget "https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/rsnapshot.conf"
+  cat rsnapshot.conf | sudo tee /srv/scripts/rsnapshot
+  sudo rm -r rsnapshot.conf
+
+  yq -i '.rsnapshots += ["#00 7,10,13,16,19,22 * * 1-5 /usr/bin/rsnapshot -c /srv/scripts/rsnapshot alpha", "#00 23 * * 1-5 /usr/bin/rsnapshot -c /srv/scripts/rsnapshot beta", "#00 7 * * 6 /usr/bin/rsnapshot -c /srv/scripts/rsnapshot gamma"]' /srv/settings.yaml
+  cron_rsnap
+
+  IPMachine=$(ip route get 1.1.1.1 | grep -oP 'src \K\S+')
+  sudo yq -i ".Informacoes.IP_LAN = \"${IPMachine}\"" /srv/settings.yaml
+}
+
+function cron_rsnap {
+YAML="/srv/settings.yaml"
+TMP_CRON=$(mktemp)
+
+# Pega o crontab atual do root (ou vazio se não existir)
+sudo crontab -l 2>/dev/null > "$TMP_CRON"
+
+# Para cada job no YAML
+yq -r '.rsnapshots[]' "$YAML" | while read -r CRON_LINE; do
+    if grep -Fxq "$CRON_LINE" "$TMP_CRON"; then
+        echo "Job já existe no crontab: $CRON_LINE"
+    else
+        echo "$CRON_LINE" >> "$TMP_CRON"
+        echo "Adicionado job: $CRON_LINE"
+    fi
+done
+
+# Aplica o novo crontab ao root
+sudo crontab "$TMP_CRON"
+rm -f "$TMP_CRON"
+}
+
 function install_date {
-  sudo touch /srv/settings.yaml
   datetime0=$(date +"%d/%m/%Y - %H:%M")
-  sudo yq -i ".Informações.Instalação = \"${datetime0}\"" /srv/settings.yaml
+  sudo yq -i ".Informacoes.Data_Instalacao = \"${datetime0}\"" /srv/settings.yaml
+  sudo yq -i ".Informacoes.Data_Restauracao = \"Nunca foi reinstalado.\"" /srv/settings.yaml
 }
 
 function the_end0 {
@@ -531,6 +571,7 @@ function linite0 {
   netplan1
   smbconf0
   beep0
+  adjusting0
   install_date
   the_end0
 }
@@ -552,10 +593,12 @@ function appliance0 {
   smbconf0
   netplan0
   beep0
+  adjusting0
   install_date
   the_end0
 }
 
+sudo touch /srv/settings.yaml
 root_check0
 hardsys0
 
