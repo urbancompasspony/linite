@@ -390,7 +390,7 @@ END {
   gsub(/[\x00-\x1F\x7F]/, "", type);
   gsub(/[\x00-\x1F\x7F]/, "", mobo);
 
-  print "Dados_da_Placa_Mae:"
+  print "Hardware:"
   print "  Tipo: \"" type "\""
   print "  Placa: \"" mobo "\""
 }
