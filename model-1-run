@@ -403,6 +403,10 @@ END {
     sudo yq -i ".Informacoes.Serial_Windows = \"Inexistente\"" /srv/settings.yaml
   }
 # ------------------------------------------------------------------------------------------------------------------------------
+  datetime0=$(date +"%d/%m/%Y - %H:%M")
+  sudo yq -i ".Informacoes.Data_Instalacao = \"${datetime0}\"" /srv/settings.yaml
+  sudo yq -i ".Informacoes.Data_Restauracao = \"Nunca foi reinstalado.\"" /srv/settings.yaml
+# ------------------------------------------------------------------------------------------------------------------------------
 }
 
 function cron_rsnap {
@@ -425,12 +429,6 @@ done
 # Aplica o novo crontab ao root
 sudo crontab "$TMP_CRON"
 rm -f "$TMP_CRON"
-}
-
-function install_date {
-  datetime0=$(date +"%d/%m/%Y - %H:%M")
-  sudo yq -i ".Informacoes.Data_Instalacao = \"${datetime0}\"" /srv/settings.yaml
-  sudo yq -i ".Informacoes.Data_Restauracao = \"Nunca foi reinstalado.\"" /srv/settings.yaml
 }
 
 function the_end0 {
@@ -463,7 +461,6 @@ function linite0 {
   smbconf0
   beep0
   adjusting0
-  install_date
   the_end0
 }
 
@@ -484,7 +481,6 @@ function appliance0 {
   netplan0
   beep0
   adjusting0
-  install_date
   the_end0
 }
 
