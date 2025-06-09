@@ -400,7 +400,7 @@ END {
     serial0=$(sudo hexdump -s 56 -e '"Serial key: " /29 "%s\n"' /sys/firmware/acpi/tables/MSDM)
     sudo yq -i ".Informacoes.Serial_Windows = \"${serial0}\"" /srv/settings.yaml
   } || {
-    sudo yq -i ".Informacoes.Serial_Windows = \"Inexistente.\"" /srv/settings.yaml
+    sudo yq -i ".Informacoes.Serial_Windows = \"Inexistente\"" /srv/settings.yaml
   }
 # ------------------------------------------------------------------------------------------------------------------------------
 }
