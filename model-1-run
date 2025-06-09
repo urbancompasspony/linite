@@ -17,7 +17,7 @@ export lanhost="http://$serverip"; export wanhost="http://z.net-freaks.com:3434"
 
 export NEEDRESTART_MODE=a; export DEBIAN_FRONTEND=noninteractive
 
-export pathsrv="/srv/install"; export destpath="/var/lib/libvirt/images"
+export destpath="/var/lib/libvirt/images"
 export github="https://raw.githubusercontent.com/urbancompasspony/docker/main/"
 
 export list00="qemu-system qemu-utils qemu-user qemu-kvm qemu-guest-agent \
@@ -39,75 +39,48 @@ function root_check0 {
 }
 
 function hardsys0 {
-  export sysmain1="DISTRIB_RELEASE=22.04"; export sysmain2="DISTRIB_RELEASE=24.04"
+  sysmain1="DISTRIB_RELEASE=22.04"
   sysversion=$(cat /etc/lsb-release | awk -F: '/RELEASE/ {print $0}' | awk '{print $1}')
-  export hardmain="Celeron(R) J4125"; hardversion=$(cat /proc/cpuinfo | grep 'model name' | head -n 1 | awk -F: '{ print $2 }' | cut -d ' ' -f 3,4)
+  hardmain="Celeron(R) J4125"
+  hardversion=$(cat /proc/cpuinfo | grep 'model name' | head -n 1 | awk -F: '{ print $2 }' | cut -d ' ' -f 3,4)
 
   # Se hardware e sistema estão ok, é o Appliance! Do contrario é generico.
-  [ "$sysversion" = "$sysmain" ] && [ "$hardversion" = "$hardmain" ] && {
+  if [ "$sysversion" = "$sysmain1" ] && [ "$hardversion" = "$hardmain" ]; then
     appliance0
-  } || {
+  else
     linite0
-    }
+  fi
 }
 
 function welcome0 {
   clear; echo ""; echo "Preparo de Servidor $1 by SuitIT®"; echo ""
-  [ -f "$pathsrv"/finished ] || [ -f /home/administrador/.installed ] && {
-    clear; echo ""; echo "Este servidor ja foi configurado previamente."; sleep 3
+  if [ -f /srv/settings.yaml ];then
+    clear; echo ""; echo "Este servidor ja foi configurado e está no Modelo CdN."; sleep 1
+    echo ""; echo "Caso precise reinstala-lo ou restaura-lo utilize o Painel CdN!"; sleep 3
     exit
-  } || {
-    [ -f "$pathsrv"/information ] && {
-      echo "A senha foi previamente alterada. Use a nova senha!"; echo ""
-      sudo touch /srv/settings.yaml
-    } || {
-      echo "Insira a senha padrao. Senha padrao: ubuntu"; echo ""
-      sudo touch /srv/settings.yaml
-    }
-  }
+  else
+    echo "Insira a senha padrao. Senha padrao: ubuntu"; echo ""
+    sudo touch /srv/settings.yaml
+  fi
   echo ""; echo "5"; sleep 1; echo "4"; sleep 1; echo "3"; sleep 1; echo "2"; sleep 1; echo "1"; sleep 1
 }
 
 function bashconf0 {
   clear; echo "Preparando sistema e configurando BASH"; echo ""
-  sudo mkdir -p "$destpath"; sudo chmod 777 -R "$destpath"; sudo mkdir -p "$pathsrv"
+  sudo mkdir -p "$destpath"; sudo chmod 777 -R "$destpath"
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
 }
 
 function mkswap0 {
-  [ -f /swapfile ] || [ -f /swap.img ] && {
+  if [ -f /swapfile ] || [ -f /swap.img ]; then
     echo "." >/dev/zero
-  } || {
+  else
     clear; echo "Swap não encontrado, criando..."
     sudo dd if=/dev/zero of=/swapfile bs=1k count=1000000
     sudo chmod 0600 /swapfile
     sudo mkswap /swapfile; sudo swapon /swapfile
     echo "/swapfile none swap sw 0 0" | sudo tee -a /etc/fstab
-  }
-}
-
-function menupass0 {
-  VALUE1="Passw0rd"; VALUE2=""; VALUE3=""
-  VALUE0=$(dialog --cancel-label "Sair da Instalacao" --ok-label "Iniciar Instalacao" --title "Novo Servidor" --form "Defina a senha do Administrador:" 11 50 0 \
-"Administrador:" 1 1 "$VALUE1" 1 15 40 0 \
-3>&1 1>&2 2>&3 3>&- > /dev/tty)
-  [ $? -ne 0 ] && cancel_user
-  var1=$(echo "$VALUE0" | sed -n 1p)
-  check0
-}
-
-function check0 {
-  [ "$var1" = "" ] && {
-    clear; echo ""; echo "Nao deixe nenhum campo em branco!"; sleep 2;
-    menu0
-  } || {
-    echo . >/dev/null
-  }
-}
-
-function cancel_user {
-  clear; echo ""; echo "A INSTALACAO FOI CANCELADA PELO USUARIO."; echo ""
-  exit
+  fi
 }
 
 function timezone0 {
@@ -139,7 +112,7 @@ function update0 {
   sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear
 
   echo "Instalando pacotes...."
-  sudo apt install $list00 -y &&
+  sudo apt install "$list00" -y &&
   sync &&
 
   sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq
@@ -155,9 +128,6 @@ function update0 {
 }
 
 function netplan0 {
-  [ -f "$pathsrv"/netplan_ok ] && {
-    clear; echo "O Netplan ja foi ajustado. Continuando."; echo ""; sleep 2
-  } || {
     sleep 3; clear; echo "Ajustando Netplan"
     echo -e "
 # This is the network config written by 'linite model-1' script
@@ -185,14 +155,11 @@ network:
       nameservers:
         addresses: [1.1.1.1, 8.8.8.8]
   version: 2" | sudo tee /etc/netplan/00-installer-config.yaml
-    sudo netplan apply && sudo touch "$pathsrv"/netplan_ok
-  }
+
+    sudo netplan apply
 }
 
 function netplan1 {
-  [ -f "$pathsrv"/netplan_ok ] && {
-    clear; echo "O Netplan ja foi ajustado. Continuando."; echo ""; sleep 2
-  } || {
     echo -e "
 #
 #network:
@@ -226,32 +193,23 @@ echo -e "
 #      optional: true
 #      addresses: [172.16.1.2/24]
 #  version: 2" | sudo tee -a /etc/netplan/00-installer-config.yaml
-
-    sudo touch "$pathsrv"/netplan_ok
-  }
 }
 
 function pfsense0 {
-  [ -f "$pathsrv"/pfsense_ok ] && {
-    clear; echo "O pfSense ja foi configurado. Continuando."; echo ""; sleep 2
-  } || {
-    sleep 3; clear; echo "Adicionando pfSense como VM"
+  sleep 3; clear; echo "Adicionando pfSense como VM"
     
-    if ping -c 1 $serverip >/dev/null; then
-      webadress="$lanhost"
-    else
-      webadress="$wanhost"
-    fi
+  if ping -c 1 $serverip >/dev/null; then
+    webadress="$lanhost"
+  else
+    webadress="$wanhost"
+  fi
 
-    [ -f "$destpath"/"$1" ] && {
-      sudo chmod 777 /var/run/libvirt/libvirt-sock
-    } || {
-      clear; sudo wget --user $usern4me --password $passw0rd $webadress/"$1" -O $destpath/"$1" &&
-      sudo chmod 777 /var/run/libvirt/libvirt-sock
-      }
-
-    sudo touch "$pathsrv"/pfsense_ok
-  }
+  if [ -f "$destpath"/"$1" ]; then
+    sudo chmod 777 /var/run/libvirt/libvirt-sock
+  else
+    clear; sudo wget --user $usern4me --password $passw0rd $webadress/"$1" -O $destpath/"$1" &&
+    sudo chmod 777 /var/run/libvirt/libvirt-sock
+  fi
 }
 
 function pfsense1 {
@@ -273,58 +231,36 @@ function pfsense1 {
 }
 
 function sysctl0 {
-  [ -f "$pathsrv"/sysctl_ok ] && {
-    clear; echo "O SYSCTL ja foi modificado. Continuando."; echo ""; sleep 2
-  } || {
-    sleep 3; clear; echo "Aplicando recursos extras ao SYSCTL"
-    echo -e "kernel.sysrq=1
+  sleep 3; clear; echo "Aplicando recursos extras ao SYSCTL"
+  echo -e "kernel.sysrq=1
 vm.panic_on_oom=1
 vm.swappiness=10
 kernel.panic=5
 #net.ipv4.ip_forward=1
 #net.ipv6.conf.all.disable_ipv6=1
-#net.ipv6.conf.default.disable_ipv6=1" | sudo tee -a /etc/sysctl.conf &&
-    sudo touch "$pathsrv"/sysctl_ok
-  }
+#net.ipv6.conf.default.disable_ipv6=1" | sudo tee -a /etc/sysctl.conf
 }
 
 function motd0 {
-  [ -f "$pathsrv"/motd_ok ] && {
-    clear; echo "O MOTD ja foi substituido. Continuando."; echo ""; sleep 2
-  } || {
-    sleep 3; clear; echo "Ajustando tela de boas vindas do servidor"
-    sudo rm -R /etc/update-motd.d/*
-    curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/00-header | sudo tee /etc/update-motd.d/00-header
-    curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/20-sysinfo | sudo tee /etc/update-motd.d/20-sysinfo
-    curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/90-dynamic-motd | sudo tee /etc/update-motd.d/90-dynamic-motd
-    sudo chmod +x /etc/update-motd.d/*
-    sudo touch "$pathsrv"/motd_ok
-  }
+  sleep 3; clear; echo "Ajustando tela de boas vindas do servidor"
+  sudo rm -R /etc/update-motd.d/*
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/00-header | sudo tee /etc/update-motd.d/00-header
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/20-sysinfo | sudo tee /etc/update-motd.d/20-sysinfo
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/90-dynamic-motd | sudo tee /etc/update-motd.d/90-dynamic-motd
+  sudo chmod +x /etc/update-motd.d/*
 }
 
 function journal0 {
-  [ -f "$pathsrv"/journal_ok ] && {
-    clear; echo "O JournalCTL ja foi ajustado. Continuando."; echo ""; sleep 2
-  } || {
-    sleep 3; clear; echo "Ajustando JOURNAL"
-    echo -e "
+  sleep 3; clear; echo "Ajustando JOURNAL"
+  echo -e "
 Storage=persistent
 SystemMaxUse=5G
-SystemKeepFree=10G" | sudo tee -a /etc/systemd/journald.conf &&
-    sudo touch "$pathsrv"/journal_ok
-  }
+SystemKeepFree=10G" | sudo tee -a /etc/systemd/journald.conf
 }
 
 function fstab0 {
-  [ -f "$pathsrv"/fstab_ok ] && {
-    clear; echo "O fstab ja foi ajustado de acordo. Continuando."; echo ""; sleep 2
-  } || {
-    sudo mkdir /mnt/disk01
-    sudo mkdir /mnt/disk02
-
-    sleep 3; clear; echo "Adicionando entradas extras ao fstab"
-
-    echo -e "
+  sudo mkdir /mnt/disk01; sudo mkdir /mnt/disk02; sleep 3; clear; echo "Adicionando entradas extras ao fstab"
+  echo -e "
 # Temp to ram!
 tmpfs /tmp tmpfs defaults 0 0
 tmpfs /var/tmp tmpfs defaults 0 0
@@ -336,28 +272,21 @@ tmpfs /var/tmp tmpfs defaults 0 0
 # /dev/disk/by-uuid/ /mnt/disk02 ext4 defaults 0 0
 
 # Acesso Externo
-# //172.25.0.X/folder /mnt/folder cifs credentials=/home/administrador/.smb,iocharset=utf8,file_mode=0777,dir_mode=0777,noperm,user,vers=2.1,nofail,x-systemd.automount,x-systemd.requires=network-online.target,x-systemd.device-timeout=3 0 0" | sudo tee -a /etc/fstab &&
-
-    sudo touch "$pathsrv"/fstab_ok
-  }
+# //172.25.0.X/folder /mnt/folder cifs credentials=/home/administrador/.smb,iocharset=utf8,file_mode=0777,dir_mode=0777,noperm,user,vers=2.1,nofail,x-systemd.automount,x-systemd.requires=network-online.target,x-systemd.device-timeout=3 0 0" | sudo tee -a /etc/fstab
 }
 
 function beep0 {
-  [ -f "$pathsrv"/beep ] && {
-    clear; echo "O beep ja foi adicionado. Continuando."; echo ""; sleep 2
-  } || {
-    sleep 3; clear; echo "Criando um Beep bonitinho se tiver speaker no servidor!"
-    wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh -O /home/administrador/.beep.sh
-    clear; echo "Beep instalado. Testando..."; sudo bash /home/administrador/.beep.sh
+  sleep 3; clear; echo "Criando um Beep bonitinho se tiver speaker no servidor!"
+  wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh -O /home/administrador/.beep.sh
+  clear; echo "Beep instalado. Testando..."; sudo bash /home/administrador/.beep.sh
 
-    #no sudo
-    #(crontab -l 2>/dev/null; echo '@reboot sleep 60; bash /home/administrador/.beep.sh') | sort -u | crontab -
+  #no sudo
+  #(crontab -l 2>/dev/null; echo '@reboot sleep 60; bash /home/administrador/.beep.sh') | sort -u | crontab -
 
-    #sudo
-    (sudo crontab -l 2>/dev/null; echo '@reboot sleep 60; bash /home/administrador/.beep.sh') | sort -u | sudo crontab -
+  #sudo
+  (sudo crontab -l 2>/dev/null; echo '@reboot sleep 60; bash /home/administrador/.beep.sh') | sort -u | sudo crontab -
 
-    sudo yq -i ".Informacoes.Beep = \"Ativo\"" /srv/settings.yaml
-  }
+  sudo yq -i ".Informacoes.Beep = \"Ativo\"" /srv/settings.yaml
 }
 
 function adjusting0 {
@@ -396,16 +325,16 @@ END {
 }
 ' | sudo tee -a /srv/settings.yaml
 # ------------------------------------------------------------------------------------------------------------------------------
-  [ -f /sys/firmware/acpi/tables/MSDM ] && {
+  if [ -f /sys/firmware/acpi/tables/MSDM ]; then
     serial0=$(sudo hexdump -s 56 -e '"Serial key: " /29 "%s\n"' /sys/firmware/acpi/tables/MSDM)
     sudo yq -i ".Informacoes.Serial_Windows = \"${serial0}\"" /srv/settings.yaml
-  } || {
+  else
     sudo yq -i ".Informacoes.Serial_Windows = \"Inexistente\"" /srv/settings.yaml
-  }
+  fi
 # ------------------------------------------------------------------------------------------------------------------------------
   datetime0=$(date +"%d/%m/%Y - %H:%M")
   sudo yq -i ".Informacoes.Data_Instalacao = \"${datetime0}\"" /srv/settings.yaml
-  sudo yq -i ".Informacoes.Data_Restauracao = \"Nunca foi reinstalado\"" /srv/settings.yaml
+  sudo yq -i ".Informacoes.Data_Ultima_Reinstalacao = \"Nunca foi reinstalado\"" /srv/settings.yaml
 # ------------------------------------------------------------------------------------------------------------------------------
 }
 
@@ -414,7 +343,7 @@ YAML="/srv/settings.yaml"
 TMP_CRON=$(mktemp)
 
 # Pega o crontab atual do root (ou vazio se não existir)
-sudo crontab -l 2>/dev/null > "$TMP_CRON"
+sudo crontab -l 2>/dev/null | sudo tee "$TMP_CRON"
 
 # Para cada job no YAML
 yq -r '.rsnapshots[]' "$YAML" | while read -r CRON_LINE; do
@@ -432,7 +361,6 @@ rm -f "$TMP_CRON"
 }
 
 function the_end0 {
-  sudo touch "$pathsrv"/finished
   clear; echo "Instalação concluida!"
   echo "Reiniciando sistema..."; sleep 3
   sudo reboot
@@ -467,12 +395,11 @@ function linite0 {
 function appliance0 {
   welcome0 "Appliance v3.0"
   bashconf0
-  menupass0
   timezone0
   useless0
   update0
   pfsense0 "pfsense-modelo.img"
-  pfsense1
+  pfsense1 "pfsense-modelo.img"
   sysctl0
   motd0
   journal0
