@@ -362,21 +362,21 @@ function beep0 {
 
 function adjusting0 {
   sudo mkdir -p /srv/scripts/config
-
+# ------------------------------------------------------------------------------------------------------------------------------
   wget "https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/01-Backup"
   cat 01-Backup | sudo tee /srv/scripts/backupcont
   sudo rm -r 01-Backup
-
+# ------------------------------------------------------------------------------------------------------------------------------
   wget "https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/rsnapshot.conf"
   cat rsnapshot.conf | sudo tee /srv/scripts/rsnapshot
   sudo rm -r rsnapshot.conf
-
+# ------------------------------------------------------------------------------------------------------------------------------
   sudo yq -i '.rsnapshots += ["#00 7,10,13,16,19,22 * * 1-5 /usr/bin/rsnapshot -c /srv/scripts/rsnapshot alpha", "#00 23 * * 1-5 /usr/bin/rsnapshot -c /srv/scripts/rsnapshot beta", "#00 7 * * 6 /usr/bin/rsnapshot -c /srv/scripts/rsnapshot gamma"]' /srv/settings.yaml
   cron_rsnap
-
+# ------------------------------------------------------------------------------------------------------------------------------
   IPMachine=$(ip route get 1.1.1.1 | grep -oP 'src \K\S+')
   sudo yq -i ".Informacoes.IP_LAN = \"${IPMachine}\"" /srv/settings.yaml
-
+# ------------------------------------------------------------------------------------------------------------------------------
   sudo inxi -M | awk '
 /Machine:/ {machine=1; next}
 machine && NF {
@@ -386,12 +386,19 @@ machine && NF {
   machine=0
 }
 END {
-  print "Machine:"
-  print "  Type: \"" type "\""
-  print "  Mobo: \"" mobo "\""
+  print "Dados_da_Placa_Mae:"
+  print "  Tipo: \"" type "\""
+  print "  Placa: \"" mobo "\""
 }
-' | sudo tee -a settings.yaml
-
+' | sudo tee -a /srv/settings.yaml
+# ------------------------------------------------------------------------------------------------------------------------------
+  [ -f /sys/firmware/acpi/tables/MSDM ] && {
+    serial0=$(sudo hexdump -s 56 -e '"Serial key: " /29 "%s\n"' /sys/firmware/acpi/tables/MSDM)
+    sudo yq -i ".Informacoes.Serial_Windows = \"${serial0}\"" /srv/settings.yaml
+  } || {
+    sudo yq -i ".Informacoes.Serial_Windows = \"Inexistente.\"" /srv/settings.yaml
+  }
+# ------------------------------------------------------------------------------------------------------------------------------
 }
 
 function cron_rsnap {
