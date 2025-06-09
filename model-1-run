@@ -112,7 +112,7 @@ function update0 {
   sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear
 
   echo "Instalando pacotes...."
-  sudo apt install "$list00" -y &&
+  sudo apt install $list00 -y &&
   sync &&
 
   sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq
