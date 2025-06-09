@@ -86,34 +86,13 @@ function mkswap0 {
   }
 }
 
-function passmgr0 {
-  [ -f "$pathsrv"/information ] && {
-    clear; echo "Informacoes coletadas de uma instalacao anterior. Continuando."; echo ""; sleep 2
-    var1=$(sed -n '1p' "$pathsrv"/information)
-    var2=$(sed -n '2p' "$pathsrv"/information)
-    var3=$(sed -n '3p' "$pathsrv"/information)
-    password0
-  } || {
-    menupass0
-    sudo touch "$pathsrv"/information
-    echo "$var1" | sudo tee "$pathsrv"/information
-    [ "$var2" = "" ] && { echo "$var1" | sudo tee -a "$pathsrv"/information; } || { echo "$var2" | sudo tee -a "$pathsrv"/information; }
-    [ "$var3" = "" ] && { echo "$var1" | sudo tee -a "$pathsrv"/information; } || { echo "$var3" | sudo tee -a "$pathsrv"/information; }
-    password0
-  }
-}
-
 function menupass0 {
   VALUE1="Passw0rd"; VALUE2=""; VALUE3=""
-  VALUE0=$(dialog --cancel-label "Sair da Instalacao" --ok-label "Iniciar Instalacao" --title "Novo Servidor" --form "Defina a senha do Administrador e as demais, caso fiquem em branco, serao a mesma:" 11 50 0 \
+  VALUE0=$(dialog --cancel-label "Sair da Instalacao" --ok-label "Iniciar Instalacao" --title "Novo Servidor" --form "Defina a senha do Administrador:" 11 50 0 \
 "Administrador:" 1 1 "$VALUE1" 1 15 40 0 \
-"Senha    XPRA:" 2 1 "$VALUE2" 2 15 40 0 \
-"Senha  PiHole:" 3 1 "$VALUE3" 3 15 40 0 \
 3>&1 1>&2 2>&3 3>&- > /dev/tty)
   [ $? -ne 0 ] && cancel_user
   var1=$(echo "$VALUE0" | sed -n 1p)
-  var2=$(echo "$VALUE0" | sed -n 2p)
-  var3=$(echo "$VALUE0" | sed -n 3p)
   check0
 }
 
@@ -173,15 +152,6 @@ function update0 {
   sudo usermod -aG libvirt administrador
   sudo usermod -aG libvirt-qemu administrador
   sudo usermod -aG docker administrador
-}
-
-function password0 {
-  [ -f "$pathsrv"/password_ok ] && {
-    clear; echo "Senha substituida anteriormente. Continuando."; echo ""; sleep 2
-  } || {
-    clear; echo "Trocando a senha do usuario ADMINISTRADOR deste servidor!"
-    echo "administrador:$var1" | sudo chpasswd && sudo touch "$pathsrv"/password_ok
-  }
 }
 
 function netplan0 {
@@ -359,10 +329,10 @@ function fstab0 {
 tmpfs /tmp tmpfs defaults 0 0
 tmpfs /var/tmp tmpfs defaults 0 0
 
-# Main Disk
+# Disk01 - Main Disk
 # /dev/disk/by-uuid/ /mnt/disk01 ext4 defaults 0 0
 
-# Backup
+# Disk02 - Backup
 # /dev/disk/by-uuid/ /mnt/disk02 ext4 defaults 0 0
 
 # Acesso Externo
@@ -401,7 +371,7 @@ function adjusting0 {
   cat rsnapshot.conf | sudo tee /srv/scripts/rsnapshot
   sudo rm -r rsnapshot.conf
 
-  yq -i '.rsnapshots += ["#00 7,10,13,16,19,22 * * 1-5 /usr/bin/rsnapshot -c /srv/scripts/rsnapshot alpha", "#00 23 * * 1-5 /usr/bin/rsnapshot -c /srv/scripts/rsnapshot beta", "#00 7 * * 6 /usr/bin/rsnapshot -c /srv/scripts/rsnapshot gamma"]' /srv/settings.yaml
+  sudo yq -i '.rsnapshots += ["#00 7,10,13,16,19,22 * * 1-5 /usr/bin/rsnapshot -c /srv/scripts/rsnapshot alpha", "#00 23 * * 1-5 /usr/bin/rsnapshot -c /srv/scripts/rsnapshot beta", "#00 7 * * 6 /usr/bin/rsnapshot -c /srv/scripts/rsnapshot gamma"]' /srv/settings.yaml
   cron_rsnap
 
   IPMachine=$(ip route get 1.1.1.1 | grep -oP 'src \K\S+')
@@ -445,8 +415,7 @@ function the_end0 {
 
 function smbconf0 {
   clear; echo "Adicionando modelo SAMBA AD"
-  sudo mkdir -p /srv/containers/scripts/
-  curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/SAMBA_Model/smbAD.conf | sudo tee /srv/containers/scripts/SMB-AD-Model.conf
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/SAMBA_Model/smbAD.conf | sudo tee /srv/scripts/config/SMB-AD-Model.conf
 }
 
 # ======================================================================================================================================================== #
@@ -474,7 +443,7 @@ function linite0 {
 function appliance0 {
   welcome0 "Appliance v3.0"
   bashconf0
-  passmgr0
+  menupass0
   timezone0
   useless0
   update0
