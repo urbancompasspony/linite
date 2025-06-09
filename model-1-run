@@ -449,113 +449,6 @@ function smbconf0 {
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/SAMBA_Model/smbAD.conf | sudo tee /srv/containers/scripts/SMB-AD-Model.conf
 }
 
-function xpra0 {
-  [ -f "$pathsrv"/xpra_ok ] && {
-    clear; echo "O XPRA ja foi iniciado. Continuando."; echo ""; sleep 2
-  } || {
-    sudo mkdir -p /srv/containers/xpra-virt-manager/home
-    sudo touch /srv/containers/xpra-virt-manager/Information
-
-    [ "$var2" = "" ] && { var2="$var1"; } || { echo . >/dev/null; }
-
-    echo "xpra-virt-manager" | sudo tee /srv/containers/xpra-virt-manager/Information
-    echo "$var2" | sudo tee -a /srv/containers/xpra-virt-manager/Information
-    echo "1920x1080" | sudo tee -a /srv/containers/xpra-virt-manager/Information
-    echo "9876" | sudo tee -a /srv/containers/xpra-virt-manager/Information
-    echo "172.25.0.5" | sudo tee -a /srv/containers/xpra-virt-manager/Information
-
-    sudo wget "$github"45-xpra-virt-manager -O /tmp/xpra-virt-manager
-    sudo chmod +x /tmp/xpra-virt-manager
-    sudo bash /tmp/xpra-virt-manager
-
-    sudo touch "$pathsrv"/xpra_ok
-  }
-}
-
-function pihole0 {
-  [ -f "$pathsrv"/pihole_ok ] && {
-    clear; echo "O PiHole ja foi iniciado. Continuando."; echo ""; sleep 2
-  } || {
-    sudo mkdir -p /srv/containers/pihole/{etc,log,dnsmasq.d}
-    sudo touch /srv/containers/pihole/Information
-
-    [ "$var3" = "" ] && { var3="$var1"; } || { echo . >/dev/null; }
-
-    echo "172.25.0.2" | sudo tee /srv/containers/pihole/Information
-    echo "$var3" | sudo tee -a /srv/containers/pihole/Information
-    echo "0.0.0.0" | sudo tee -a /srv/containers/pihole/Information
-    echo "pihole" | sudo tee -a /srv/containers/pihole/Information
-    echo "macvlan" | sudo tee -a /srv/containers/pihole/Information
-
-    sudo wget "$github"01-pihole -O /tmp/pihole
-    sudo chmod +x /tmp/pihole
-    sudo bash /tmp/pihole
-
-    sudo touch "$pathsrv"/pihole_ok
-  }
-}
-
-function myspeed0 {
-  [ -f "$pathsrv"/myspeed_ok ] && {
-    clear; echo "O MySpeed ja foi iniciado. Continuando."; echo ""; sleep 2
-  } || {
-    sudo mkdir -p /srv/containers/myspeed-tracker/data
-    sudo touch /srv/containers/myspeed-tracker/Information
-
-    echo "myspeed-tracker" | sudo tee /srv/containers/myspeed-tracker/Information
-    echo "172.25.0.4" | sudo tee -a /srv/containers/myspeed-tracker/Information
-
-    sudo wget "$github"20-myspeed-tracker -O /tmp/myspeed-tracker
-    sudo chmod +x /tmp/myspeed-tracker
-    sudo bash /tmp/myspeed-tracker
-
-    sudo touch "$pathsrv"/myspeed_ok
-  }
-}
-
-function scriptsrv0 {
-  [ -f "$pathsrv"/scriptsrv_ok ] && {
-    clear; echo "O ScriptSRV ja foi iniciado. Continuando."; echo ""; sleep 2
-  } || {
-    sudo mkdir -p /srv/containers/script-server/{scripts,runners}
-    sudo touch /srv/containers/script-server/Information
-
-    echo "script-server" | sudo tee /srv/containers/script-server/Information
-    echo "172.25.0.6" | sudo tee -a /srv/containers/script-server/Information
-
-    sudo wget "$github"70-script-server -O /tmp/script-server
-    sudo chmod +x /tmp/script-server
-    sudo bash /tmp/script-server
-
-    sudo touch "$pathsrv"/scriptsrv_ok
-  }
-}
-
-function openspeed0 {
-  [ -f "$pathsrv"/speed_ok ] && {
-    clear; echo "O SpeedTestLAN ja foi iniciado. Continuando."; echo ""; sleep 2
-  } || {
-    sudo mkdir -p /srv/containers/openspeedtest
-    sudo touch /srv/containers/openspeedtest/Information
-
-    echo "openspeedtest" | sudo tee /srv/containers/openspeedtest/Information
-    echo "172.25.0.7" | sudo tee -a /srv/containers/openspeedtest/Information
-
-    sudo wget "$github"16-openspeedtest -O /tmp/speedtest
-    sudo chmod +x /tmp/speedtest
-    sudo bash /tmp/speedtest
-    sudo touch "$pathsrv"/speed_ok
-  }
-}
-
-function containers0 {
-  pihole0
-  myspeed0
-  xpra0
-  openspeed0
-  scriptsrv0
-}
-
 # ======================================================================================================================================================== #
 
 function linite0 {
@@ -587,7 +480,6 @@ function appliance0 {
   update0
   pfsense0 "pfsense-modelo.img"
   pfsense1
-  containers0
   sysctl0
   motd0
   journal0
@@ -601,6 +493,7 @@ function appliance0 {
 }
 
 sudo touch /srv/settings.yaml
+
 root_check0
 hardsys0
 
