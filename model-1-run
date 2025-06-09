@@ -405,7 +405,7 @@ END {
 # ------------------------------------------------------------------------------------------------------------------------------
   datetime0=$(date +"%d/%m/%Y - %H:%M")
   sudo yq -i ".Informacoes.Data_Instalacao = \"${datetime0}\"" /srv/settings.yaml
-  sudo yq -i ".Informacoes.Data_Restauracao = \"Nunca foi reinstalado.\"" /srv/settings.yaml
+  sudo yq -i ".Informacoes.Data_Restauracao = \"Nunca foi reinstalado\"" /srv/settings.yaml
 # ------------------------------------------------------------------------------------------------------------------------------
 }
 
