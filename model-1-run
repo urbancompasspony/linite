@@ -386,6 +386,10 @@ machine && NF {
   machine=0
 }
 END {
+  # Remove control characters
+  gsub(/[\x00-\x1F\x7F]/, "", type);
+  gsub(/[\x00-\x1F\x7F]/, "", mobo);
+
   print "Dados_da_Placa_Mae:"
   print "  Tipo: \"" type "\""
   print "  Placa: \"" mobo "\""
