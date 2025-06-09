@@ -59,10 +59,10 @@ function welcome0 {
   } || {
     [ -f "$pathsrv"/information ] && {
       echo "A senha foi previamente alterada. Use a nova senha!"; echo ""
-      sudo echo . >/dev/null
+      sudo touch /srv/settings.yaml
     } || {
       echo "Insira a senha padrao. Senha padrao: ubuntu"; echo ""
-      sudo echo . >/dev/null
+      sudo touch /srv/settings.yaml
     }
   }
   echo ""; echo "5"; sleep 1; echo "4"; sleep 1; echo "3"; sleep 1; echo "2"; sleep 1; echo "1"; sleep 1
@@ -483,8 +483,6 @@ function appliance0 {
   install_date
   the_end0
 }
-
-sudo touch /srv/settings.yaml
 
 root_check0
 hardsys0
