@@ -275,20 +275,6 @@ tmpfs /var/tmp tmpfs defaults 0 0
 # //172.25.0.X/folder /mnt/folder cifs credentials=/home/administrador/.smb,iocharset=utf8,file_mode=0777,dir_mode=0777,noperm,user,vers=2.1,nofail,x-systemd.automount,x-systemd.requires=network-online.target,x-systemd.device-timeout=3 0 0" | sudo tee -a /etc/fstab
 }
 
-function beep0 {
-  sleep 3; clear; echo "Criando um Beep bonitinho se tiver speaker no servidor!"
-  wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh -O /home/administrador/.beep.sh
-  clear; echo "Beep instalado. Testando..."; sudo bash /home/administrador/.beep.sh
-
-  #no sudo
-  #(crontab -l 2>/dev/null; echo '@reboot sleep 60; bash /home/administrador/.beep.sh') | sort -u | crontab -
-
-  #sudo
-  (sudo crontab -l 2>/dev/null; echo '@reboot sleep 60; bash /home/administrador/.beep.sh') | sort -u | sudo crontab -
-
-  sudo yq -i ".Informacoes.Beep = \"Ativo\"" /srv/settings.yaml
-}
-
 function adjusting0 {
   sudo mkdir -p /srv/scripts/config
 # ------------------------------------------------------------------------------------------------------------------------------
@@ -315,9 +301,8 @@ machine && NF {
   machine=0
 }
 END {
-  # Remove control characters
-  gsub(/[\x00-\x1F\x7F]/, "", type);
-  gsub(/[\x00-\x1F\x7F]/, "", mobo);
+  gsub(/[\x00-\x1F\x7F]/, "", Tipo);
+  gsub(/[\x00-\x1F\x7F]/, "", Placa);
 
   print "Hardware:"
   print "  Tipo: \"" type "\""
@@ -336,6 +321,14 @@ END {
   sudo yq -i ".Informacoes.Data_Instalacao = \"${datetime0}\"" /srv/settings.yaml
   sudo yq -i ".Informacoes.Data_Ultima_Reinstalacao = \"Nunca foi reinstalado\"" /srv/settings.yaml
 # ------------------------------------------------------------------------------------------------------------------------------
+  wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh -O /home/administrador/.beep.sh; chmod +x /home/administrador/.beep.sh
+
+  #no sudo
+  #(crontab -l 2>/dev/null; echo '@reboot sleep 60; bash /home/administrador/.beep.sh') | sort -u | crontab -
+  #sudo
+  (sudo crontab -l 2>/dev/null; echo '@reboot sleep 60; bash /home/administrador/.beep.sh') | sort -u | sudo crontab -
+
+  sudo yq -i ".Informacoes.Beep = \"Ativo\"" /srv/settings.yaml
 }
 
 function cron_rsnap {
@@ -387,7 +380,6 @@ function linite0 {
   fstab0
   netplan1
   smbconf0
-  beep0
   adjusting0
   the_end0
 }
@@ -406,7 +398,6 @@ function appliance0 {
   fstab0
   smbconf0
   netplan0
-  beep0
   adjusting0
   the_end0
 }
