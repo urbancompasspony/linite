@@ -18,7 +18,7 @@ export destpath="/var/lib/libvirt/images"
 export github="https://raw.githubusercontent.com/urbancompasspony/docker/main/"
 
 export list00="net-tools speedtest-cli whois netdiscover iperf arp-scan traceroute sshpass inxi zip unzip p7zip-full p7zip cifs-utils rsnapshot iotop cmatrix htop inxi tree build-essential unrar \
-openvpn nmap parallel rclone samba samba-dsdb-modules samba-vfs-modules bash-completion git"
+openvpn nmap parallel rclone samba samba-dsdb-modules samba-vfs-modules bash-completion git ubuntu-release-upgrader-core"
 
 # ======================================================================================================================================================== #
 
