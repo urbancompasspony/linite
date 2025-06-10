@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# IDEAL TO RUN WITH https://github.com/DesktopECHO/Pi-hole-for-Android!
+# Maybe with Ubuntu. Not so good.
+
 export LANG=C
 export LC_ALL=C
 
