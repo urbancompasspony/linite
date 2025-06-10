@@ -3,6 +3,10 @@
 # FIRST:
 sudo apt install curl wget dialog nano
 
+# sudo pihole uninstall -y
+
+# wget -qO- https://raw.githubusercontent.com/Botspot/pi-apps/master/install | bash
+
 nano /etc/hosts
 127.0.1.1 cattail
 
