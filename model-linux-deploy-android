@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # ======================================================================================================================================================== #
-# curl -L m.linuxuniverse.com.br | bash
+# curl -L lda.linuxuniverse.com.br | bash
 # ======================================================================================================================================================== #
 
 wget -O- https://raw.githubusercontent.com/urbancompasspony/linite/refs/heads/main/model-linux-deploy-android-run > ~/.model-installer
