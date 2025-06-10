@@ -1,1 +1,176 @@
+#!/usr/bin/env bash
 
+# ======================================================================================================================================================== #
+# curl -L lda.linuxuniverse.com.br | bash -i
+# ======================================================================================================================================================== #
+
+export LANG=C
+export LC_ALL=C
+
+export serverip="172.20.0.22"
+export usern4me="admin"; export passw0rd="isorulez"
+
+export lanhost="http://$serverip"; export wanhost="http://z.net-freaks.com:3434"
+
+export NEEDRESTART_MODE=a; export DEBIAN_FRONTEND=noninteractive
+
+export destpath="/var/lib/libvirt/images"
+export github="https://raw.githubusercontent.com/urbancompasspony/docker/main/"
+
+export list00="net-tools speedtest-cli whois netdiscover iperf arp-scan traceroute sshpass inxi zip unzip p7zip-full p7zip cifs-utils rsnapshot iotop cmatrix htop inxi tree build-essential unrar \
+openvpn nmap parallel rclone samba samba-dsdb-modules samba-vfs-modules"
+
+# ======================================================================================================================================================== #
+
+function root_check0 {
+  [ "$EUID" -ne 0 ] || {
+    clear
+    echo "Não execute este script como Root! DICA: Remova o SUDO do comando ou execute-o como usuario local."; echo ""
+    exit
+  }
+}
+
+function welcome0 {
+  clear; echo ""; echo "Preparo de Servidor Mobile Android on LinuxDeploy by SuitIT®"; echo ""
+  if [ -f /srv/settings.yaml ];then
+    clear; echo ""; echo "Este servidor ja foi configurado e está no Modelo CdN."; sleep 1
+    echo ""; echo "Caso precise reinstala-lo ou restaura-lo utilize o Painel CdN!"; sleep 3
+    exit
+  else
+    sudo touch /srv/settings.yaml
+  fi
+  echo ""; echo "5"; sleep 1; echo "4"; sleep 1; echo "3"; sleep 1; echo "2"; sleep 1; echo "1"; sleep 1
+}
+
+function bashconf0 {
+  clear; echo "Preparando sistema e configurando BASH"; echo ""
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
+}
+
+function mkswap0 {
+  if [ -f /swapfile ] || [ -f /swap.img ]; then
+    echo "." >/dev/zero
+  else
+    clear; echo "Swap não encontrado, criando..."
+    sudo dd if=/dev/zero of=/swapfile bs=1k count=1000000
+    sudo chmod 0600 /swapfile
+    sudo mkswap /swapfile; sudo swapon /swapfile
+    echo "/swapfile none swap sw 0 0" | sudo tee -a /etc/fstab
+  fi
+}
+
+function update0 {
+  clear; echo "Atualizando o sistema"; echo ""
+  sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear
+
+  echo "Instalando pacotes...."
+  sudo apt install $list00 -y &&
+  sync &&
+
+  sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_arm64 -O /usr/local/bin/yq
+  sudo chmod +x /usr/local/bin/yq
+}
+
+function sysctl0 {
+  sleep 3; clear; echo "Aplicando recursos extras ao SYSCTL"
+  echo -e "kernel.sysrq=1
+vm.panic_on_oom=1
+vm.swappiness=10
+kernel.panic=5
+#net.ipv4.ip_forward=1
+#net.ipv6.conf.all.disable_ipv6=1
+#net.ipv6.conf.default.disable_ipv6=1" | sudo tee -a /etc/sysctl.conf
+}
+
+function motd0 {
+  sleep 3; clear; echo "Ajustando tela de boas vindas do servidor"
+  sudo rm -R /etc/update-motd.d/*
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/00-header | sudo tee /etc/update-motd.d/00-header
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/20-sysinfo | sudo tee /etc/update-motd.d/20-sysinfo
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/90-dynamic-motd | sudo tee /etc/update-motd.d/90-dynamic-motd
+  sudo chmod +x /etc/update-motd.d/*
+}
+
+function journal0 {
+  sleep 3; clear; echo "Ajustando JOURNAL"
+  echo -e "
+Storage=persistent
+SystemMaxUse=5G
+SystemKeepFree=10G" | sudo tee -a /etc/systemd/journald.conf
+}
+
+function adjusting0 {
+  sudo mkdir -p /srv/scripts/config
+# ------------------------------------------------------------------------------------------------------------------------------
+  wget "https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/01-Backup"
+  cat 01-Backup | sudo tee /srv/scripts/backupcont
+  sudo rm -r 01-Backup
+# ------------------------------------------------------------------------------------------------------------------------------
+  wget "https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/rsnapshot.conf"
+  cat rsnapshot.conf | sudo tee /srv/scripts/rsnapshot
+  sudo rm -r rsnapshot.conf
+# ------------------------------------------------------------------------------------------------------------------------------
+  sudo yq -i '.rsnapshots += ["#00 7,10,13,16,19,22 * * 1-5 /usr/bin/rsnapshot -c /srv/scripts/rsnapshot alpha", "#00 23 * * 1-5 /usr/bin/rsnapshot -c /srv/scripts/rsnapshot beta", "#00 7 * * 6 /usr/bin/rsnapshot -c /srv/scripts/rsnapshot gamma"]' /srv/settings.yaml
+# ------------------------------------------------------------------------------------------------------------------------------
+  IPMachine=$(ip route get 1.1.1.1 | grep -oP 'src \K\S+')
+  sudo yq -i ".Informacoes.IP_LAN_Install = \"${IPMachine}\"" /srv/settings.yaml
+# ------------------------------------------------------------------------------------------------------------------------------
+sudo inxi -M | awk '
+/Machine:/ {machine=1; next}
+machine && NF {
+  sub(/^ *Type: /, "", $0); type=$0;
+  getline;
+  sub(/^ *Mobo: /, "", $0); mobo=$0;
+  machine=0
+}
+END {
+  gsub(/[\x00-\x1F\x7F]/, "", type);
+  gsub(/[\x00-\x1F\x7F]/, "", mobo);
+
+  print "Hardware:"
+  print "  Tipo: \"" type "\""
+  print "  Placa: \"" mobo "\""
+}
+' | sudo tee -a /srv/settings.yaml
+# ------------------------------------------------------------------------------------------------------------------------------
+  if [ -f /sys/firmware/acpi/tables/MSDM ]; then
+    serial0=$(sudo hexdump -s 56 -e '"Serial key: " /29 "%s\n"' /sys/firmware/acpi/tables/MSDM)
+    sudo yq -i ".Informacoes.Serial_Windows = \"${serial0}\"" /srv/settings.yaml
+  else
+    sudo yq -i ".Informacoes.Serial_Windows = \"Inexistente\"" /srv/settings.yaml
+  fi
+# ------------------------------------------------------------------------------------------------------------------------------
+  datetime0=$(date +"%d/%m/%Y - %H:%M")
+  sudo yq -i ".Informacoes.Data_Instalacao = \"${datetime0}\"" /srv/settings.yaml
+  sudo yq -i ".Informacoes.Data_Ultima_Reinstalacao = \"Nunca foi reinstalado\"" /srv/settings.yaml
+# ------------------------------------------------------------------------------------------------------------------------------
+}
+
+function the_end0 {
+  clear; echo "Instalação concluida!"
+}
+
+function smbconf0 {
+  clear; echo "Adicionando modelo SAMBA AD"
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/SAMBA_Model/smbAD.conf | sudo tee /srv/SMB-AD-Model.conf
+}
+
+# ======================================================================================================================================================== #
+
+function linite0 {
+  welcome0 "Generico v3.0"
+  bashconf0
+  mkswap0
+  update0
+  sysctl0
+  motd0
+  journal0
+  smbconf0
+  adjusting0
+  the_end0
+}
+
+root_check0
+linite0
+
+exit 1
