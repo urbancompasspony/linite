@@ -1,21 +1,9 @@
 #!/usr/bin/env bash
 
-# ======================================================================================================================================================== #
-# curl -L lda.linuxuniverse.com.br | bash -i
-# ======================================================================================================================================================== #
-
 export LANG=C
 export LC_ALL=C
 
-export serverip="172.20.0.22"
-export usern4me="admin"; export passw0rd="isorulez"
-
-export lanhost="http://$serverip"; export wanhost="http://z.net-freaks.com:3434"
-
 export NEEDRESTART_MODE=a; export DEBIAN_FRONTEND=noninteractive
-
-export destpath="/var/lib/libvirt/images"
-export github="https://raw.githubusercontent.com/urbancompasspony/docker/main/"
 
 export list00="net-tools speedtest-cli whois netdiscover iperf arp-scan traceroute sshpass inxi zip unzip p7zip-full p7zip cifs-utils rsnapshot iotop cmatrix htop inxi tree build-essential unrar \
 openvpn nmap parallel rclone samba samba-dsdb-modules samba-vfs-modules bash-completion git ubuntu-release-upgrader-core"
@@ -115,31 +103,6 @@ function adjusting0 {
 # ------------------------------------------------------------------------------------------------------------------------------
   IPMachine=$(ip route get 1.1.1.1 | grep -oP 'src \K\S+')
   sudo yq -i ".Informacoes.IP_LAN_Install = \"${IPMachine}\"" /srv/settings.yaml
-# ------------------------------------------------------------------------------------------------------------------------------
-sudo inxi -M | awk '
-/Machine:/ {machine=1; next}
-machine && NF {
-  sub(/^ *Type: /, "", $0); type=$0;
-  getline;
-  sub(/^ *Mobo: /, "", $0); mobo=$0;
-  machine=0
-}
-END {
-  gsub(/[\x00-\x1F\x7F]/, "", type);
-  gsub(/[\x00-\x1F\x7F]/, "", mobo);
-
-  print "Hardware:"
-  print "  Tipo: \"" type "\""
-  print "  Placa: \"" mobo "\""
-}
-' | sudo tee -a /srv/settings.yaml
-# ------------------------------------------------------------------------------------------------------------------------------
-  if [ -f /sys/firmware/acpi/tables/MSDM ]; then
-    serial0=$(sudo hexdump -s 56 -e '"Serial key: " /29 "%s\n"' /sys/firmware/acpi/tables/MSDM)
-    sudo yq -i ".Informacoes.Serial_Windows = \"${serial0}\"" /srv/settings.yaml
-  else
-    sudo yq -i ".Informacoes.Serial_Windows = \"Inexistente\"" /srv/settings.yaml
-  fi
 # ------------------------------------------------------------------------------------------------------------------------------
   datetime0=$(date +"%d/%m/%Y - %H:%M")
   sudo yq -i ".Informacoes.Data_Instalacao = \"${datetime0}\"" /srv/settings.yaml
