@@ -1,12 +1,10 @@
 #!/usr/bin/env bash
 
 # FIRST:
-# RUN sudo apt install curl wget dialog nano
+sudo apt install curl wget dialog nano
 
-# ======================================================================================================================================================== #
-# curl -L lda.linuxuniverse.com.br | bash
-# ======================================================================================================================================================== #
+nano /etc/hosts
+127.0.1.1 cattail
 
-wget -O- https://raw.githubusercontent.com/urbancompasspony/linite/refs/heads/main/model-linux-deploy-android-run > ~/.model-installer
-chmod +x .model-installer
-./.model-installer
+# then:
+wget -O- https://raw.githubusercontent.com/urbancompasspony/linite/refs/heads/main/model-linux-deploy-android-run > ~/.model-installer; chmod +x .model-installer; ./.model-installer
