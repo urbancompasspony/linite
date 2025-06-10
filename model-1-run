@@ -13,6 +13,8 @@
 export LANG=C
 export LC_ALL=C
 
+export yamlbase="/srv/system.yaml"
+
 export serverip="172.20.0.22"
 export usern4me="admin"; export passw0rd="isorulez"
 
@@ -57,13 +59,13 @@ function hardsys0 {
 
 function welcome0 {
   clear; echo ""; echo "Preparo de Servidor $1 by SuitIT®"; echo ""
-  if [ -f /srv/settings.yaml ];then
+  if [ -f "$yamlbase" ];then
     clear; echo ""; echo "Este servidor ja foi configurado e está no Modelo CdN."; sleep 1
     echo ""; echo "Caso precise reinstala-lo ou restaura-lo utilize o Painel CdN!"; sleep 3
     exit
   else
     echo "Insira a senha padrao. Senha padrao: ubuntu"; echo ""
-    sudo touch /srv/settings.yaml
+    sudo touch "$yamlbase"
   fi
   echo ""; echo "5"; sleep 1; echo "4"; sleep 1; echo "3"; sleep 1; echo "2"; sleep 1; echo "1"; sleep 1
 }
@@ -289,11 +291,11 @@ function adjusting0 {
   cat rsnapshot.conf | sudo tee /srv/scripts/rsnapshot
   sudo rm -r rsnapshot.conf
 # ------------------------------------------------------------------------------------------------------------------------------
-  sudo yq -i '.rsnapshots += ["#00 7,10,13,16,19,22 * * 1-5 /usr/bin/rsnapshot -c /srv/scripts/rsnapshot alpha", "#00 23 * * 1-5 /usr/bin/rsnapshot -c /srv/scripts/rsnapshot beta", "#00 7 * * 6 /usr/bin/rsnapshot -c /srv/scripts/rsnapshot gamma"]' /srv/settings.yaml
+  sudo yq -i '.rsnapshots += ["#00 7,10,13,16,19,22 * * 1-5 /usr/bin/rsnapshot -c /srv/scripts/rsnapshot alpha", "#00 23 * * 1-5 /usr/bin/rsnapshot -c /srv/scripts/rsnapshot beta", "#00 7 * * 6 /usr/bin/rsnapshot -c /srv/scripts/rsnapshot gamma"]' "$yamlbase"
   cron_rsnap
 # ------------------------------------------------------------------------------------------------------------------------------
   IPMachine=$(ip route get 1.1.1.1 | grep -oP 'src \K\S+')
-  sudo yq -i ".Informacoes.IP_LAN_Install = \"${IPMachine}\"" /srv/settings.yaml
+  sudo yq -i ".Informacoes.IP_LAN_Install = \"${IPMachine}\"" "$yamlbase"
 # ------------------------------------------------------------------------------------------------------------------------------
 sudo inxi -M | awk '
 /Machine:/ {machine=1; next}
@@ -311,18 +313,18 @@ END {
   print "  Tipo: \"" type "\""
   print "  Placa: \"" mobo "\""
 }
-' | sudo tee -a /srv/settings.yaml
+' | sudo tee -a "$yamlbase"
 # ------------------------------------------------------------------------------------------------------------------------------
   if [ -f /sys/firmware/acpi/tables/MSDM ]; then
     serial0=$(sudo hexdump -s 56 -e '"Serial key: " /29 "%s\n"' /sys/firmware/acpi/tables/MSDM)
-    sudo yq -i ".Informacoes.Serial_Windows = \"${serial0}\"" /srv/settings.yaml
+    sudo yq -i ".Informacoes.Serial_Windows = \"${serial0}\"" "$yamlbase"
   else
-    sudo yq -i ".Informacoes.Serial_Windows = \"Inexistente\"" /srv/settings.yaml
+    sudo yq -i ".Informacoes.Serial_Windows = \"Inexistente\"" "$yamlbase"
   fi
 # ------------------------------------------------------------------------------------------------------------------------------
   datetime0=$(date +"%d/%m/%Y - %H:%M")
-  sudo yq -i ".Informacoes.Data_Instalacao = \"${datetime0}\"" /srv/settings.yaml
-  sudo yq -i ".Informacoes.Data_Ultima_Reinstalacao = \"Nunca foi reinstalado\"" /srv/settings.yaml
+  sudo yq -i ".Informacoes.Data_Instalacao = \"${datetime0}\"" "$yamlbase"
+  sudo yq -i ".Informacoes.Data_Ultima_Reinstalacao = \"Nunca foi reinstalado\"" "$yamlbase"
 # ------------------------------------------------------------------------------------------------------------------------------
   wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh -O /home/administrador/.beep.sh; chmod +x /home/administrador/.beep.sh
 
@@ -331,18 +333,17 @@ END {
   #sudo
   (sudo crontab -l 2>/dev/null; echo '@reboot sleep 60; bash /home/administrador/.beep.sh') | sort -u | sudo crontab -
 
-  sudo yq -i ".Informacoes.Beep = \"Ativo\"" /srv/settings.yaml
+  sudo yq -i ".Informacoes.Beep = \"Ativo\"" "$yamlbase"
 }
 
 function cron_rsnap {
-YAML="/srv/settings.yaml"
 TMP_CRON=$(mktemp)
 
 # Pega o crontab atual do root (ou vazio se não existir)
 sudo crontab -l 2>/dev/null | sudo tee "$TMP_CRON"
 
 # Para cada job no YAML
-yq -r '.rsnapshots[]' "$YAML" | while read -r CRON_LINE; do
+yq -r '.rsnapshots[]' "$yamlbase" | while read -r CRON_LINE; do
     if grep -Fxq "$CRON_LINE" "$TMP_CRON"; then
         echo "Job já existe no crontab: $CRON_LINE"
     else
