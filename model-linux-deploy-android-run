@@ -64,6 +64,8 @@ function update0 {
 
   sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_arm64 -O /usr/local/bin/yq
   sudo chmod +x /usr/local/bin/yq
+
+  wget -qO- https://raw.githubusercontent.com/Botspot/pi-apps/master/install | bash
 }
 
 function sysctl0 {
