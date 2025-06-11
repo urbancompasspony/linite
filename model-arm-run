@@ -32,15 +32,12 @@ function welcome0 {
 
 function bashconf0 {
   clear; echo "Preparando sistema e configurando BASH"; echo ""
-  sudo mkdir -p "$destpath"; sudo chmod 777 -R "$destpath"; sudo mkdir -p "$pathsrv"
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
-  . .bashrc
 }
 
 function timezone0 {
   sudo timedatectl set-timezone Etc/GMT+3
   sudo timedatectl set-local-rtc 1
-  sudo touch "$pathsrv"/timezone_ok
 }
 
 function useless0 {
@@ -60,7 +57,6 @@ EOF
 
   sudo systemctl disable systemd-networkd-wait-online.service
   sudo systemctl mask systemd-networkd-wait-online.service
-  sudo touch "$pathsrv"/useless_services
 }
 
 function update_arm {
@@ -79,7 +75,6 @@ function update_arm {
     sudo systemctl mask NetworkManager-wait-online.service
 
     sudo usermod -aG docker administrador
-    sudo touch "$pathsrv"/updatearm_ok
 }
 
 function netplan0 {
@@ -109,8 +104,8 @@ function netplan0 {
 #        - 192.168.4.1/24
 #        optional: true
 #        access-points:
-#          "ctOS RPi":
-#            password: "5V06@uso"
+#          'ctOS RPi':
+#            password: '5V06@uso'
 #            mode: ap" | sudo tee -a /etc/netplan/00-installer-config.yaml
 
 echo -e "
@@ -126,8 +121,6 @@ echo -e "
 #      optional: true
 #      addresses: [172.16.1.2/24]
 #  version: 2" | sudo tee -a /etc/netplan/00-installer-config.yaml
-
-    sudo touch "$pathsrv"/netplan_ok
 }
 
 function sysctl0 {
@@ -138,8 +131,7 @@ vm.swappiness=10
 kernel.panic=5
 #net.ipv4.ip_forward=1
 #net.ipv6.conf.all.disable_ipv6=1
-#net.ipv6.conf.default.disable_ipv6=1" | sudo tee -a /etc/sysctl.conf &&
-    sudo touch "$pathsrv"/sysctl_ok
+#net.ipv6.conf.default.disable_ipv6=1" | sudo tee -a /etc/sysctl.conf
 }
 
 function yaml0 {
@@ -154,7 +146,6 @@ function motd0 {
     curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/20-sysinfo | sudo tee /etc/update-motd.d/20-sysinfo
     curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/90-dynamic-motd | sudo tee /etc/update-motd.d/90-dynamic-motd
     sudo chmod +x /etc/update-motd.d/*
-    sudo touch "$pathsrv"/motd_ok
 }
 
 function journal0 {
@@ -162,35 +153,10 @@ function journal0 {
     echo -e "
 Storage=persistent
 SystemMaxUse=5G
-SystemKeepFree=10G" | sudo tee -a /etc/systemd/journald.conf &&
-    sudo touch "$pathsrv"/journal_ok
-}
-
-function fstab0 {
-    sudo mkdir /mnt/main
-    sudo mkdir /mnt/backup
-
-    sleep 3; clear; echo "Adicionando entradas extras ao fstab"
-
-    echo -e "
-# Temp to ram!
-tmpfs /tmp tmpfs defaults 0 0
-tmpfs /var/tmp tmpfs defaults 0 0
-
-# Main Disk
-# /dev/disk/by-uuid/ /mnt/main ext4 defaults 0 0
-
-# Backup
-# /dev/disk/by-uuid/ /mnt/backup ext4 defaults 0 0
-
-# Acesso Externo
-# //172.25.0.X/folder /mnt/folder cifs credentials=/home/administrador/.smb,iocharset=utf8,file_mode=0777,dir_mode=0777,noperm,user,vers=2.1,nofail,x-systemd.automount,x-systemd.requires=network-online.target,x-systemd.device-timeout=3 0 0" | sudo tee -a /etc/fstab &&
-
-    sudo touch "$pathsrv"/fstab_ok
+SystemKeepFree=10G" | sudo tee -a /etc/systemd/journald.conf
 }
 
 function the_end0 {
-  sudo touch "$pathsrv"/finished
   clear; echo "Instalação concluida!"
   echo "Reiniciando sistema..."; sleep 3
   sudo reboot
@@ -205,7 +171,7 @@ function smbconf0 {
 # ======================================================================================================================================================== #
 
 root_check0
-welcome0 "ARM v1.0"
+welcome0 "ARM v2.0"
 bashconf0
 timezone0
 useless0
