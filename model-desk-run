@@ -19,11 +19,11 @@ docker.io qemu-system qemu-utils qemu-user qemu-kvm qemu-guest-agent libvirt-cli
 # ======================================================================================================================================================== #
 
 function root_check0 {
-  [ "$EUID" -ne 0 ] || {
+  if ! [ "$EUID" -ne 0 ]; then
     clear
     echo "Não execute este script como Root! DICA: Remova o SUDO do comando ou execute-o como usuario local."; echo ""
     exit
-  }
+  fi
 }
 
 function welcome0 {
@@ -41,10 +41,10 @@ function useless0 {
 }
 
 function update0 {
-    clear; echo "Atualizando o sistema"; echo ""
-    sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear
+  clear; echo "Atualizando o sistema"; echo ""
+  sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear
 
-    cat <<EOF | sudo tee /etc/apt/preferences.d/nosnap.pref
+  cat <<EOF | sudo tee /etc/apt/preferences.d/nosnap.pref
 # To prevent repository packages from triggering the installation of Snap,
 # this file forbids snapd from being installed by APT.
 # For more information: https://linuxmint-user-guide.readthedocs.io/en/latest/snap.html
@@ -53,17 +53,16 @@ Pin: release a=*
 Pin-Priority: -10
 EOF
 
-    sudo apt-mark hold snapd
+  sudo apt-mark hold snapd
+  echo "Instalando pacotes..."
+  sudo apt install $list01 -y
+  sync &&
 
-    echo "Instalando pacotes..."
-    sudo apt install $list01 -y
-    sync &&
-
-    sudo -E usermod -aG docker "$USER"
+  sudo -E usermod -aG docker "$USER"
 }
 
 function token0 {
-  [ -f /etc/.tokenok ] || {
+  if ! [ -f /etc/.tokenok ]; then
     wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1-1ubuntu2.1~18.04.23_amd64.deb
     sudo dpkg -i libssl1.1_1.1.1-1ubuntu2.1~18.04.23_amd64.deb; sudo rm libssl1*.deb
 
@@ -89,9 +88,7 @@ function token0 {
     cd ~; modutil -dbdir sql:.pki/nssdb/ -add "Safenet 5110" -libfile "/usr/lib/libeToken.so"
 
     sudo touch /etc/.tokenok
-  } && {
-    echo . >/dev/null
-  }
+  fi
 }
 
 function bashconf0 {
@@ -105,7 +102,7 @@ function timezone0 {
 }
 
 function sysctl0 {
-  [ -f /etc/.sysctlok ] || {
+  if ! [ -f /etc/.sysctlok ]; then
     sleep 3; clear; echo "Aplicando recursos extras ao SYSCTL"
     echo -e "kernel.sysrq=1
 vm.panic_on_oom=1
@@ -116,26 +113,22 @@ kernel.panic=5
 #net.ipv6.conf.default.disable_ipv6=1" | sudo tee -a /etc/sysctl.conf
 
     sudo touch /etc/.sysctlok
-} && {
-    echo . >/dev/null
-  }
+  fi
 }
 
 function fstab0 {
-  [ -f /etc/.fstabok ] || {
+  if ! [ -f /etc/.fstabok ]; then
 echo -e "
 # Temp to ram!
 tmpfs /tmp tmpfs defaults 0 0
 tmpfs /var/tmp tmpfs defaults 0 0" | sudo tee -a /etc/fstab
 
     sudo touch /etc/.fstabok
-  } && {
-    echo . >/dev/null
-  }
+  fi
 }
 
 function browsers0 {
-  [ -f /etc/.browserok ] || {
+  if ! [ -f /etc/.browserok ]; then
     # Google Chrome
     wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
     sudo dpkg -i ./google-chrome*.deb; sudo rm google-chrome*.deb
@@ -159,14 +152,12 @@ Pin-Priority: 1000
     sudo apt update; sudo apt install firefox -y
 
     sudo touch /etc/.browserok
-  } && {
-    echo . >/dev/null
-  }
+  fi
 }
 
 function dwservice0 {
-    wget https://www.dwservice.net/download/dwagent_x86.sh -O ~/dwagent_x86.sh
-    chmod +x dwagent_x86.sh
+  wget https://www.dwservice.net/download/dwagent_x86.sh -O ~/dwagent_x86.sh
+  chmod +x dwagent_x86.sh
 }
 
 function ADDCJoin0 {
@@ -197,7 +188,7 @@ function appsflat0 {
 }
 
 function onlyoffice0 {
-  [ -f /etc/.officeok ] || {
+  if ! [ -f /etc/.officeok ]; then
     mkdir -p ~/.gnupg
     gpg --no-default-keyring --keyring gnupg-ring:/tmp/onlyoffice.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys CB2DE8E5
     chmod 644 /tmp/onlyoffice.gpg; sudo chown root:root /tmp/onlyoffice.gpg; sudo mv /tmp/onlyoffice.gpg /usr/share/keyrings/onlyoffice.gpg
@@ -218,15 +209,14 @@ function onlyoffice0 {
     fc-cache --force
 
     sudo touch /etc/.officeok
-  } && {
-    echo . >/dev/null
-  }
+  fi
 }
 
 function wine0 {
-  echo "deb https://download.opensuse.org/repositories/Emulators:/Wine:/Debian/xUbuntu_$(lsb_release -r | awk {'print $2'}) ./" | sudo tee /etc/apt/sources.list.d/wine-obs.list
-  wget -qO- https://download.opensuse.org/repositories/Emulators:/Wine:/Debian/xUbuntu_$(lsb_release -r | awk {'print $2'})/Release.key | sudo tee /etc/apt/trusted.gpg.d/winehq.asc
-  sudo apt update; sudo apt install -y wine-stable winetricks
+  echo "deb https://download.opensuse.org/repositories/Emulators:/Wine:/Debian/xUbuntu_$(lsb_release -r | awk '{print $2}') ./" | sudo tee /etc/apt/sources.list.d/wine-obs.list
+  wget -qO- "https://download.opensuse.org/repositories/Emulators:/Wine:/Debian/xUbuntu_$(lsb_release -r | awk '{print $2}')/Release.key" | sudo tee /etc/apt/trusted.gpg.d/winehq.asc
+  sudo apt update
+  sudo apt install -y wine-stable winetricks
 }
 
 function pathwine0 {
@@ -249,11 +239,6 @@ function yaml0 {
 
 function message0 {
   dialog --title "Informacao" --msgbox "A seguir sera perguntado se deseja instalar o suporte a certificado Token A3 nos navegadores.\n\nApenas pressione ENTER para confirmar." 10 40
-  clear
-}
-
-function message1 {
-  dialog --title "Informacao" --msgbox "A seguir vamos instalar o pacote Office com o Microsoft Core Fonts.\n\nNa tela que surgir pressione TAB e tecle Enter para escolher OK.\n\nNa segunda tela pressione TAB e escolha SIM." 12 40
   clear
 }
 
