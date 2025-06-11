@@ -77,9 +77,7 @@ function bashconf0 {
 }
 
 function mkswap0 {
-  if [ -f /swapfile ] || [ -f /swap.img ]; then
-    echo "." >/dev/zero
-  else
+  if ! [ -f /swapfile ] || [ -f /swap.img ]; then
     clear; echo "Swap não encontrado, criando..."
     sudo dd if=/dev/zero of=/swapfile bs=1k count=1000000
     sudo chmod 0600 /swapfile
@@ -344,12 +342,12 @@ sudo crontab -l 2>/dev/null | sudo tee "$TMP_CRON"
 
 # Para cada job no YAML
 yq -r '.rsnapshots[]' "$yamlbase" | while read -r CRON_LINE; do
-    if grep -Fxq "$CRON_LINE" "$TMP_CRON"; then
-        echo "Job já existe no crontab: $CRON_LINE"
-    else
-        echo "$CRON_LINE" >> "$TMP_CRON"
-        echo "Adicionado job: $CRON_LINE"
-    fi
+  if grep -Fxq "$CRON_LINE" "$TMP_CRON"; then
+      echo "Job já existe no crontab: $CRON_LINE"
+  else
+      echo "$CRON_LINE" >> "$TMP_CRON"
+      echo "Adicionado job: $CRON_LINE"
+  fi
 done
 
 # Aplica o novo crontab ao root
