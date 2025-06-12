@@ -4,6 +4,8 @@
 # curl -L m.linuxuniverse.com.br | bash -i
 # ======================================================================================================================================================== #
 
+MENU_VERSION="v3.2 - 11/06/2025"
+
 # Informations for the compliance Celeron:
 #        enp1s0 = ETH0
 #        enp2s0 = ETH1
@@ -58,7 +60,7 @@ function hardsys0 {
 }
 
 function welcome0 {
-  clear; echo ""; echo "Preparo de Servidor $1 by SuitIT®"; echo ""
+  clear; echo ""; echo "Preparo de Servidor $MENU_VERSION by SuitIT®"; echo ""
   if [ -f "$yamlbase" ];then
     clear; echo ""; echo "Este servidor ja foi configurado e está no Modelo CdN."; sleep 1
     echo ""; echo "Caso precise reinstala-lo ou restaura-lo utilize o Painel CdN!"; sleep 3
@@ -369,7 +371,7 @@ function smbconf0 {
 # ======================================================================================================================================================== #
 
 function linite0 {
-  welcome0 "Generico v3.0"
+  welcome0
   bashconf0
   mkswap0
   timezone0
@@ -387,7 +389,7 @@ function linite0 {
 }
 
 function appliance0 {
-  welcome0 "Appliance v3.0"
+  welcome0
   bashconf0
   timezone0
   useless0
