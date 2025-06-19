@@ -79,7 +79,9 @@ function bashconf0 {
 }
 
 function mkswap0 {
-  if ! [ -f /swapfile ] || [ -f /swap.img ]; then
+  if [ -f /swap.img ] || [ -f /swapfile ]; then
+    clear; echo "Swap encontrado, ignorando..."
+  else
     clear; echo "Swap não encontrado, criando..."
     sudo dd if=/dev/zero of=/swapfile bs=1k count=1000000
     sudo chmod 0600 /swapfile
