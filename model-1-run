@@ -230,7 +230,7 @@ function pfsense1 {
 --network type=direct,source=enp2s0,source_mode=bridge,mac=52:54:00:55:ea:02 \
 --network type=direct,source=eno1,source_mode=bridge,mac=52:54:00:55:ea:03 \
 --disk /var/lib/libvirt/images/"$1" \
---os-variant=freebsd13.1 \
+--os-variant=freebsd14.2 \
 --graphics vnc \
 --import \
 --autostart 1>/dev/null 2>/dev/null &
