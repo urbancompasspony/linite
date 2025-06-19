@@ -4,7 +4,7 @@
 # curl -L m.linuxuniverse.com.br | bash -i
 # ======================================================================================================================================================== #
 
-MENU_VERSION="v3.2 - 11/06/2025"
+MENU_VERSION="v3.3 - 19/06/2025"
 
 # Informations for the compliance Celeron:
 #        enp1s0 = ETH0
@@ -379,7 +379,7 @@ function linite0 {
   timezone0
   useless0
   update0
-  pfsense0 "pfsense.img"
+  pfsense0 "pfsense2.8"
   sysctl0
   motd0
   journal0
