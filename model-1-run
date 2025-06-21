@@ -32,8 +32,8 @@ libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq gen
 docker.io net-tools speedtest-cli whois netdiscover iperf arp-scan traceroute sshpass network-manager dkms r8168-dkms \
 libatasmart-bin smartmontools zip unzip p7zip-full 7zip p7zip cifs-utils rsnapshot rclone iotop \
 haveged stress lm-sensors cmatrix btop inxi tree dialog btrfs-progs build-essential unrar lz4 duf \
-openvpn curl nmap parallel rclone openssh-server samba samba-dsdb-modules samba-vfs-modules beep xinit xorg openbox xdotool \
-gpm tmux pavucontrol caja epiphany-browser gparted cmatrix gnome-disk-utility terminator rdesktop pluma terminator xmlstarlet"
+openvpn curl nmap parallel rclone openssh-server samba samba-dsdb-modules samba-vfs-modules beep xinit xorg openbox xdotool dbus-x11 dbus-user-session \
+gpm tmux pavucontrol caja gparted cmatrix gnome-disk-utility terminator rdesktop pluma terminator xmlstarlet"
 
 # ======================================================================================================================================================== #
 
@@ -370,6 +370,21 @@ function smbconf0 {
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/SAMBA_Model/smbAD.conf | sudo tee /srv/scripts/config/SMB-AD-Model.conf
 }
 
+function firefox0 {
+  sudo install -d -m 0755 /etc/apt/keyrings &&
+  wget -q https://packages.mozilla.org/apt/repo-signing-key.gpg -O- | sudo tee /etc/apt/keyrings/packages.mozilla.org.asc > /dev/null &&
+  gpg -n -q --import --import-options import-show /etc/apt/keyrings/packages.mozilla.org.asc | awk '/pub/{getline; gsub(/^ +| +$/,""); if($0 == "35BAA0B33E9EB396F59CA838C0BA5CE6DC6315A3") print "\nThe key fingerprint matches ("$0").\n"; else print "\nVerification failed: the fingerprint ("$0") does not match the expected one.\n"}' &&
+  echo "deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.asc] https://packages.mozilla.org/apt mozilla main" | sudo tee -a /etc/apt/sources.list.d/mozilla.list > /dev/null &&
+
+  echo '
+Package: *
+Pin: origin packages.mozilla.org
+Pin-Priority: 1000
+' | sudo tee /etc/apt/preferences.d/mozilla &&
+
+  sudo apt update; sudo apt install firefox -y
+}
+
 # ======================================================================================================================================================== #
 
 function linite0 {
@@ -386,6 +401,7 @@ function linite0 {
   fstab0
   netplan1
   smbconf0
+  firefox0
   adjusting0
   the_end0
 }
@@ -403,6 +419,7 @@ function appliance0 {
   journal0
   fstab0
   smbconf0
+  firefox0
   netplan0
   adjusting0
   the_end0
