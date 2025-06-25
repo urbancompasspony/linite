@@ -12,7 +12,7 @@ net-tools netdiscover iperf arp-scan traceroute speedtest-cli whois openvpn curl
 gparted gnome-disk-utility vlc kolourpaint cpu-x \
 cifs-utils samba smbclient liblchown-perl p7zip unrar lz4 rclone rsnapshot iotop \
 printer-driver-escpr hplip printer-driver-all \
-stress lm-sensors cmatrix btop inxi tree dialog btrfs-progs filelight \
+stress lm-sensors cmatrix btop inxi tree dialog btrfs-progs filelight libreoffice libreoffice-l10n-pt-br \
 libssl3 pcscd opensc xmlstarlet \
 xrdp xorgxrdp freerdp2-x11 openssh-server \
 adsys adsys-windows samba-ad-dc sssd-ad sssd-tools realmd adcli smb4k \
