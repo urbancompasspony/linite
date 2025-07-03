@@ -211,15 +211,17 @@ function pfsense0 {
     webadress="$wanhost"
   fi
 
-  if [ -f "$destpath"/"$1" ]; then
-    sudo chmod 777 /var/run/libvirt/libvirt-sock
-  else
+  # Aqui verifica se a .img ja existe ou se pode baixar uma nova.
+  if ! [ -f "$destpath"/"$1" ]; then
     clear; sudo wget --user $usern4me --password $passw0rd $webadress/"$1" -O $destpath/"$1" &&
     sudo chmod 777 /var/run/libvirt/libvirt-sock
+    sleep 2
+    sudo touch /tmp/allowvirt0
   fi
 }
 
 function pfsense1 {
+  if [ -f "/tmp/allowvirt0" ]; then
     sudo virt-install --import \
 --name pfSense \
 --boot hd,cdrom,menu=on \
@@ -235,6 +237,8 @@ function pfsense1 {
 --import \
 --autostart 1>/dev/null 2>/dev/null &
     sleep 3; clear
+    sudo rm /tmp/allowvirt0
+  fi
 }
 
 function sysctl0 {
