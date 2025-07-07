@@ -338,8 +338,8 @@ END {
   sudo yq -i ".Informacoes.Beep = \"Ativo\"" "$yamlbase"
 # ------------------------------------------------------------------------------------------------------------------------------
   # Criando backup para os .yaml!
-  (sudo crontab -l 2>/dev/null; echo '00 02 * * * cp /srv/system.yaml /srv/.system.yaml') | sort -u | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo '00 02 * * * cp /srv/containers.yaml /srv/.containers.yaml') | sort -u | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo '* 12 * * 2 cp /srv/system.yaml /srv/.system.yaml') | sort -u | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo '* 12 * * 2 cp /srv/containers.yaml /srv/.containers.yaml') | sort -u | sudo crontab -
 }
 
 function cron_rsnap {
