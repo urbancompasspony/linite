@@ -27,7 +27,7 @@ export NEEDRESTART_MODE=a; export DEBIAN_FRONTEND=noninteractive
 export destpath="/var/lib/libvirt/images"
 export github="https://raw.githubusercontent.com/urbancompasspony/docker/main/"
 
-export list00="qemu-system qemu-utils qemu-user qemu-kvm qemu-guest-agent \
+export list00="qemu-system qemu-utils qemu-user qemu-kvm qemu-guest-agent qemu-block-supplemental \
 libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq genisoimage guestfs-tools \
 docker.io net-tools speedtest-cli whois netdiscover iperf arp-scan traceroute sshpass network-manager dkms r8168-dkms \
 libatasmart-bin smartmontools zip unzip p7zip-full 7zip p7zip cifs-utils rsnapshot rclone iotop \
