@@ -16,6 +16,7 @@ export LANG=C
 export LC_ALL=C
 
 export yamlbase="/srv/system.yaml"
+export yamlextra="/srv/containers.yaml"
 
 export serverip="172.20.0.22"
 export usern4me="admin"; export passw0rd="isorulez"
@@ -67,7 +68,6 @@ function welcome0 {
     exit
   else
     echo "Insira a senha padrao. Senha padrao: ubuntu"; echo ""
-    sudo touch "$yamlbase"
   fi
   echo ""; echo "5"; sleep 1; echo "4"; sleep 1; echo "3"; sleep 1; echo "2"; sleep 1; echo "1"; sleep 1
 }
@@ -243,13 +243,13 @@ function pfsense1 {
 
 function sysctl0 {
   sleep 3; clear; echo "Aplicando recursos extras ao SYSCTL"
-  echo -e "kernel.sysrq=1
+  echo -e "kernel.sysrq=1" | sudo tee /etc/sysctl.d/10-magic-sysrq.conf
+  echo -e "vm.swappiness=10
 vm.panic_on_oom=1
-vm.swappiness=10
 kernel.panic=5
 #net.ipv4.ip_forward=1
 #net.ipv6.conf.all.disable_ipv6=1
-#net.ipv6.conf.default.disable_ipv6=1" | sudo tee -a /etc/sysctl.conf
+#net.ipv6.conf.default.disable_ipv6=1" | sudo tee /etc/sysctl.d/99-sysctl.conf
 }
 
 function motd0 {
@@ -290,15 +290,12 @@ function adjusting0 {
   sudo mkdir -p /srv/scripts/config
 # ------------------------------------------------------------------------------------------------------------------------------
   wget "https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/01-Backup"
-  cat 01-Backup | sudo tee /srv/scripts/backupcont
+  cat 01-Backup | sudo tee /srv/scripts/backupcont; sudo chmod +x /srv/scripts/backupcont
   sudo rm -r 01-Backup
 # ------------------------------------------------------------------------------------------------------------------------------
   wget "https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/rsnapshot.conf"
-  cat rsnapshot.conf | sudo tee /srv/scripts/rsnapshot
+  cat rsnapshot.conf | sudo tee /srv/scripts/rsnapshot; sudo chmod +x /srv/scripts/rsnapshot
   sudo rm -r rsnapshot.conf
-# ------------------------------------------------------------------------------------------------------------------------------
-  sudo yq -i '.rsnapshots += ["#00 7,10,13,16,19,22 * * 1-5 /usr/bin/rsnapshot -c /srv/scripts/rsnapshot alpha", "#00 23 * * 1-5 /usr/bin/rsnapshot -c /srv/scripts/rsnapshot beta", "#00 7 * * 6 /usr/bin/rsnapshot -c /srv/scripts/rsnapshot gamma"]' "$yamlbase"
-  cron_rsnap
 # ------------------------------------------------------------------------------------------------------------------------------
   IPMachine=$(ip route get 1.1.1.1 | grep -oP 'src \K\S+')
   sudo yq -i ".Informacoes.IP_LAN_Install = \"${IPMachine}\"" "$yamlbase"
@@ -314,7 +311,6 @@ machine && NF {
 END {
   gsub(/[\x00-\x1F\x7F]/, "", type);
   gsub(/[\x00-\x1F\x7F]/, "", mobo);
-
   print "Hardware:"
   print "  Tipo: \"" type "\""
   print "  Placa: \"" mobo "\""
@@ -333,39 +329,20 @@ END {
   sudo yq -i ".Informacoes.Data_Ultima_Reinstalacao = \"Nunca foi reinstalado\"" "$yamlbase"
 # ------------------------------------------------------------------------------------------------------------------------------
   wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh -O /home/administrador/.beep.sh; chmod +x /home/administrador/.beep.sh
-
-  (sudo crontab -l 2>/dev/null; echo '@reboot sleep 60; bash /home/administrador/.beep.sh') | sort -u | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "# BEEP!") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "@reboot sleep 60; bash /home/administrador/.beep.sh") | sudo crontab -
   sudo yq -i ".Informacoes.Beep = \"Ativo\"" "$yamlbase"
 # ------------------------------------------------------------------------------------------------------------------------------
   # Criando backup para os .yaml!
-  (sudo crontab -l 2>/dev/null; echo '* 12 * * 2 cp /srv/system.yaml /srv/.system.yaml') | sort -u | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo '* 12 * * 2 cp /srv/containers.yaml /srv/.containers.yaml') | sort -u | sudo crontab -
-}
-
-function cron_rsnap {
-TMP_CRON=$(mktemp)
-
-# Pega o crontab atual do root (ou vazio se não existir)
-sudo crontab -l 2>/dev/null | sudo tee "$TMP_CRON"
-
-# Para cada job no YAML
-yq -r '.rsnapshots[]' "$yamlbase" | while read -r CRON_LINE; do
-  if grep -Fxq "$CRON_LINE" "$TMP_CRON"; then
-      echo "Job já existe no crontab: $CRON_LINE"
-  else
-      echo "$CRON_LINE" >> "$TMP_CRON"
-      echo "Adicionado job: $CRON_LINE"
-  fi
-done
-
-# Aplica o novo crontab ao root
-sudo crontab "$TMP_CRON"
-rm -f "$TMP_CRON"
+  (sudo crontab -l 2>/dev/null; echo "# Backup Essencial!") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "* 12 * * 2 cp /srv/system.yaml /srv/.system.yaml") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "* 12 * * 2 cp /srv/containers.yaml /srv/.containers.yaml") | sudo crontab -
 }
 
 function the_end0 {
   clear; echo "Instalação concluida!"
-  echo "Reiniciando sistema..."; sleep 3
+  sudo touch "$yamlbase"
+  echo "Reiniciando sistema em 3 segundos"; sleep 3
   sudo reboot
 }
 
@@ -380,13 +357,11 @@ function firefox0 {
   wget -q https://packages.mozilla.org/apt/repo-signing-key.gpg -O- | sudo tee /etc/apt/keyrings/packages.mozilla.org.asc > /dev/null &&
   gpg -n -q --import --import-options import-show /etc/apt/keyrings/packages.mozilla.org.asc | awk '/pub/{getline; gsub(/^ +| +$/,""); if($0 == "35BAA0B33E9EB396F59CA838C0BA5CE6DC6315A3") print "\nThe key fingerprint matches ("$0").\n"; else print "\nVerification failed: the fingerprint ("$0") does not match the expected one.\n"}' &&
   echo "deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.asc] https://packages.mozilla.org/apt mozilla main" | sudo tee -a /etc/apt/sources.list.d/mozilla.list > /dev/null &&
-
   echo '
 Package: *
 Pin: origin packages.mozilla.org
 Pin-Priority: 1000
 ' | sudo tee /etc/apt/preferences.d/mozilla &&
-
   sudo apt update; sudo apt install firefox -y
 }
 
