@@ -293,7 +293,7 @@ END {
   (sudo crontab -l 2>/dev/null; echo "#00 23 * * * bash /srv/containers/scripts/autolog-dominio") | sudo crontab -
   # ------------------------------------------------------------------------------------------------------------------------------
   # RansomExt
-https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/ransomext
+  sudo wget https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/ransomext -O /srv/scripts/ransomext; sudo chmod +x /srv/scripts/ransomext
   (sudo crontab -l 2>/dev/null; echo "# RansomExt") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "#00 8,12,15,18 * * * bash /srv/containers/scripts/ransomext") | sudo crontab -
   # ------------------------------------------------------------------------------------------------------------------------------
