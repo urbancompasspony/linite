@@ -172,114 +172,8 @@ function update0 {
   sudo usermod -aG docker administrador
 }
 
-function netplan0 {
-    sleep 1; clear; echo "Ajustando Netplan"
-    echo -e "
-# This is the network config written by 'linite model-1' script
-network:
-  ethernets:
-#    renderer: NetworkManager
-    eno1:
-      dhcp4: true
-      nameservers:
-        addresses: [1.1.1.1, 8.8.8.8]
-    enp1s0:
-      dhcp4: true
-      nameservers:
-        addresses: [1.1.1.1, 8.8.8.8]
-    enp2s0:
-      dhcp4: true
-      nameservers:
-        addresses: [1.1.1.1, 8.8.8.8]
-    enp4s0:
-      dhcp4: false
-      addresses: [172.25.0.3/24]
-      routes:
-      - to: default
-        via: 192.168.0.1
-      nameservers:
-        addresses: [1.1.1.1, 8.8.8.8]
-  version: 2" | sudo tee /etc/netplan/00-installer-config.yaml
-
-    sudo netplan apply
-}
-
-function netplan1 {
-    echo -e "
-#
-#network:
-#    ethernets:
-#        renderer: NetworkManager
-#        enp4s0:
-#            addresses: [192.168.250.10/24]
-#            routes:
-#            - to: default
-#              via: 192.168.120.254
-#            dhcp4: no
-##           optional: true
-#            nameservers:
-#              addresses: [192.168.250.1]
-#              #addresses: [200.225.197.34, 200.225.197.37] 
-#              #addresses: [200.175.89.139, 200.175.5.139]
-#              #addresses: [8.8.4.4, 8.8.8.8]
-#              #addresses: [1.1.1.1, 1.0.0.1]
-#    version: 2" | sudo tee -a /etc/netplan/00-installer-config.yaml
-
-echo -e "
-#
-#network:
-#  ethernets:
-#    eth0:
-#      dhcp4: true
-#      optional: true
-
-#    eth1: # THIS!
-#      dhcp4: no
-#      optional: true
-#      addresses: [172.16.1.2/24]
-#  version: 2" | sudo tee -a /etc/netplan/00-installer-config.yaml
-}
-
-function pfsense0 {
-  sleep 1; clear; echo "Adicionando pfSense como VM"
-    
-  if ping -c 1 $serverip >/dev/null; then
-    webadress="$lanhost"
-  else
-    webadress="$wanhost"
-  fi
-
-  # Aqui verifica se a .img ja existe ou se pode baixar uma nova.
-  if ! [ -f "$destpath"/"$1" ]; then
-    clear; sudo wget --user $usern4me --password $passw0rd $webadress/"$1" -O $destpath/"$1" &&
-    sudo chmod 777 /var/run/libvirt/libvirt-sock
-    sleep 2
-    sudo touch /tmp/allowvirt0
-  fi
-}
-
-function pfsense1 {
-  if [ -f "/tmp/allowvirt0" ]; then
-    sudo virt-install --import \
---name pfSense \
---boot hd,cdrom,menu=on \
---memory 2048 \
---vcpus 2 \
---cpu host \
---network type=direct,source=enp1s0,source_mode=bridge,mac=52:54:00:55:ea:01 \
---network type=direct,source=enp2s0,source_mode=bridge,mac=52:54:00:55:ea:02 \
---network type=direct,source=eno1,source_mode=bridge,mac=52:54:00:55:ea:03 \
---disk /var/lib/libvirt/images/"$1" \
---os-variant=freebsd14.2 \
---graphics vnc \
---import \
---autostart 1>/dev/null 2>/dev/null &
-    sleep 1; clear
-    sudo rm /tmp/allowvirt0
-  fi
-}
-
 function sysctl0 {
+  # A partir do 24.04:
   sleep 1; clear; echo "Aplicando recursos extras ao SYSCTL"
   echo -e "kernel.sysrq=1" | sudo tee /etc/sysctl.d/10-magic-sysrq.conf
   echo -e "vm.swappiness=10
@@ -324,16 +218,27 @@ tmpfs /var/tmp tmpfs defaults 0 0
 # //172.25.0.X/folder /mnt/folder cifs credentials=/home/administrador/.smb,iocharset=utf8,file_mode=0777,dir_mode=0777,noperm,user,vers=2.1,nofail,x-systemd.automount,x-systemd.requires=network-online.target,x-systemd.device-timeout=3 0 0" | sudo tee -a /etc/fstab
 }
 
+function smbconf0 {
+  clear; echo "Adicionando modelo SAMBA AD"
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/SAMBA_Model/smbAD.conf | sudo tee /srv/scripts/config/SMB-AD-Model.conf
+}
+
+function firefox0 {
+  sudo apt purge epiphany-browser -y
+  sudo install -d -m 0755 /etc/apt/keyrings &&
+  wget -q https://packages.mozilla.org/apt/repo-signing-key.gpg -O- | sudo tee /etc/apt/keyrings/packages.mozilla.org.asc > /dev/null &&
+  gpg -n -q --import --import-options import-show /etc/apt/keyrings/packages.mozilla.org.asc | awk '/pub/{getline; gsub(/^ +| +$/,""); if($0 == "35BAA0B33E9EB396F59CA838C0BA5CE6DC6315A3") print "\nThe key fingerprint matches ("$0").\n"; else print "\nVerification failed: the fingerprint ("$0") does not match the expected one.\n"}' &&
+  echo "deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.asc] https://packages.mozilla.org/apt mozilla main" | sudo tee -a /etc/apt/sources.list.d/mozilla.list > /dev/null &&
+  echo '
+Package: *
+Pin: origin packages.mozilla.org
+Pin-Priority: 1000
+' | sudo tee /etc/apt/preferences.d/mozilla &&
+  sudo apt update; sudo apt install firefox -y
+}
+
 function adjusting0 {
   sudo mkdir -p /srv/scripts/config
-# ------------------------------------------------------------------------------------------------------------------------------
-  wget "https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/01-Backup"
-  cat 01-Backup | sudo tee /srv/scripts/backupcont; sudo chmod +x /srv/scripts/backupcont
-  sudo rm -r 01-Backup
-# ------------------------------------------------------------------------------------------------------------------------------
-  wget "https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/rsnapshot.conf"
-  cat rsnapshot.conf | sudo tee /srv/scripts/rsnapshot; sudo chmod +x /srv/scripts/rsnapshot
-  sudo rm -r rsnapshot.conf
 # ------------------------------------------------------------------------------------------------------------------------------
   IPMachine=$(ip route get 1.1.1.1 | grep -oP 'src \K\S+')
   sudo yq -i ".Informacoes.IP_LAN_Install = \"${IPMachine}\"" "$yamlbase"
@@ -373,8 +278,33 @@ END {
 # ------------------------------------------------------------------------------------------------------------------------------
   # Criando backup para os .yaml!
   (sudo crontab -l 2>/dev/null; echo "# Backup Essencial!") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "* 12 * * 2 cp /srv/system.yaml /srv/.system.yaml") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "* 12 * * 2 cp /srv/containers.yaml /srv/.containers.yaml") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "0 12 * * 2 cp /srv/system.yaml /srv/.system.yaml") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "0 12 * * 2 cp /srv/containers.yaml /srv/.containers.yaml") | sudo crontab -
+# ------------------------------------------------------------------------------------------------------------------------------
+  # Auto BackupCont
+  wget "https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/01-Backup"
+  cat 01-Backup | sudo tee /srv/scripts/backupcont; sudo chmod +x /srv/scripts/backupcont; sudo rm -r 01-Backup
+  (sudo crontab -l 2>/dev/null; echo "# AutoBackup Containers") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "#00 02 * * * bash /srv/containers/scripts/backupcont") | sudo crontab -
+  # ------------------------------------------------------------------------------------------------------------------------------
+  # AutoLog Domain or Samba
+
+  (sudo crontab -l 2>/dev/null; echo "# AutoLog") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "#00 23 * * * bash /srv/containers/scripts/autolog-dominio") | sudo crontab -
+  # ------------------------------------------------------------------------------------------------------------------------------
+  # RansomExt
+https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/ransomext
+  (sudo crontab -l 2>/dev/null; echo "# RansomExt") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "#00 8,12,15,18 * * * bash /srv/containers/scripts/ransomext") | sudo crontab -
+  # ------------------------------------------------------------------------------------------------------------------------------
+  # RSnapshots
+  sudo wget "https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/rsnapshot.conf" -O /srv/scripts/rsnapshot; sudo chmod +x /srv/scripts/rsnapshot
+  (sudo crontab -l 2>/dev/null; echo "# Alpha - A cada X minutos das 8:00 as 18:00! 12x") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "#00 12,18 * * * /usr/bin/rsnapshot -c /srv/containers/scripts/rsnapshot-particular.conf alpha") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "# Beta - A partir das 20:00, todos os dias exceto fim de semana - 5x na Semana. 5x") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "#30 19 * * 1-5 /usr/bin/rsnapshot -c /srv/containers/scripts/rsnapshot-particular.conf beta") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "# Gamma - 1x na Semana 4x") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "#00 21 * * 6 /usr/bin/rsnapshot -c /srv/containers/scripts/rsnapshot-particular.conf gamma") | sudo crontab -  
 }
 
 function the_end0 {
@@ -384,66 +314,144 @@ function the_end0 {
   sudo reboot
 }
 
-function smbconf0 {
-  clear; echo "Adicionando modelo SAMBA AD"
-  curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/SAMBA_Model/smbAD.conf | sudo tee /srv/scripts/config/SMB-AD-Model.conf
+function netplan0 {
+    sleep 1; clear; echo "Ajustando Netplan"
+    echo -e "
+# This is the network config written by 'linite model-1' script
+network:
+  ethernets:
+#    renderer: NetworkManager
+    eno1:
+      dhcp4: true
+      nameservers:
+        addresses: [1.1.1.1, 8.8.8.8]
+    enp1s0:
+      dhcp4: true
+      nameservers:
+        addresses: [1.1.1.1, 8.8.8.8]
+    enp2s0:
+      dhcp4: true
+      nameservers:
+        addresses: [1.1.1.1, 8.8.8.8]
+    enp4s0:
+      dhcp4: false
+      addresses: [172.25.0.3/24]
+      routes:
+      - to: default
+        via: 192.168.0.1
+      nameservers:
+        addresses: [1.1.1.1, 8.8.8.8]
+  version: 2" | sudo tee /etc/netplan/00-installer-config.yaml
+  sudo netplan apply
 }
 
-function firefox0 {
-  sudo apt purge epiphany-browser -y
-  sudo install -d -m 0755 /etc/apt/keyrings &&
-  wget -q https://packages.mozilla.org/apt/repo-signing-key.gpg -O- | sudo tee /etc/apt/keyrings/packages.mozilla.org.asc > /dev/null &&
-  gpg -n -q --import --import-options import-show /etc/apt/keyrings/packages.mozilla.org.asc | awk '/pub/{getline; gsub(/^ +| +$/,""); if($0 == "35BAA0B33E9EB396F59CA838C0BA5CE6DC6315A3") print "\nThe key fingerprint matches ("$0").\n"; else print "\nVerification failed: the fingerprint ("$0") does not match the expected one.\n"}' &&
-  echo "deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.asc] https://packages.mozilla.org/apt mozilla main" | sudo tee -a /etc/apt/sources.list.d/mozilla.list > /dev/null &&
-  echo '
-Package: *
-Pin: origin packages.mozilla.org
-Pin-Priority: 1000
-' | sudo tee /etc/apt/preferences.d/mozilla &&
-  sudo apt update; sudo apt install firefox -y
+function netplan1 {
+    echo -e "
+#
+#network:
+#    ethernets:
+#        renderer: NetworkManager
+#        enp4s0:
+#            addresses: [192.168.250.10/24]
+#            routes:
+#            - to: default
+#              via: 192.168.120.254
+#            dhcp4: no
+##           optional: true
+#            nameservers:
+#              addresses: [192.168.250.1]
+#              #addresses: [200.225.197.34, 200.225.197.37] 
+#              #addresses: [200.175.89.139, 200.175.5.139]
+#              #addresses: [8.8.4.4, 8.8.8.8]
+#              #addresses: [1.1.1.1, 1.0.0.1]
+#    version: 2" | sudo tee -a /etc/netplan/00-installer-config.yaml
+
+echo -e "
+#
+#network:
+#  ethernets:
+#    eth0:
+#      dhcp4: true
+#      optional: true
+
+#    eth1: # THIS!
+#      dhcp4: no
+#      optional: true
+#      addresses: [172.16.1.2/24]
+#  version: 2" | sudo tee -a /etc/netplan/00-installer-config.yaml
+  sudo netplan apply
+}
+
+function pfsense0 {
+  sleep 1; clear; echo "Adicionando pfSense como VM"
+  if ping -c 1 $serverip >/dev/null; then
+    webadress="$lanhost"
+  else
+    webadress="$wanhost"
+  fi
+  # Aqui verifica se a .img ja existe ou se pode baixar uma nova.
+  if ! [ -f "$destpath"/"$1" ]; then
+    clear; sudo wget --user $usern4me --password $passw0rd $webadress/"$1" -O $destpath/"$1" &&
+    sudo chmod 777 /var/run/libvirt/libvirt-sock
+    sleep 2
+    sudo touch /tmp/allowvirt0
+  fi
+}
+
+function pfsense1 {
+  if [ -f "/tmp/allowvirt0" ]; then
+    sudo virt-install --import \
+--name pfSense \
+--boot hd,cdrom,menu=on \
+--memory 2048 \
+--vcpus 2 \
+--cpu host \
+--network type=direct,source=enp1s0,source_mode=bridge,mac=52:54:00:55:ea:01 \
+--network type=direct,source=enp2s0,source_mode=bridge,mac=52:54:00:55:ea:02 \
+--network type=direct,source=eno1,source_mode=bridge,mac=52:54:00:55:ea:03 \
+--disk /var/lib/libvirt/images/"$1" \
+--os-variant=freebsd14.2 \
+--graphics vnc \
+--import \
+--autostart 1>/dev/null 2>/dev/null &
+    sleep 1; clear
+    sudo rm /tmp/allowvirt0
+  fi
 }
 
 # ======================================================================================================================================================== #
 
-function linite0 {
+function common_place {
   welcome0
   bashconf0
   mkswap0
   timezone0
   useless0
   update0
-  pfsense0 "pfsense2.8"
   sysctl0
   motd0
   journal0
   fstab0
-  netplan1
   smbconf0
   firefox0
   adjusting0
-  the_end0
+}
+
+function linite0 {
+  common_place
+  netplan1
+  pfsense0 "pfsense2.8"
 }
 
 function appliance0 {
-  welcome0
-  bashconf0
-  timezone0
-  useless0
-  update0
+  common_place
+  netplan0
   pfsense0 "pfsense-modelo.img"
   pfsense1 "pfsense-modelo.img"
-  sysctl0
-  motd0
-  journal0
-  fstab0
-  smbconf0
-  firefox0
-  netplan0
-  adjusting0
-  the_end0
 }
 
 root_check0
 hardsys0
+the_end0
 
 exit 1
