@@ -62,12 +62,13 @@ function hardsys0 {
 
 function welcome0 {
   clear; echo ""; echo "Preparo de Servidor $MENU_VERSION by SuitIT®"; echo ""
-  if [ -f "$yamlbase" ];then
+  if [ -f "$yamlbase" ]; then
     clear; echo ""; echo "Este servidor ja foi configurado e está no Modelo CdN."; sleep 1
     echo ""; echo "Caso precise reinstala-lo ou restaura-lo utilize o Painel CdN!"; sleep 1
     exit
   else
     echo "Insira a senha padrao. Senha padrao: ubuntu"; echo ""
+    sudo touch "$yamlbase"
   fi
   echo ""; echo "5"; sleep 1; echo "4"; sleep 1; echo "3"; sleep 1; echo "2"; sleep 1; echo "1"; sleep 1
 }
@@ -267,28 +268,23 @@ END {
     sudo yq -i ".Informacoes.Serial_Windows = \"Inexistente\"" "$yamlbase"
   fi
 # ------------------------------------------------------------------------------------------------------------------------------
-  datetime0=$(date +"%d/%m/%Y - %H:%M")
-  sudo yq -i ".Informacoes.Data_Instalacao = \"${datetime0}\"" "$yamlbase"
-  sudo yq -i ".Informacoes.Data_Ultima_Reinstalacao = \"Nunca foi reinstalado\"" "$yamlbase"
-# ------------------------------------------------------------------------------------------------------------------------------
   wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh -O /home/administrador/.beep.sh; chmod +x /home/administrador/.beep.sh
   (sudo crontab -l 2>/dev/null; echo "# BEEP!") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "@reboot sleep 60; bash /home/administrador/.beep.sh") | sudo crontab -
   sudo yq -i ".Informacoes.Beep = \"Ativo\"" "$yamlbase"
 # ------------------------------------------------------------------------------------------------------------------------------
-  # Criando backup para os .yaml!
+  # Criando um backup para os .yaml!
   (sudo crontab -l 2>/dev/null; echo "# Backup Essencial!") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "0 12 * * 2 cp /srv/system.yaml /srv/.system.yaml") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "0 12 * * 2 cp /srv/containers.yaml /srv/.containers.yaml") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "0 0 * * * cp /srv/system.yaml /srv/.system.yaml") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "0 0 * * * cp /srv/containers.yaml /srv/.containers.yaml") | sudo crontab -
 # ------------------------------------------------------------------------------------------------------------------------------
   # Auto BackupCont
-  wget "https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/01-Backup"
-  cat 01-Backup | sudo tee /srv/scripts/backupcont; sudo chmod +x /srv/scripts/backupcont; sudo rm -r 01-Backup
+  sudo wget "https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/01-Backup" -O /srv/scripts/backupcont; sudo chmod +x /srv/scripts/backupcont
   (sudo crontab -l 2>/dev/null; echo "# AutoBackup Containers") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "#00 02 * * * bash /srv/containers/scripts/backupcont") | sudo crontab -
   # ------------------------------------------------------------------------------------------------------------------------------
-  # AutoLog Domain or Samba
-
+  # AutoLog Rotate for Domain
+  sudo wget https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Backup/backup-syslog -O /srv/scripts/autolog-dominio; sudo chmod +x /srv/scripts/autolog-dominio
   (sudo crontab -l 2>/dev/null; echo "# AutoLog") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "#00 23 * * * bash /srv/containers/scripts/autolog-dominio") | sudo crontab -
   # ------------------------------------------------------------------------------------------------------------------------------
@@ -309,8 +305,10 @@ END {
 
 function the_end0 {
   clear; echo "Instalação concluida!"
-  sudo touch "$yamlbase"
-  echo "Reiniciando sistema em 3 segundos"; sleep 1
+  datetime0=$(date +"%d/%m/%Y - %H:%M")
+  sudo yq -i ".Informacoes.Data_Instalacao = \"${datetime0}\"" "$yamlbase"
+  sudo yq -i ".Informacoes.Data_Ultima_Reinstalacao = \"Nunca foi reinstalado\"" "$yamlbase"
+  echo "Reiniciando sistema em 3 segundos"; sleep 3
   sudo reboot
 }
 
