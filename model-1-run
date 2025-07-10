@@ -64,7 +64,7 @@ function welcome0 {
   clear; echo ""; echo "Preparo de Servidor $MENU_VERSION by SuitIT®"; echo ""
   if [ -f "$yamlbase" ];then
     clear; echo ""; echo "Este servidor ja foi configurado e está no Modelo CdN."; sleep 1
-    echo ""; echo "Caso precise reinstala-lo ou restaura-lo utilize o Painel CdN!"; sleep 3
+    echo ""; echo "Caso precise reinstala-lo ou restaura-lo utilize o Painel CdN!"; sleep 1
     exit
   else
     echo "Insira a senha padrao. Senha padrao: ubuntu"; echo ""
@@ -79,14 +79,52 @@ function bashconf0 {
 }
 
 function mkswap0 {
-  if [ -f /swap.img ] || [ -f /swapfile ]; then
-    clear; echo "Swap encontrado, ignorando..."
+  local swap_file=""
+  local swap_size=0
+  
+  # Verifica qual arquivo de swap existe
+  if [ -f /swap.img ]; then
+    swap_file="/swap.img"
+  elif [ -f /swapfile ]; then
+    swap_file="/swapfile"
+  fi
+  
+  # Se encontrou um arquivo de swap, verifica o tamanho
+  if [ -n "$swap_file" ]; then
+    # Obtém o tamanho do arquivo em bytes
+    swap_size=$(stat -c%s "$swap_file" 2>/dev/null || echo 0)
+    # Converte para GB (1GB = 1000000000 bytes)
+    swap_size_gb=$((swap_size / 1000000000))
+    
+    if [ $swap_size_gb -lt 1 ]; then
+      clear; echo "Swap encontrado mas com menos de 1GB ($swap_size_gb GB), recriando..."
+      
+      # Desativa o swap atual se estiver ativo
+      sudo swapoff "$swap_file" 2>/dev/null || true
+           
+      # Remove o arquivo antigo
+      sudo rm -f "$swap_file"
+      
+      # Cria novo swap
+      sudo dd if=/dev/zero of=/swapfile bs=1k count=1000000
+      sudo chmod 0600 /swapfile
+      sudo mkswap /swapfile
+      sudo swapon /swapfile
+      #echo "/swapfile none swap sw 0 0" | sudo tee -a /etc/fstab
+      
+      clear; echo "Swap recriado com 1GB!"
+    else
+      clear; echo "Swap encontrado com tamanho adequado (${swap_size_gb}GB), ignorando..."
+    fi
   else
-    clear; echo "Swap não encontrado, criando..."
+    clear; echo "Swap não encontrado, criando um novo..."
     sudo dd if=/dev/zero of=/swapfile bs=1k count=1000000
     sudo chmod 0600 /swapfile
-    sudo mkswap /swapfile; sudo swapon /swapfile
+    sudo mkswap /swapfile
+    sudo swapon /swapfile
     echo "/swapfile none swap sw 0 0" | sudo tee -a /etc/fstab
+    
+    clear; echo "Swap criado com 1GB!"
   fi
 }
 
@@ -135,7 +173,7 @@ function update0 {
 }
 
 function netplan0 {
-    sleep 3; clear; echo "Ajustando Netplan"
+    sleep 1; clear; echo "Ajustando Netplan"
     echo -e "
 # This is the network config written by 'linite model-1' script
 network:
@@ -203,7 +241,7 @@ echo -e "
 }
 
 function pfsense0 {
-  sleep 3; clear; echo "Adicionando pfSense como VM"
+  sleep 1; clear; echo "Adicionando pfSense como VM"
     
   if ping -c 1 $serverip >/dev/null; then
     webadress="$lanhost"
@@ -236,13 +274,13 @@ function pfsense1 {
 --graphics vnc \
 --import \
 --autostart 1>/dev/null 2>/dev/null &
-    sleep 3; clear
+    sleep 1; clear
     sudo rm /tmp/allowvirt0
   fi
 }
 
 function sysctl0 {
-  sleep 3; clear; echo "Aplicando recursos extras ao SYSCTL"
+  sleep 1; clear; echo "Aplicando recursos extras ao SYSCTL"
   echo -e "kernel.sysrq=1" | sudo tee /etc/sysctl.d/10-magic-sysrq.conf
   echo -e "vm.swappiness=10
 vm.panic_on_oom=1
@@ -253,7 +291,7 @@ kernel.panic=5
 }
 
 function motd0 {
-  sleep 3; clear; echo "Ajustando tela de boas vindas do servidor"
+  sleep 1; clear; echo "Ajustando tela de boas vindas do servidor"
   sudo rm -R /etc/update-motd.d/*
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/00-header | sudo tee /etc/update-motd.d/00-header
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/20-sysinfo | sudo tee /etc/update-motd.d/20-sysinfo
@@ -262,7 +300,7 @@ function motd0 {
 }
 
 function journal0 {
-  sleep 3; clear; echo "Ajustando JOURNAL"
+  sleep 1; clear; echo "Ajustando JOURNAL"
   echo -e "
 Storage=persistent
 SystemMaxUse=5G
@@ -270,7 +308,7 @@ SystemKeepFree=10G" | sudo tee -a /etc/systemd/journald.conf
 }
 
 function fstab0 {
-  sudo mkdir /mnt/disk01; sudo mkdir /mnt/disk02; sleep 3; clear; echo "Adicionando entradas extras ao fstab"
+  sudo mkdir /mnt/disk01; sudo mkdir /mnt/disk02; sleep 1; clear; echo "Adicionando entradas extras ao fstab"
   echo -e "
 # Temp to ram!
 tmpfs /tmp tmpfs defaults 0 0
@@ -342,7 +380,7 @@ END {
 function the_end0 {
   clear; echo "Instalação concluida!"
   sudo touch "$yamlbase"
-  echo "Reiniciando sistema em 3 segundos"; sleep 3
+  echo "Reiniciando sistema em 3 segundos"; sleep 1
   sudo reboot
 }
 
