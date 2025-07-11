@@ -209,19 +209,14 @@ function fstab0 {
 tmpfs /tmp tmpfs defaults 0 0
 tmpfs /var/tmp tmpfs defaults 0 0
 
-# Disk01 - Main Disk
+# Disk01 Principal
 # /dev/disk/by-uuid/ /mnt/disk01 ext4 defaults 0 0
 
-# Disk02 - Backup
+# Disk02 Backup
 # /dev/disk/by-uuid/ /mnt/disk02 ext4 defaults 0 0
 
-# Acesso Externo
-# //172.25.0.X/folder /mnt/folder cifs credentials=/home/administrador/.smb,iocharset=utf8,file_mode=0777,dir_mode=0777,noperm,user,vers=2.1,nofail,x-systemd.automount,x-systemd.requires=network-online.target,x-systemd.device-timeout=3 0 0" | sudo tee -a /etc/fstab
-}
-
-function smbconf0 {
-  clear; echo "Adicionando modelo SAMBA AD"
-  curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/main/SAMBA_Model/smbAD.conf | sudo tee /srv/scripts/config/SMB-AD-Model.conf
+# Acesso Externo (Se necessario)
+# //172.25.0.X/pasta_rede /mnt/pasta_local cifs credentials=/home/administrador/.smb,iocharset=utf8,file_mode=0777,dir_mode=0777,noperm,user,vers=2.1,nofail,x-systemd.automount,x-systemd.requires=network-online.target,x-systemd.device-timeout=3 0 0" | sudo tee -a /etc/fstab
 }
 
 function firefox0 {
@@ -438,7 +433,6 @@ function common_place {
   motd0
   journal0
   fstab0
-  smbconf0
   firefox0
   adjusting0
 }
