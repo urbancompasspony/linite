@@ -290,11 +290,11 @@ END {
   # ------------------------------------------------------------------------------------------------------------------------------
   # RSnapshots
   sudo wget "https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/rsnapshot.conf" -O /srv/scripts/rsnapshot.conf; sudo chmod +x /srv/scripts/rsnapshot.conf
-  (sudo crontab -l 2>/dev/null; echo "# Alpha - Exeucta as 7h, 10h, 12h, 14h e 16h! 6x por dia") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "# Alpha - Executa as 7h, 10h, 12h, 14h, 16h e 18h! 6x por dia") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "#00 7,10,12,14,16,18 * * * /usr/bin/rsnapshot -c /srv/containers/scripts/rsnapshot.conf alpha") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "# Beta - A partir das 20:00, todos os dias exceto fim de semana - 5x na Semana. 5x") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "# Beta - A partir das 20:00 5x na Semana cobrindo sabados mas nao domingos") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "#00 20 * * 1-5 /usr/bin/rsnapshot -c /srv/containers/scripts/rsnapshot.conf beta") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "# Gamma - 1x na Semana 4x") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "# Gamma - 1x na Semana aos domingos, perdurando 4x, aprox. 1 mes") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "#00 6 * * 0 /usr/bin/rsnapshot -c /srv/containers/scripts/rsnapshot.conf gamma") | sudo crontab -
   # ------------------------------------------------------------------------------------------------------------------------------
   # AutoDelete Trash for SMB!
