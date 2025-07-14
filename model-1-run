@@ -274,33 +274,33 @@ END {
   (sudo crontab -l 2>/dev/null; echo "0 0 * * * cp /srv/containers.yaml /srv/.containers.yaml") | sudo crontab -
 # ------------------------------------------------------------------------------------------------------------------------------
   # Auto BackupCont
-  sudo wget "https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/01-Backup" -O /srv/scripts/backupcont; sudo chmod +x /srv/scripts/backupcont
+  sudo wget "https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/01-Backup" -O /srv/scripts/backupcont.sh; sudo chmod +x /srv/scripts/backupcont.sh
   (sudo crontab -l 2>/dev/null; echo "# AutoBackup Containers") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "#00 02 * * * bash /srv/containers/scripts/backupcont") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "#00 02 * * * bash /srv/containers/scripts/backupcont.sh") | sudo crontab -
   # ------------------------------------------------------------------------------------------------------------------------------
   # AutoLog Rotate for Domain
-  sudo wget https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Backup/backup-syslog -O /srv/scripts/autolog-dominio; sudo chmod +x /srv/scripts/autolog-dominio
+  sudo wget https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Backup/backup-syslog -O /srv/scripts/autolog-dominio.sh; sudo chmod +x /srv/scripts/autolog-dominio.sh
   (sudo crontab -l 2>/dev/null; echo "# AutoLog") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "#00 23 * * * bash /srv/containers/scripts/autolog-dominio") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "#00 23 * * * bash /srv/containers/scripts/autolog-dominio.sh") | sudo crontab -
   # ------------------------------------------------------------------------------------------------------------------------------
   # RansomExt
-  sudo wget https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/ransomext -O /srv/scripts/ransomext; sudo chmod +x /srv/scripts/ransomext
+  sudo wget https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/ransomext -O /srv/scripts/ransomext.sh; sudo chmod +x /srv/scripts/ransomext.sh
   (sudo crontab -l 2>/dev/null; echo "# RansomExt") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "#00 8,12,15,18 * * * bash /srv/containers/scripts/ransomext") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "#00 8,12,15,18 * * * bash /srv/containers/scripts/ransomext.sh") | sudo crontab -
   # ------------------------------------------------------------------------------------------------------------------------------
   # RSnapshots
-  sudo wget "https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/rsnapshot.conf" -O /srv/scripts/rsnapshot; sudo chmod +x /srv/scripts/rsnapshot
-  (sudo crontab -l 2>/dev/null; echo "# Alpha - A cada X minutos das 8:00 as 18:00! 12x") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "#00 12,18 * * * /usr/bin/rsnapshot -c /srv/containers/scripts/rsnapshot-particular.conf alpha") | sudo crontab -
+  sudo wget "https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/rsnapshot.conf" -O /srv/scripts/rsnapshot.conf; sudo chmod +x /srv/scripts/rsnapshot.conf
+  (sudo crontab -l 2>/dev/null; echo "# Alpha - Exeucta as 7h, 10h, 12h, 14h e 16h! 6x por dia") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "#00 7,10,12,14,16,18 * * * /usr/bin/rsnapshot -c /srv/containers/scripts/rsnapshot.conf alpha") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "# Beta - A partir das 20:00, todos os dias exceto fim de semana - 5x na Semana. 5x") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "#30 19 * * 1-5 /usr/bin/rsnapshot -c /srv/containers/scripts/rsnapshot-particular.conf beta") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "#00 20 * * 1-5 /usr/bin/rsnapshot -c /srv/containers/scripts/rsnapshot.conf beta") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "# Gamma - 1x na Semana 4x") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "#00 21 * * 6 /usr/bin/rsnapshot -c /srv/containers/scripts/rsnapshot-particular.conf gamma") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "#00 6 * * 0 /usr/bin/rsnapshot -c /srv/containers/scripts/rsnapshot.conf gamma") | sudo crontab -
   # ------------------------------------------------------------------------------------------------------------------------------
   # AutoDelete Trash for SMB!
-  sudo wget https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Backup/02-Models_AutoDelete -O /srv/scripts/deleterecycle; sudo chmod +x /srv/scripts/deleterecycle
+  sudo wget https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Backup/02-Models_AutoDelete -O /srv/scripts/deleterecycle.sh; sudo chmod +x /srv/scripts/deleterecycle.sh
   (sudo crontab -l 2>/dev/null; echo "# Delete Trash") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "#0 18 14,28 * * bash /srv/containers/scripts/deleterecycle") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "#0 18 14,28 * * bash /srv/containers/scripts/deleterecycle.sh") | sudo crontab -
   # ------------------------------------------------------------------------------------------------------------------------------
   # Support Pannel!
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/Diagnostics/install.sh | sudo bash
