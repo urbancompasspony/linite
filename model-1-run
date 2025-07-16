@@ -307,7 +307,7 @@ END {
   sudo wget https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Backup/02-Models_AutoDelete -O /srv/scripts/deleterecycle.sh; sudo chmod +x /srv/scripts/deleterecycle.sh
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "# Delete Trash") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "#0 18 14,28 * * bash /srv/scripts/deleterecycle.sh") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "#0 6 * * * bash /srv/scripts/deleterecycle.sh") | sudo crontab -
   # ------------------------------------------------------------------------------------------------------------------------------
   # Support Pannel!
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/Diagnostics/install.sh | sudo bash
