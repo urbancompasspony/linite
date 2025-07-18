@@ -209,10 +209,10 @@ function fstab0 {
 tmpfs /tmp tmpfs defaults 0 0
 tmpfs /var/tmp tmpfs defaults 0 0
 
-# Disk01 Principal
+# Disk01
 # /dev/disk/by-uuid/ /mnt/disk01 ext4 defaults 0 0
 
-# Disk02 Backup
+# Disk02
 # /dev/disk/by-uuid/ /mnt/disk02 ext4 defaults 0 0
 
 # Acesso Externo (Se necessario)
@@ -234,6 +234,7 @@ Pin-Priority: 1000
 }
 
 function adjusting0 {
+# ----------------------------------------------------------------------------------------------------------------------------------------------------
   sudo mkdir -p /srv/scripts/config
 # ------------------------------------------------------------------------------------------------------------------------------
   IPMachine=$(ip route get 1.1.1.1 | grep -oP 'src \K\S+')
@@ -255,44 +256,44 @@ END {
   print "  Placa: \"" mobo "\""
 }
 ' | sudo tee -a "$yamlbase"
-# ------------------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------------------------------------
   if [ -f /sys/firmware/acpi/tables/MSDM ]; then
     serial0=$(sudo hexdump -s 56 -e '"Serial key: " /29 "%s\n"' /sys/firmware/acpi/tables/MSDM)
     sudo yq -i ".Informacoes.Serial_Windows = \"${serial0}\"" "$yamlbase"
   else
     sudo yq -i ".Informacoes.Serial_Windows = \"Inexistente\"" "$yamlbase"
   fi
-# ------------------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------------------------------------
   wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh -O /home/administrador/.beep.sh; chmod +x /home/administrador/.beep.sh
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "# BEEP!") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "@reboot sleep 60; bash /home/administrador/.beep.sh") | sudo crontab -
   sudo yq -i ".Informacoes.Beep = \"Ativo\"" "$yamlbase"
-# ------------------------------------------------------------------------------------------------------------------------------
-  # Criando um backup para os .yaml!
+# ----------------------------------------------------------------------------------------------------------------------------------------------------
+  # Backups CDN
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "# Backup Essencial!") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "0 0 * * * cp /srv/system.yaml /srv/.system.yaml") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "0 0 * * * cp /srv/containers.yaml /srv/.containers.yaml") | sudo crontab -
-# ------------------------------------------------------------------------------------------------------------------------------
+  (sudo crontab -l 2>/dev/null; echo "# Backups CDN") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "00 02 * * * cp /srv/system.yaml /srv/.system.yaml") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "00 02 * * * cp /srv/containers.yaml /srv/.containers.yaml") | sudo crontab -
+# ----------------------------------------------------------------------------------------------------------------------------------------------------
   # Auto BackupCont
   sudo wget "https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/01-Backup" -O /srv/scripts/backupcont.sh; sudo chmod +x /srv/scripts/backupcont.sh
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "# AutoBackup Containers") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "#00 02 * * * /srv/scripts/backupcont.sh") | sudo crontab -
-  # ------------------------------------------------------------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # AutoLog Rotate for Domain
   sudo wget https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Backup/backup-syslog -O /srv/scripts/autolog-dominio.sh; sudo chmod +x /srv/scripts/autolog-dominio.sh
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "# AutoLog") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "#00 23 * * * /srv/scripts/autolog-dominio.sh") | sudo crontab -
-  # ------------------------------------------------------------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # RansomExt
   sudo wget https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/ransomext -O /srv/scripts/ransomext.sh; sudo chmod +x /srv/scripts/ransomext.sh
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "# RansomExt") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "#00 8,12,15,18 * * * /srv/scripts/ransomext.sh") | sudo crontab -
-  # ------------------------------------------------------------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # RSnapshots
   sudo wget "https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/rsnapshot.conf" -O /srv/scripts/rsnapshot.conf; sudo chmod +x /srv/scripts/rsnapshot.conf
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
@@ -302,21 +303,22 @@ END {
   (sudo crontab -l 2>/dev/null; echo "#00 20 * * 1-5 /usr/bin/rsnapshot -c /srv/scripts/rsnapshot.conf beta") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "# Gamma - 1x na Semana aos domingos, perdurando 4x, aprox. 1 mes") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "#00 6 * * 0 /usr/bin/rsnapshot -c /srv/scripts/rsnapshot.conf gamma") | sudo crontab -
-  # ------------------------------------------------------------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # AutoDelete Trash for SMB!
   sudo wget https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Backup/02-Models_AutoDelete -O /srv/scripts/deleterecycle.sh; sudo chmod +x /srv/scripts/deleterecycle.sh
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "# Delete Trash") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "#0 6 * * * /srv/scripts/deleterecycle.sh") | sudo crontab -
-  # ------------------------------------------------------------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # Safe RSYNC!
   sudo wget https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Backup/03-safe-rsync -O /srv/scripts/safersync.sh; sudo chmod +x /srv/scripts/safersync.sh
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "# Safe Rsync") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo '#0 2 * * * mountpoint -q /mnt/origem && mountpoint -q /mnt/destino && rsync --delete -aHAXv --numeric-ids --sparse /origem /destino') | sudo crontab -
-  # ------------------------------------------------------------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # Support Pannel!
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/Diagnostics/install.sh | sudo bash
+  # ----------------------------------------------------------------------------------------------------------------------------------------------------
 }
 
 function the_end0 {
