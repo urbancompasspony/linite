@@ -315,6 +315,11 @@ END {
   (sudo crontab -l 2>/dev/null; echo "# Safe Rsync") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo '#0 2 * * * mountpoint -q /mnt/disk01 && mountpoint -q /mnt/disk02 && rsync --delete -aHAXv --numeric-ids --sparse /origem /destino') | sudo crontab -
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
+  # RClone Example
+  (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "# RClone") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo '#0 2 * * * mountpoint -q /mnt/disk01 && rclone sync --max-age 24h --no-traverse --exclude "Lixeira/**" /mnt/disk01/ OneDrive:Backup_Servidor') | sudo crontab -
+  # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # Support Pannel!
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/Diagnostics/install.sh | sudo bash
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
