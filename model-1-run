@@ -267,7 +267,7 @@ END {
   wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh -O /home/administrador/.beep.sh; chmod +x /home/administrador/.beep.sh
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "# BEEP!") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "@reboot sleep 60; bash /home/administrador/.beep.sh") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "@reboot sleep 60; /home/administrador/.beep.sh") | sudo crontab -
   sudo yq -i ".Informacoes.Beep = \"Ativo\"" "$yamlbase"
 # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # Backups CDN
