@@ -298,11 +298,11 @@ END {
   sudo wget "https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/rsnapshot.conf" -O /srv/scripts/rsnapshot.conf; sudo chmod +x /srv/scripts/rsnapshot.conf
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "# Alpha - Executa as 7h, 10h, 12h, 14h, 16h e 18h! 6x por dia") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "#00 7,10,12,14,16,18 * * * mountpoint -q /mnt/DESTINO && /usr/bin/rsnapshot -c /srv/scripts/rsnapshot.conf alpha") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "#00 7,10,12,14,16,18 * * * mountpoint -q /mnt/disk01 && mountpoint -q /mnt/disk02 && /usr/bin/rsnapshot -c /srv/scripts/rsnapshot.conf alpha") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "# Beta - A partir das 20:00 5x na Semana cobrindo sabados mas nao domingos") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "#00 20 * * 1-5 mountpoint -q /mnt/DESTINO && /usr/bin/rsnapshot -c /srv/scripts/rsnapshot.conf beta") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "#00 20 * * 1-5 mountpoint -q /mnt/disk01 && mountpoint -q /mnt/disk02 && /usr/bin/rsnapshot -c /srv/scripts/rsnapshot.conf beta") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "# Gamma - 1x na Semana aos domingos, perdurando 4x, aprox. 1 mes") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "#00 6 * * 0 mountpoint -q /mnt/DESTINO && /usr/bin/rsnapshot -c /srv/scripts/rsnapshot.conf gamma") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "#00 6 * * 0 mountpoint -q /mnt/disk01 && mountpoint -q /mnt/disk02 && /usr/bin/rsnapshot -c /srv/scripts/rsnapshot.conf gamma") | sudo crontab -
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # AutoDelete Trash for SMB!
   sudo wget https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Backup/02-Models_AutoDelete -O /srv/scripts/deleterecycle.sh; sudo chmod +x /srv/scripts/deleterecycle.sh
@@ -310,10 +310,10 @@ END {
   (sudo crontab -l 2>/dev/null; echo "# Delete Trash") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "#0 6 * * * /srv/scripts/deleterecycle.sh") | sudo crontab -
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
-  # Safe RSYNC!
+  # Safe RSYNC! KISS
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "# Safe Rsync") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo '#0 2 * * * mountpoint -q /mnt/ORIGEM && mountpoint -q /mnt/DESTINO && rsync --delete -aHAXv --numeric-ids --sparse /origem /destino') | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo '#0 2 * * * mountpoint -q /mnt/disk01 && mountpoint -q /mnt/disk02 && rsync --delete -aHAXv --numeric-ids --sparse /origem /destino') | sudo crontab -
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # Support Pannel!
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/Diagnostics/install.sh | sudo bash
