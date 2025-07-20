@@ -311,7 +311,6 @@ END {
   (sudo crontab -l 2>/dev/null; echo "#0 6 * * * /srv/scripts/deleterecycle.sh") | sudo crontab -
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # Safe RSYNC!
-  sudo wget https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Backup/03-safe-rsync -O /srv/scripts/safersync.sh; sudo chmod +x /srv/scripts/safersync.sh
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "# Safe Rsync") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo '#0 2 * * * mountpoint -q /mnt/ORIGEM && mountpoint -q /mnt/DESTINO && rsync --delete -aHAXv --numeric-ids --sparse /origem /destino') | sudo crontab -
