@@ -28,8 +28,8 @@ export NEEDRESTART_MODE=a; export DEBIAN_FRONTEND=noninteractive
 export destpath="/var/lib/libvirt/images"
 export github="https://raw.githubusercontent.com/urbancompasspony/docker/main/"
 
-# x86_64
-export list00="qemu-system qemu-utils qemu-user qemu-kvm qemu-guest-agent qemu-block-supplemental \
+# All (+arm32)
+export list00="qemu-system qemu-utils qemu-user qemu-kvm qemu-guest-agent \
 libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq genisoimage guestfs-tools \
 docker.io net-tools speedtest-cli whois netdiscover iperf arp-scan traceroute sshpass network-manager dkms r8168-dkms \
 libatasmart-bin smartmontools zip unzip p7zip-full 7zip p7zip cifs-utils rsnapshot rclone iotop detox fdupes \
@@ -37,8 +37,11 @@ haveged stress lm-sensors cmatrix btop inxi tree dialog btrfs-progs build-essent
 openvpn curl nmap parallel rclone openssh-server beep xinit xorg openbox xdotool dbus-x11 dbus-user-session \
 gpm tmux pavucontrol caja gparted cmatrix gnome-disk-utility terminator rdesktop pluma terminator xmlstarlet screen"
 
-# ARM
+# ARM64 RPi5
 export list01="docker-buildx mesa-vulkan-drivers mesa-utils vulkan-tools"
+
+# x86_64
+export list02="qemu-block-supplemental"
 
 # ======================================================================================================================================================== #
 
@@ -58,6 +61,8 @@ function hardsys0 {
 
   if [ $HOSTTYPE = "aarch64" ]; then
     arm0
+  elif [ $HOSTTYPE = "arm" ]; then
+    arm1
   elif [ "$sysversion" = "$sysmain1" ] && [ "$hardversion" = "$hardmain" ]; then
     appliance0
   else
@@ -172,9 +177,13 @@ function update0 {
     sudo apt install $list00 $list01 -y &&
     sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_arm64 -O /usr/local/bin/yq
     sudo chmod +x /usr/local/bin/yq
+  elif [ $HOSTTYPE = "x86_64" ]; then
+    sudo apt install $list00 list02 -y &&
+    sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq
+    sudo chmod +x /usr/local/bin/yq
   else
     sudo apt install $list00 -y &&
-    sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq
+    sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_arm -O /usr/local/bin/yq
     sudo chmod +x /usr/local/bin/yq
   fi
 
@@ -280,9 +289,7 @@ END {
     sudo yq -i ".Informacoes.Serial_Windows = \"Inexistente\"" "$yamlbase"
   fi
 # ----------------------------------------------------------------------------------------------------------------------------------------------------
-  if [ $HOSTTYPE = "aarch64" ]; then
-    echo "Arquitetura incorreta. Pulando."
-  else
+  if [ $HOSTTYPE = "x86_64" ]; then
     wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh -O /home/administrador/.beep.sh; chmod +x /home/administrador/.beep.sh
     (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
     (sudo crontab -l 2>/dev/null; echo "# BEEP!") | sudo crontab -
@@ -481,8 +488,21 @@ function common_place {
   adjusting0
 }
 
+# arm64 (rpi5)
 function arm0 {
   common_place
+}
+
+# arm32 (redmi9)
+function arm1 {
+  welcome0
+  bashconf0
+  update0
+  sysctl0
+  motd0
+  journal0
+  firefox0
+  adjusting0
 }
 
 function linite0 {
