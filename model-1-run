@@ -4,7 +4,7 @@
 # curl -L m.linuxuniverse.com.br | bash -i
 # ======================================================================================================================================================== #
 
-MENU_VERSION="v3.3 - 19/06/2025"
+MENU_VERSION="v3.3 - 23-07-2025"
 
 # Informations for the compliance Celeron:
 #        enp1s0 = ETH0
