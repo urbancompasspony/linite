@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-
-# ======================================================================================================================================================== #
-# curl -L arm.linuxuniverse.com.br | bash
-# ======================================================================================================================================================== #
-
-wget -O- https://raw.githubusercontent.com/urbancompasspony/linite/refs/heads/main/model-1-run > ~/.model-installer
-chmod +x .model-installer
-./.model-installer
