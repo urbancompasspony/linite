@@ -28,13 +28,17 @@ export NEEDRESTART_MODE=a; export DEBIAN_FRONTEND=noninteractive
 export destpath="/var/lib/libvirt/images"
 export github="https://raw.githubusercontent.com/urbancompasspony/docker/main/"
 
+# x86_64
 export list00="qemu-system qemu-utils qemu-user qemu-kvm qemu-guest-agent qemu-block-supplemental \
 libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq genisoimage guestfs-tools \
 docker.io net-tools speedtest-cli whois netdiscover iperf arp-scan traceroute sshpass network-manager dkms r8168-dkms \
-libatasmart-bin smartmontools zip unzip p7zip-full 7zip p7zip cifs-utils rsnapshot rclone iotop detox fdupes durep \
+libatasmart-bin smartmontools zip unzip p7zip-full 7zip p7zip cifs-utils rsnapshot rclone iotop detox fdupes \
 haveged stress lm-sensors cmatrix btop inxi tree dialog btrfs-progs build-essential unrar lz4 duf \
-openvpn curl nmap parallel rclone openssh-server samba samba-dsdb-modules samba-vfs-modules beep xinit xorg openbox xdotool dbus-x11 dbus-user-session \
+openvpn curl nmap parallel rclone openssh-server beep xinit xorg openbox xdotool dbus-x11 dbus-user-session \
 gpm tmux pavucontrol caja gparted cmatrix gnome-disk-utility terminator rdesktop pluma terminator xmlstarlet screen"
+
+# ARM
+export list01="docker-buildx mesa-vulkan-drivers mesa-utils vulkan-tools"
 
 # ======================================================================================================================================================== #
 
@@ -52,8 +56,9 @@ function hardsys0 {
   hardmain="Celeron(R) J4125"
   hardversion=$(cat /proc/cpuinfo | grep 'model name' | head -n 1 | awk -F: '{ print $2 }' | cut -d ' ' -f 3,4)
 
-  # Se hardware e sistema estão ok, é o Appliance! Do contrario é generico.
-  if [ "$sysversion" = "$sysmain1" ] && [ "$hardversion" = "$hardmain" ]; then
+  if [ $HOSTTYPE = "aarch64" ]; then
+    arm0
+  elif [ "$sysversion" = "$sysmain1" ] && [ "$hardversion" = "$hardmain" ]; then
     appliance0
   else
     linite0
@@ -147,7 +152,12 @@ Pin: release a=*
 Pin-Priority: -10
 EOF
 
-    sudo apt-mark hold snapd
+    if [ $HOSTTYPE = "aarch64" ]; then
+      sudo apt-mark hold snap
+    else
+      sudo apt-mark hold snapd
+    fi
+
     sudo systemctl stop systemd-networkd-wait-online.service
     sudo systemctl disable systemd-networkd-wait-online.service
     sudo systemctl mask systemd-networkd-wait-online.service
@@ -158,11 +168,17 @@ function update0 {
   sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear
 
   echo "Instalando pacotes...."
-  sudo apt install $list00 -y &&
-  sync &&
+  if [ $HOSTTYPE = "aarch64" ]; then
+    sudo apt install $list00 $list01 -y &&
+    sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_arm64 -O /usr/local/bin/yq
+    sudo chmod +x /usr/local/bin/yq
+  else
+    sudo apt install $list00 -y &&
+    sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq
+    sudo chmod +x /usr/local/bin/yq
+  fi
 
-  sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq
-  sudo chmod +x /usr/local/bin/yq
+  sync &&
 
   sudo systemctl stop NetworkManager-wait-online.service
   sudo systemctl disable NetworkManager-wait-online.service
@@ -461,6 +477,10 @@ function common_place {
   adjusting0
 }
 
+function arm0 {
+  common_place
+}
+
 function linite0 {
   common_place
   netplan1
@@ -478,4 +498,4 @@ root_check0
 hardsys0
 the_end0
 
-exit 1
+exit 0
