@@ -190,7 +190,6 @@ function update0 {
 }
 
 function sysctl0 {
-  # A partir do 24.04:
   sleep 1; clear; echo "Aplicando recursos extras ao SYSCTL"
   echo -e "kernel.sysrq=1" | sudo tee /etc/sysctl.d/10-magic-sysrq.conf
   echo -e "vm.swappiness=10
@@ -250,8 +249,9 @@ Pin-Priority: 1000
 }
 
 function adjusting0 {
-# ----------------------------------------------------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------------------------------
   sudo mkdir -p /srv/scripts/config
+  sudo touch "$yamlbase"
 # ------------------------------------------------------------------------------------------------------------------------------
   IPMachine=$(ip route get 1.1.1.1 | grep -oP 'src \K\S+')
   sudo yq -i ".Informacoes.IP_LAN_Install = \"${IPMachine}\"" "$yamlbase"
@@ -280,11 +280,15 @@ END {
     sudo yq -i ".Informacoes.Serial_Windows = \"Inexistente\"" "$yamlbase"
   fi
 # ----------------------------------------------------------------------------------------------------------------------------------------------------
-  wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh -O /home/administrador/.beep.sh; chmod +x /home/administrador/.beep.sh
-  (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "# BEEP!") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "@reboot sleep 60; /home/administrador/.beep.sh") | sudo crontab -
-  sudo yq -i ".Informacoes.Beep = \"Ativo\"" "$yamlbase"
+  if [ $HOSTTYPE = "aarch64" ]; then
+    echo "Arquitetura incorreta. Pulando."
+  else
+    wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh -O /home/administrador/.beep.sh; chmod +x /home/administrador/.beep.sh
+    (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
+    (sudo crontab -l 2>/dev/null; echo "# BEEP!") | sudo crontab -
+    (sudo crontab -l 2>/dev/null; echo "@reboot sleep 60; /home/administrador/.beep.sh") | sudo crontab -
+    sudo yq -i ".Informacoes.Beep = \"Ativo\"" "$yamlbase"
+  fi
 # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # Backups CDN
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
@@ -344,15 +348,6 @@ END {
   # Support Pannel!
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/Diagnostics/install.sh | sudo bash
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
-}
-
-function the_end0 {
-  clear; echo "Instalação concluida!"
-  datetime0=$(date +"%d/%m/%Y - %H:%M")
-  sudo yq -i ".Informacoes.Data_Instalacao = \"${datetime0}\"" "$yamlbase"
-  sudo yq -i ".Informacoes.Data_Ultima_Reinstalacao = \"Nunca foi reinstalado\"" "$yamlbase"
-  echo "Reiniciando sistema em 3 segundos"; sleep 3
-  sudo reboot
 }
 
 function netplan0 {
@@ -458,6 +453,15 @@ function pfsense1 {
     sleep 1; clear
     sudo rm /tmp/allowvirt0
   fi
+}
+
+function the_end0 {
+  clear; echo "Instalação concluida!"
+  datetime0=$(date +"%d/%m/%Y - %H:%M")
+  sudo yq -i ".Informacoes.Data_Instalacao = \"${datetime0}\"" "$yamlbase"
+  sudo yq -i ".Informacoes.Data_Ultima_Reinstalacao = \"Nunca foi reinstalado\"" "$yamlbase"
+  echo "Reiniciando sistema em 3 segundos"; sleep 3
+  sudo reboot
 }
 
 # ======================================================================================================================================================== #
