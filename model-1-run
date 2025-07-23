@@ -35,13 +35,13 @@ docker.io net-tools speedtest-cli whois netdiscover iperf arp-scan traceroute ss
 libatasmart-bin smartmontools zip unzip p7zip-full 7zip p7zip cifs-utils rsnapshot rclone iotop detox fdupes \
 haveged stress lm-sensors cmatrix btop inxi tree dialog btrfs-progs build-essential unrar lz4 duf \
 openvpn curl nmap parallel rclone openssh-server beep xinit xorg openbox xdotool dbus-x11 dbus-user-session \
-gpm tmux pavucontrol caja gparted cmatrix gnome-disk-utility terminator rdesktop pluma terminator xmlstarlet screen"
+tmux pavucontrol caja gparted cmatrix gnome-disk-utility terminator rdesktop pluma terminator xmlstarlet screen"
 
 # ARM64 RPi5
 export list01="docker-buildx mesa-vulkan-drivers mesa-utils vulkan-tools"
 
 # x86_64
-export list02="qemu-block-supplemental"
+export list02="gpm qemu-block-supplemental"
 
 # ======================================================================================================================================================== #
 
@@ -146,7 +146,6 @@ function timezone0 {
 
 function useless0 {
     clear; echo "Removendo pacotes e desativando servicos inuteis"; echo ""
-    sudo apt purge needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolution-data-server bluez blueman bluetooth -y
 
     cat <<EOF | sudo tee /etc/apt/preferences.d/nosnap.pref
 # To prevent repository packages from triggering the installation of Snap,
@@ -188,6 +187,8 @@ function update0 {
   fi
 
   sync &&
+
+  sudo apt purge needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolution-data-server bluez blueman bluetooth -y
 
   sudo systemctl stop NetworkManager-wait-online.service
   sudo systemctl disable NetworkManager-wait-online.service
@@ -498,7 +499,6 @@ function arm1 {
   welcome0
   bashconf0
   update0
-  sysctl0
   motd0
   journal0
   firefox0
