@@ -294,7 +294,7 @@ END {
     wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh -O /home/administrador/.beep.sh; chmod +x /home/administrador/.beep.sh
     (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
     (sudo crontab -l 2>/dev/null; echo "# BEEP!") | sudo crontab -
-    (sudo crontab -l 2>/dev/null; echo "@reboot sleep 60; /home/administrador/.beep.sh") | sudo crontab -
+    (sudo crontab -l 2>/dev/null; echo "@reboot sleep 60; bash /home/administrador/.beep.sh") | sudo crontab -
     sudo yq -i ".Informacoes.Beep = \"Ativo\"" "$yamlbase"
   fi
 # ----------------------------------------------------------------------------------------------------------------------------------------------------
@@ -308,19 +308,19 @@ END {
   sudo wget "https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/01-Backup" -O /srv/scripts/backupcont.sh; sudo chmod +x /srv/scripts/backupcont.sh
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "# AutoBackup Containers") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "#00 02 * * * /srv/scripts/backupcont.sh") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "#00 02 * * * bash /srv/scripts/backupcont.sh") | sudo crontab -
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # AutoLog Rotate for Domain
   sudo wget https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Backup/backup-syslog -O /srv/scripts/autolog-dominio.sh; sudo chmod +x /srv/scripts/autolog-dominio.sh
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "# AutoLog") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "#00 23 * * * /srv/scripts/autolog-dominio.sh") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "#00 23 * * * bash /srv/scripts/autolog-dominio.sh") | sudo crontab -
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # RansomExt
   sudo wget https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/ransomext -O /srv/scripts/ransomext.sh; sudo chmod +x /srv/scripts/ransomext.sh
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "# RansomExt") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "#00 7 * * * /srv/scripts/ransomext.sh") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "#00 7 * * * bash /srv/scripts/ransomext.sh") | sudo crontab -
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # RSnapshots
   sudo wget "https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/rsnapshot.conf" -O /srv/scripts/rsnapshot.conf; sudo chmod +x /srv/scripts/rsnapshot.conf
@@ -336,7 +336,7 @@ END {
   sudo wget https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Backup/02-Models_AutoDelete -O /srv/scripts/deleterecycle.sh; sudo chmod +x /srv/scripts/deleterecycle.sh
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "# Delete Trash") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "#0 6 * * * /srv/scripts/deleterecycle.sh") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "#0 6 * * * bash /srv/scripts/deleterecycle.sh") | sudo crontab -
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # Safe RSYNC! KISS
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
