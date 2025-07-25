@@ -177,7 +177,7 @@ function update0 {
     sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_arm64 -O /usr/local/bin/yq
     sudo chmod +x /usr/local/bin/yq
   elif [ $HOSTTYPE = "x86_64" ]; then
-    sudo apt install $list00 list02 -y &&
+    sudo apt install $list00 $list02 -y &&
     sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq
     sudo chmod +x /usr/local/bin/yq
   else
