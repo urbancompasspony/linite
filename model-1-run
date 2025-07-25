@@ -147,6 +147,8 @@ function timezone0 {
 function useless0 {
     clear; echo "Removendo pacotes e desativando servicos inuteis"; echo ""
 
+  sudo apt purge needrestart cloud-init unattended-upgrades plank deja-dup evolution evolution-data-server bluez blueman bluetooth -y
+
     cat <<EOF | sudo tee /etc/apt/preferences.d/nosnap.pref
 # To prevent repository packages from triggering the installation of Snap,
 # this file forbids snapd from being installed by APT.
@@ -161,42 +163,42 @@ EOF
     else
       sudo apt-mark hold snapd
     fi
-
-    sudo systemctl stop systemd-networkd-wait-online.service
-    sudo systemctl disable systemd-networkd-wait-online.service
-    sudo systemctl mask systemd-networkd-wait-online.service
 }
 
 function update0 {
   clear; echo "Atualizando o sistema"; echo ""
   sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear
-
   echo "Instalando pacotes...."
   if [ $HOSTTYPE = "aarch64" ]; then
-    sudo apt install $list00 $list01 -y &&
+    sudo apt install $list00 $list01 -y
     sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_arm64 -O /usr/local/bin/yq
     sudo chmod +x /usr/local/bin/yq
+    services0
   elif [ $HOSTTYPE = "x86_64" ]; then
-    sudo apt install $list00 $list02 -y &&
+    sudo apt install $list00 $list02 -y
     sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq
     sudo chmod +x /usr/local/bin/yq
-  else
+    services0
+else
     sudo apt install $list00 -y &&
     sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_arm -O /usr/local/bin/yq
     sudo chmod +x /usr/local/bin/yq
+    services0
+  fi
+}
+
+function services0 {
+  if sudo systemctl stop NetworkManager-wait-online.service; sudo systemctl disable NetworkManager-wait-online.service; sudo systemctl mask NetworkManager-wait-online.service; then
+    echo "NetworkManager-wait-online desativado."
   fi
 
-  sync &&
+  if sudo systemctl stop systemd-networkd-wait-online.service; sudo systemctl disable systemd-networkd-wait-online.service; sudo systemctl mask systemd-networkd-wait-online.service; then
+    echo "systemd-networkd-wait-online desativado."
+  fi
 
-  sudo apt purge needrestart cloud-init snapd unattended-upgrades plank deja-dup evolution evolution-data-server bluez blueman bluetooth -y
-
-  sudo systemctl stop NetworkManager-wait-online.service
-  sudo systemctl disable NetworkManager-wait-online.service
-  sudo systemctl mask NetworkManager-wait-online.service
-
-  sudo usermod -aG libvirt administrador
-  sudo usermod -aG libvirt-qemu administrador
-  sudo usermod -aG docker administrador
+  if sudo usermod -aG libvirt administrador; sudo usermod -aG libvirt-qemu administrador; sudo usermod -aG docker administrador; then
+    echo "Permissoes docker atribuidas."
+  fi
 }
 
 function sysctl0 {
