@@ -145,9 +145,10 @@ function timezone0 {
 }
 
 function useless0 {
-    clear; echo "Removendo pacotes e desativando servicos inuteis"; echo ""
+  clear; echo "Removendo pacotes desnecessarios"; echo ""
 
   sudo apt purge needrestart cloud-init unattended-upgrades plank deja-dup evolution evolution-data-server bluez blueman bluetooth -y
+  sudo apt autoremove -y
 
     cat <<EOF | sudo tee /etc/apt/preferences.d/nosnap.pref
 # To prevent repository packages from triggering the installation of Snap,
@@ -166,7 +167,7 @@ EOF
 }
 
 function update0 {
-  clear; echo "Atualizando o sistema"; echo ""
+  clear; echo "Atualizando o sistema e desativando serviços inuteis"; echo ""
   sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear
   echo "Instalando pacotes...."
   if [ $HOSTTYPE = "aarch64" ]; then
