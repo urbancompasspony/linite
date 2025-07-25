@@ -59,9 +59,9 @@ function hardsys0 {
   hardmain="Celeron(R) J4125"
   hardversion=$(cat /proc/cpuinfo | grep 'model name' | head -n 1 | awk -F: '{ print $2 }' | cut -d ' ' -f 3,4)
 
-  if [ $HOSTTYPE = "aarch64" ]; then
+  if [ "$HOSTTYPE" = "aarch64" ]; then
     arm0
-  elif [ $HOSTTYPE = "arm" ]; then
+  elif [ "$HOSTTYPE" = "arm" ]; then
     arm1
   elif [ "$sysversion" = "$sysmain1" ] && [ "$hardversion" = "$hardmain" ]; then
     appliance0
@@ -159,7 +159,7 @@ Pin: release a=*
 Pin-Priority: -10
 EOF
 
-    if [ $HOSTTYPE = "aarch64" ]; then
+    if [ "$HOSTTYPE" = "aarch64" ]; then
       sudo apt-mark hold snap
       sudo apt purge snapd -y
       sudo apt autoremove -y
@@ -174,12 +174,12 @@ function update0 {
   clear; echo "Atualizando o sistema e desativando serviços inuteis"; echo ""
   sudo apt update; sudo apt upgrade -y; sudo apt autoremove -y; clear
   echo "Instalando pacotes...."
-  if [ $HOSTTYPE = "aarch64" ]; then
+  if [ "$HOSTTYPE" = "aarch64" ]; then
     sudo apt install $list00 $list01 -y
     sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_arm64 -O /usr/local/bin/yq
     sudo chmod +x /usr/local/bin/yq
     services0
-  elif [ $HOSTTYPE = "x86_64" ]; then
+  elif [ "$HOSTTYPE" = "x86_64" ]; then
     sudo apt install $list00 $list02 -y
     sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq
     sudo chmod +x /usr/local/bin/yq
@@ -297,7 +297,7 @@ END {
     sudo yq -i ".Informacoes.Serial_Windows = \"Inexistente\"" "$yamlbase"
   fi
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
-  if [ $HOSTTYPE = "x86_64" ]; then
+  if [ "$HOSTTYPE" = "x86_64" ]; then
     wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh -O /home/administrador/.beep.sh; chmod +x /home/administrador/.beep.sh
     (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
     (sudo crontab -l 2>/dev/null; echo "# BEEP!") | sudo crontab -
@@ -307,7 +307,7 @@ END {
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # Support Pannel!
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/Diagnostics/install.sh | sudo bash
-  if [ $HOSTTYPE = "arm" ]; then
+  if [ "$HOSTTYPE" = "arm" ]; then
     clear; echo "Se for um sistema Chroot Mobile, pare este sistema, inicie novamente e reexecute a instalacao do Diagnostic Menu pelo menu SRV!"
     sleep 3
   fi
