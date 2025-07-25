@@ -147,7 +147,7 @@ function timezone0 {
 function useless0 {
   clear; echo "Removendo pacotes desnecessarios"; echo ""
 
-  sudo apt purge needrestart cloud-init unattended-upgrades plank deja-dup evolution evolution-data-server bluez blueman bluetooth -y
+  sudo apt purge needrestart cloud-init unattended-upgrades bluez blueman bluetooth -y
   sudo apt autoremove -y
 
     cat <<EOF | sudo tee /etc/apt/preferences.d/nosnap.pref
@@ -161,8 +161,12 @@ EOF
 
     if [ $HOSTTYPE = "aarch64" ]; then
       sudo apt-mark hold snap
+      sudo apt purge snapd -y
+      sudo apt autoremove -y
     else
       sudo apt-mark hold snapd
+      sudo apt purge snapd -y
+      sudo apt autoremove -y
     fi
 }
 
