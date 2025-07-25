@@ -265,15 +265,15 @@ Pin-Priority: 1000
   sudo apt update; sudo apt install firefox -y
 }
 
-function adjusting0 {
-# ------------------------------------------------------------------------------------------------------------------------------
+function yamls0 {
+  # ----------------------------------------------------------------------------------------------------------------------------------------------------
   sudo mkdir -p /srv/scripts/config
   sudo touch "$yamlbase"
-# ------------------------------------------------------------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------------------------------------------------------------------------------
   IPMachine=$(ip route get 1.1.1.1 | grep -oP 'src \K\S+')
   sudo yq -i ".Informacoes.IP_LAN_Install = \"${IPMachine}\"" "$yamlbase"
-# ------------------------------------------------------------------------------------------------------------------------------
-sudo inxi -M | awk '
+  # ----------------------------------------------------------------------------------------------------------------------------------------------------
+  sudo inxi -M | awk '
 /Machine:/ {machine=1; next}
 machine && NF {
   sub(/^ *Type: /, "", $0); type=$0;
@@ -289,14 +289,14 @@ END {
   print "  Placa: \"" mobo "\""
 }
 ' | sudo tee -a "$yamlbase"
-# ----------------------------------------------------------------------------------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------------------------------------------------------------------------------
   if [ -f /sys/firmware/acpi/tables/MSDM ]; then
     serial0=$(sudo hexdump -s 56 -e '"Serial key: " /29 "%s\n"' /sys/firmware/acpi/tables/MSDM)
     sudo yq -i ".Informacoes.Serial_Windows = \"${serial0}\"" "$yamlbase"
   else
     sudo yq -i ".Informacoes.Serial_Windows = \"Inexistente\"" "$yamlbase"
   fi
-# ----------------------------------------------------------------------------------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------------------------------------------------------------------------------
   if [ $HOSTTYPE = "x86_64" ]; then
     wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh -O /home/administrador/.beep.sh; chmod +x /home/administrador/.beep.sh
     (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
@@ -304,13 +304,34 @@ END {
     (sudo crontab -l 2>/dev/null; echo "@reboot sleep 60; bash /home/administrador/.beep.sh") | sudo crontab -
     sudo yq -i ".Informacoes.Beep = \"Ativo\"" "$yamlbase"
   fi
+  # ----------------------------------------------------------------------------------------------------------------------------------------------------
+  # Support Pannel!
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/Diagnostics/install.sh | sudo bash
+  if [ $HOSTTYPE = "arm" ]; then
+    clear; echo "Se for um sistema Chroot Mobile, pare este sistema, inicie novamente e reexecute a instalacao do Diagnostic Menu pelo menu SRV!"
+    sleep 3
+  fi
+  # ----------------------------------------------------------------------------------------------------------------------------------------------------
+}
+
+function crontabs0 {
 # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # Backups CDN
+  sudo mkdir /srv/.bkp
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "# Backups CDN") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "00 02 * * * cp /srv/system.yaml /srv/.system.yaml") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "00 02 * * * cp /srv/containers.yaml /srv/.containers.yaml") | sudo crontab -
-# ----------------------------------------------------------------------------------------------------------------------------------------------------
+  (sudo crontab -l 2>/dev/null; echo "00 02 * * * cp /srv/*.yaml /srv/.bkp/") | sudo crontab -
+  # ----------------------------------------------------------------------------------------------------------------------------------------------------
+  # Safe RSYNC! KISS
+  (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "# Safe Rsync") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo '#0 2 * * * mountpoint -q /mnt/disk01 && mountpoint -q /mnt/disk02 && rsync --delete -aHAXv --numeric-ids --sparse /origem /destino') | sudo crontab -
+  # ----------------------------------------------------------------------------------------------------------------------------------------------------
+  # RClone Example
+  (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "# RClone") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo '#0 2 * * * mountpoint -q /mnt/disk01 && rclone sync --max-age 24h --no-traverse --exclude "Lixeira/**" /mnt/disk01/ OneDrive:Backup_Servidor') | sudo crontab -
+  # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # Auto BackupCont
   sudo wget "https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/01-Backup" -O /srv/scripts/backupcont.sh; sudo chmod +x /srv/scripts/backupcont.sh
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
@@ -329,43 +350,30 @@ END {
   (sudo crontab -l 2>/dev/null; echo "# RansomExt") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "#00 7 * * * bash /srv/scripts/ransomext.sh") | sudo crontab -
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
-  # RSnapshots
-  sudo wget "https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/rsnapshot.conf" -O /srv/scripts/rsnapshot.conf; sudo chmod +x /srv/scripts/rsnapshot.conf
-  (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "# Alpha - Executa as 7h, 10h, 12h, 14h, 16h e 18h! 6x por dia") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "#00 7,10,12,14,16,18 * * * mountpoint -q /mnt/disk01 && mountpoint -q /mnt/disk02 && /usr/bin/rsnapshot -c /srv/scripts/rsnapshot.conf alpha") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "# Beta - A partir das 20:00 5x na Semana cobrindo sabados mas nao domingos") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "#00 20 * * 1-5 mountpoint -q /mnt/disk01 && mountpoint -q /mnt/disk02 && /usr/bin/rsnapshot -c /srv/scripts/rsnapshot.conf beta") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "# Gamma - 1x na Semana aos domingos, perdurando 4x, aprox. 1 mes") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "#00 6 * * 0 mountpoint -q /mnt/disk01 && mountpoint -q /mnt/disk02 && /usr/bin/rsnapshot -c /srv/scripts/rsnapshot.conf gamma") | sudo crontab -
-  # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # AutoDelete Trash for SMB!
   sudo wget https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Backup/02-Models_AutoDelete -O /srv/scripts/deleterecycle.sh; sudo chmod +x /srv/scripts/deleterecycle.sh
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "# Delete Trash") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "#0 6 * * * bash /srv/scripts/deleterecycle.sh") | sudo crontab -
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
-  # Safe RSYNC! KISS
-  (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "# Safe Rsync") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo '#0 2 * * * mountpoint -q /mnt/disk01 && mountpoint -q /mnt/disk02 && rsync --delete -aHAXv --numeric-ids --sparse /origem /destino') | sudo crontab -
-  # ----------------------------------------------------------------------------------------------------------------------------------------------------
-  # RClone Example
-  (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "# RClone") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo '#0 2 * * * mountpoint -q /mnt/disk01 && rclone sync --max-age 24h --no-traverse --exclude "Lixeira/**" /mnt/disk01/ OneDrive:Backup_Servidor') | sudo crontab -
-  # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # Perma Lixeira para Syncthing
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "# Permissões da Lixeira do AD para Syncthing") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo '#0 2 * * * lixo0="/mnt/disk01/Domain/Lixeira/" && [ -d "$lixo0" ] && chmod 777 -R "$lixo0" 2>/dev/null || :') | sudo crontab -
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
-  # Support Pannel!
-  curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/Diagnostics/install.sh | sudo bash
-  if [ $HOSTTYPE = "arm" ]; then
-    clear; echo "Se for um sistema Chroot Mobile, pare este sistema, inicie novamente e reexecute a instalacao do Diagnostic Menu pelo menu SRV!"
-    sleep 3
-  fi
+  # RSnapshots
+  sudo wget "https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/rsnapshot.conf" -O /srv/scripts/rsnapshot.conf; sudo chmod +x /srv/scripts/rsnapshot.conf
+  (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "# RSnapshots") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "# Alpha - Executa as 7h, 10h, 12h, 14h, 16h e 18h! 6x por dia") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "#00 7,10,12,14,16,18 * * * mountpoint -q /mnt/disk01 && mountpoint -q /mnt/disk02 && /usr/bin/rsnapshot -c /srv/scripts/rsnapshot.conf alpha") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "# Beta - A partir das 20:00 5x na Semana cobrindo sabados mas nao domingos") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "#00 20 * * 1-5 mountpoint -q /mnt/disk01 && mountpoint -q /mnt/disk02 && /usr/bin/rsnapshot -c /srv/scripts/rsnapshot.conf beta") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "# Gamma - 1x na Semana aos domingos, perdurando 4x, aprox. 1 mes") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "#00 6 * * 0 mountpoint -q /mnt/disk01 && mountpoint -q /mnt/disk02 && /usr/bin/rsnapshot -c /srv/scripts/rsnapshot.conf gamma") | sudo crontab -
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
 }
 
@@ -497,7 +505,8 @@ function common_place {
   journal0
   fstab0
   firefox0
-  adjusting0
+  yamls0
+  crontabs0
 }
 
 # arm64 (rpi5)
@@ -513,7 +522,8 @@ function arm1 {
   motd0
   journal0
   firefox0
-  adjusting0
+  yamls0
+  crontabs0
 }
 
 function linite0 {
