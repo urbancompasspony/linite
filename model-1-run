@@ -160,13 +160,15 @@ Pin-Priority: -10
 EOF
 
     if [ "$HOSTTYPE" = "aarch64" ]; then
-      sudo apt-mark hold snap
       sudo apt purge snapd -y
       sudo apt autoremove -y
-    else
       sudo apt-mark hold snapd
+      sudo apt-mark hold snap
+    else
       sudo apt purge snapd -y
       sudo apt autoremove -y
+      sudo apt-mark hold snapd
+      sudo apt-mark hold snap
     fi
 }
 
