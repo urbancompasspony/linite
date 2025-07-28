@@ -34,10 +34,10 @@ libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq gen
 docker.io net-tools speedtest-cli whois netdiscover iperf arp-scan traceroute sshpass network-manager dkms r8168-dkms \
 libatasmart-bin smartmontools zip unzip p7zip-full 7zip p7zip cifs-utils rsnapshot rclone iotop detox fdupes \
 haveged stress lm-sensors cmatrix btop inxi tree dialog btrfs-progs build-essential unrar lz4 duf \
-caja xinit xorg openbox xdotool dbus-x11 dbus-user-session xorg \
-xserver-xorg-core xserver-xorg-input-all xserver-xorg-video-vesa xserver-xorg-video-fbdev xserver-xorg-video-intel \
+caja xinit xorg openbox xdotool dbus-x11 dbus-user-session xorg xvfb xserver-xorg-core xserver-xorg-input-all \
+xserver-xorg-video-vesa xserver-xorg-video-fbdev xserver-xorg-video-dummy \
 openvpn curl nmap parallel rclone openssh-server beep cmatrix pavucontrol \
-tmux  gparted gnome-disk-utility terminator rdesktop pluma terminator xmlstarlet screen"
+tmux gparted gnome-disk-utility terminator rdesktop pluma terminator xmlstarlet screen"
 
 # ARM64 RPi5
 export list01="docker-buildx mesa-vulkan-drivers mesa-utils vulkan-tools"
