@@ -1,357 +1,262 @@
-# 🚀 Linite - Automated Linux Server Deployment
+# Model-1 Server Setup Script v3.3
 
-> **Sistema automatizado de preparação e configuração de servidores Linux para ambientes corporativos e domésticos.**
+## 📖 Sobre
 
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Platform](https://img.shields.io/badge/Platform-Linux-green.svg)](https://www.linux.org/)
-[![Architecture](https://img.shields.io/badge/Architecture-x86__64%20%7C%20ARM64-orange.svg)](https://github.com/urbancompasspony/linite)
-
-## 📋 Sobre o Projeto
-
-O **Linite** é uma solução completa para automação de deploy e configuração de servidores Linux, projetado para simplificar a instalação e configuração de ambientes corporativos com foco em virtualização, containerização e serviços de rede.
-
-## ✨ Características Principais
-
-- **🔧 Configuração Automatizada** - Setup completo do sistema operacional
-- **🐳 Containerização** - Suporte nativo ao Docker e orquestração
-- **🖥️ Virtualização** - KVM/QEMU com libvirt pré-configurado
-- **🌐 Networking** - Configuração avançada de rede com Netplan
-- **📊 Monitoramento** - Ferramentas de sistema e performance
-- **🔒 Segurança** - Configurações hardening e firewall
-- **📱 Multi-Arquitetura** - Suporte x86_64, ARM64 e Android
-- **🎯 Modelos Específicos** - Appliances e desktops corporativos
-
-## 🏗️ Modelos Disponíveis
-
-### 📟 **Model-1 (Appliance/Server)**
-```bash
-curl -L m.linuxuniverse.com.br | bash
-```
-**Características:**
-- ✅ KVM/QEMU + Libvirt
-- ✅ Docker + Network tools
-- ✅ pfSense VM automática
-- ✅ Netplan configurado
-- ✅ Samba AD modelo
-- ✅ Backup automático
-- ✅ MOTD personalizado
-
-**Hardware Suportado:**
-- Intel Celeron J4125 (Appliance oficial)
-- Sistemas genéricos x86_64
-
-### 🦾 **Model-ARM (Raspberry Pi/ARM)**
-```bash
-curl -L arm.linuxuniverse.com.br | bash
-```
-**Características:**
-- ✅ Docker otimizado para ARM
-- ✅ Network tools completo
-- ✅ Configuração WiFi/Ethernet
-- ✅ GPIO e hardware específico
-- ✅ Samba e OpenVPN
-
-### 🖥️ **Model-Desk (Desktop Corporativo)**
-```bash
-wget -O- desk.linuxuniverse.com.br | bash
-```
-**Características:**
-- ✅ Ambiente desktop completo
-- ✅ Navegadores (Chrome, Firefox, Edge)
-- ✅ OnlyOffice + LibreOffice
-- ✅ Token A3 e certificados
-- ✅ Active Directory integration
-- ✅ Flatpak e Wine
-- ✅ Ferramentas de produtividade
-
-### 📱 **Model-Android (Linux Deploy)**
-```bash
-# Para Android com Linux Deploy
-wget -O- https://raw.githubusercontent.com/urbancompasspony/linite/main/model-linux-deploy-android-run | bash
-```
+O **Model-1** é um script bash automatizado desenvolvido pela SuitIT® que transforma um Ubuntu Server básico em um servidor corporativo completo e otimizado. O script detecta automaticamente o tipo de hardware (x86_64, ARM64, ARM32) e aplica configurações específicas para cada arquitetura.
 
 ## 🚀 Instalação Rápida
 
-### Detecção Automática de Hardware
 ```bash
-# O script detecta automaticamente o hardware e aplica o modelo correto
-curl -L m.linuxuniverse.com.br | bash
+# Execução direta via curl
+curl -L m.linuxuniverse.com.br | bash -i
+
+# Ou download e execução local
+wget https://raw.githubusercontent.com/urbancompasspony/docker/main/model-1-run
+chmod +x model-1-run
+./model-1-run
 ```
 
-### Instalação Manual por Modelo
-```bash
-# Appliance/Server (x86_64)
-curl -L m.linuxuniverse.com.br | bash
+## 🎯 O Que o Script Faz
 
-# ARM/Raspberry Pi
-curl -L arm.linuxuniverse.com.br | bash
+### 🔍 Detecção Automática de Hardware
+- **Celeron J4125**: Configuração completa para appliances corporativos
+- **ARM64 (Raspberry Pi 5)**: Otimizações para SBC ARM de 64 bits
+- **ARM32**: Configuração básica para dispositivos ARM de 32 bits
+- **x86_64 Generic**: Configuração padrão para servidores Intel/AMD
 
-# Desktop Corporativo
-wget -O- desk.linuxuniverse.com.br | bash
-```
+### 📦 Pacotes Instalados
 
-## 📦 Pacotes Instalados
+#### Pacotes Base (Todos os Sistemas)
+- **Virtualização**: `qemu-system`, `libvirt`, `virt-manager`, `ovmf`
+- **Containerização**: `docker.io` com configurações otimizadas
+- **Rede**: `net-tools`, `netdiscover`, `nmap`, `iperf`, `traceroute`
+- **Monitoramento**: `btop`, `iotop`, `lm-sensors`, `inxi`, `smartmontools`
+- **Backup/Sync**: `rsnapshot`, `rclone`, `cifs-utils`
+- **Utilitários**: `dialog`, `tree`, `zip/unzip`, `p7zip`, `duf`
+- **Desktop**: `xorg`, `openbox`, `terminator`, `gparted`
 
-### 🔧 **Ferramentas de Sistema**
-```
-- qemu-system, qemu-utils, qemu-kvm
-- libvirt-clients, libvirt-daemon-system
-- docker.io, bridge-utils
-- net-tools, netdiscover, nmap
-- iotop, btop, inxi, tree
-```
-
-### 🌐 **Networking**
-```
-- speedtest-cli, whois, traceroute
-- openvpn, iperf, arp-scan
-- samba, samba-dsdb-modules
-- network-manager, dnsmasq
-```
-
-### 💾 **Storage & Backup**
-```
-- rsnapshot, rclone, cifs-utils
-- btrfs-progs, guestfs-tools
-- zip, unzip, p7zip-full, unrar
-- smartmontools, gparted
-```
-
-### 🎨 **Desktop (Model-Desk apenas)**
-```
-- firefox, google-chrome, microsoft-edge
-- libreoffice, onlyoffice-desktopeditors
-- vlc, gparted, cpu-x
-- flatpak, wine-stable
-```
+#### Pacotes Específicos por Arquitetura
+- **ARM64**: `docker-buildx`, `mesa-vulkan-drivers`, `vulkan-tools`
+- **x86_64**: `gpm`, `qemu-block-supplemental`
 
 ## ⚙️ Configurações Aplicadas
 
-### 🐧 **Sistema Base**
-- **Timezone**: `Etc/GMT+3` (Brasília)
-- **Swap**: 1GB automático se não existir
-- **Journal**: Limitado a 5GB, persistente
-- **SYSCTL**: Otimizações de performance
-- **MOTD**: Personalizado com informações do sistema
+### 🔧 Otimizações de Sistema
 
-### 🌐 **Rede (Netplan)**
+#### **SWAP Inteligente**
+- Detecta SWAP existente e ajusta automaticamente
+- Cria SWAP de 1GB se inexistente ou insuficiente
+- Configuração otimizada para servidores
+
+#### **Timezone e RTC**
+```bash
+# Configura timezone para GMT-3 (Brasil)
+sudo timedatectl set-timezone Etc/GMT+3
+sudo timedatectl set-local-rtc 1
+```
+
+#### **SYSCTL Optimizations** 
+```bash
+# Configurações aplicadas:
+vm.swappiness=10          # Reduz uso de SWAP
+vm.panic_on_oom=1         # Sistema reinicia em Out of Memory
+kernel.panic=5            # Reinicia após 5s em kernel panic
+kernel.sysrq=1            # Habilita Magic SysRq
+```
+
+### 🗂️ Estrutura de Diretórios
+
+#### **Montagem de Discos**
+- `/mnt/disk01` e `/mnt/disk02` - Pontos de montagem padrão
+- `/var/lib/libvirt/images` - Imagens de VMs com permissões corretas
+- `/srv/scripts/` - Scripts de automação
+- `/srv/.bkp/` - Backups de configuração
+
+#### **FSTAB Enhancements**
+```bash
+# RAM Disk para arquivos temporários
+tmpfs /tmp tmpfs defaults 0 0
+tmpfs /var/tmp tmpfs defaults 0 0
+
+# Preparação para montagem de discos externos
+# Suporte a compartilhamentos SMB/CIFS
+```
+
+### 🌐 Configuração de Rede
+
+#### **Netplan Inteligente**
+- **Modelo Appliance (Celeron)**: Configuração multi-interface para firewall
+- **Outros Modelos**: Configuração DHCP padrão com fallback estático
+
+#### **Interfaces Configuradas (Appliance)**
+- `eno1/enp1s0/enp2s0`: DHCP para conectividade
+- `enp4s0`: IP estático 172.25.0.3/24 para rede interna
+
+### 🔒 Segurança e Serviços
+
+#### **Remoção de Componentes Desnecessários**
+- Remove `snapd`, `cloud-init`, `unattended-upgrades`
+- Desabilita `bluetooth` e `blueman`
+- Configura bloqueio permanente do snap
+
+#### **Otimização de Serviços**
+- Desabilita serviços de espera de rede demorados
+- Adiciona usuário aos grupos: `libvirt`, `libvirt-qemu`, `docker`
+- Configura journald com limite de 1GB
+
+### 📊 Monitoramento e MOTD
+
+#### **Message of the Day Personalizado**
+- Header customizado da SuitIT®
+- Informações detalhadas do sistema
+- Status dinâmico de serviços
+
+#### **Sistema de Informações YAML**
 ```yaml
-# Appliance (Model-1)
-network:
-  ethernets:
-    eno1: {dhcp4: true}        # WAN
-    enp1s0: {dhcp4: true}      # LAN1  
-    enp2s0: {dhcp4: true}      # LAN2
-    enp4s0:                    # Management
-      dhcp4: false
-      addresses: [172.25.0.3/24]
-```
-
-### 🔒 **Segurança**
-- Snap desabilitado e bloqueado
-- Serviços desnecessários removidos
-- Firewall configurado
-- SSH habilitado e configurado
-
-### 📊 **Monitoramento**
-- Ferramentas de performance (btop, iotop)
-- Sensors de hardware (lm-sensors)
-- Disk usage tools (duf, tree)
-- Network monitoring (netdiscover, nmap)
-
-## 🐳 Virtualização e Containers
-
-### KVM/QEMU (Model-1)
-```bash
-# pfSense VM criada automaticamente
-- Name: pfSense
-- Memory: 2GB
-- vCPUs: 2
-- Networks: 3 interfaces bridged
-- Autostart: Enabled
-```
-
-### Docker
-```bash
-# Usuário adicionado ao grupo docker
-sudo usermod -aG docker administrador
-
-# Containers prontos para uso
-docker run -d --name container_name image_name
-```
-
-## 📁 Estrutura de Arquivos
-
-```
-/srv/
-├── system.yaml              # Configurações do sistema (YAML)
-├── scripts/
-│   ├── backupcont           # Script de backup containers
-│   ├── rsnapshot            # Configuração rsnapshot
-│   └── config/
-│       └── SMB-AD-Model.conf # Modelo Samba AD
-└── containers/              # Dados de containers
-
-/var/lib/libvirt/images/     # Imagens de VMs
-/etc/netplan/                # Configuração de rede
-/etc/update-motd.d/          # MOTD personalizado
-```
-
-## 🔧 Configuração Pós-Instalação
-
-### Verificar Status
-```bash
-# Verificar serviços
-sudo systemctl status libvirtd docker
-
-# Verificar VMs
-sudo virsh list --all
-
-# Verificar rede
-ip addr show
-sudo netplan status
-```
-
-### Configurar Samba AD
-```bash
-# Modelo disponível em:
-sudo cat /srv/scripts/config/SMB-AD-Model.conf
-
-# Configurar domínio
-sudo samba-tool domain provision --use-rfc2307 --interactive
-```
-
-### Backup Automático
-```bash
-# Rsnapshot configurado automaticamente
-sudo crontab -l
-
-# Executar backup manual
-sudo /usr/bin/rsnapshot -c /srv/scripts/rsnapshot alpha
-```
-
-## 🛠️ Customização
-
-### Modificar Configurações
-```bash
-# Editar configurações do sistema
-sudo nano /srv/system.yaml
-
-# Aplicar mudanças de rede
-sudo netplan apply
-
-# Recarregar serviços
-sudo systemctl daemon-reload
-```
-
-### Adicionar Pacotes
-```bash
-# Instalar pacotes adicionais
-sudo apt install package_name
-
-# Para ARM, usar pacotes específicos
-sudo apt install package_name_arm64
-```
-
-## 📊 YAML de Configuração
-
-O sistema utiliza um arquivo YAML central para configurações:
-
-```yaml
-# /srv/system.yaml
+# Estrutura criada em /srv/system.yaml
 Informacoes:
-  IP_LAN_Install: "192.168.1.100"
-  Data_Instalacao: "07/07/2025 - 14:30"
-  Data_Ultima_Reinstalacao: "Nunca foi reinstalado"
-  Serial_Windows: "XXXXX-XXXXX-XXXXX"
-  Beep: "Ativo"
+  IP_LAN_Install: "192.168.x.x"
+  Serial_Windows: "Chave-Serial-OEM"
+  Data_Instalacao: "DD/MM/YYYY - HH:MM"
+  Beep: "Ativo" # Apenas x86_64
 
 Hardware:
-  Tipo: "Desktop Computer"
-  Placa: "Intel Corp. Board"
-
-rsnapshots:
-  - "#00 7,10,13,16,19,22 * * 1-5 /usr/bin/rsnapshot -c /srv/scripts/rsnapshot alpha"
-  - "#00 23 * * 1-5 /usr/bin/rsnapshot -c /srv/scripts/rsnapshot beta"
-  - "#00 7 * * 6 /usr/bin/rsnapshot -c /srv/scripts/rsnapshot gamma"
+  Tipo: "Modelo detectado"
+  Placa: "Motherboard identificada"
 ```
 
-## 🔍 Troubleshooting
+## 🔄 Automações via Crontab
 
-### Problemas Comuns
-
-#### Script não executa
+### **Backups Automatizados**
 ```bash
-# Verificar permissões
-chmod +x script_name
+# Backup diário de configurações (02:00)
+00 02 * * * cp /srv/*.yaml /srv/.bkp/
 
-# Executar com bash explícito
-bash script_name
+# Backup de containers Docker (comentado por padrão)
+#00 02 * * * bash /srv/scripts/backupcont.sh
 
-# Verificar conectividade
-ping -c 3 raw.githubusercontent.com
+# Rotação de logs de domínio (23:00)
+#00 23 * * * bash /srv/scripts/autolog-dominio.sh
 ```
 
-#### Rede não funciona
+### **Sincronização e Backup**
 ```bash
-# Verificar interfaces
-ip link show
+# RSYNC seguro entre discos
+#0 2 * * * mountpoint -q /mnt/disk01 && mountpoint -q /mnt/disk02 && rsync --delete -aHAXv --numeric-ids --sparse /origem /destino
 
-# Reconfigurar netplan
-sudo netplan --debug apply
-
-# Verificar DNS
-nslookup google.com
+# RClone para nuvem (OneDrive exemplo)
+#0 2 * * * mountpoint -q /mnt/disk01 && rclone sync --max-age 24h --no-traverse /mnt/disk01/ OneDrive:Backup_Servidor
 ```
 
-#### Docker não funciona
+### **Snapshots com RSnapshot**
+- **Alpha**: 6x por dia (7h, 10h, 12h, 14h, 16h, 18h)
+- **Beta**: 5x por semana (segunda a sexta, 20h)
+- **Gamma**: 1x por semana (domingo, 6h) - retenção de 1 mês
+
+### **Segurança Anti-Ransomware**
 ```bash
-# Verificar status
-sudo systemctl status docker
+# Detecção de extensões suspeitas (07:00)
+#00 7 * * * bash /srv/scripts/ransomext.sh
 
-# Reiniciar serviço
-sudo systemctl restart docker
-
-# Verificar grupos do usuário
-groups $USER
+# Limpeza automática de lixeira SMB (06:00)
+#0 6 * * * bash /srv/scripts/deleterecycle.sh
 ```
 
-## 🚨 Requisitos
+## 🖥️ Virtualização Integrada
 
-### Sistemas Suportados
-- **Ubuntu 22.04 LTS** (Recomendado)
-- **Ubuntu 24.04 LTS**
-- **Debian 11/12**
-- **Linux Mint 21/22**
+### **pfSense Automático (Apenas Appliance Celeron)**
+- Download automático da imagem pfSense otimizada
+- Criação de VM com 3 interfaces de rede
+- Configuração automática para uso como firewall/roteador
+- Inicialização automática com o sistema
 
-### Hardware Mínimo
-- **RAM**: 4GB (8GB recomendado)
-- **Storage**: 20GB (50GB recomendado)
-- **CPU**: x86_64 ou ARM64
-- **Network**: Interface ethernet
-
-### Especificações do Appliance
-- **CPU**: Intel Celeron J4125
-- **Interfaces**: 3x Ethernet (WAN + 2x LAN)
-- **RAM**: 8GB
-- **Storage**: 128GB SSD
-
-### Estrutura de Desenvolvimento
+### **Configuração da VM pfSense**
 ```bash
-linite/
-├── model-1                  # Script modelo appliance
-├── model-1-run             # Implementação modelo 1
-├── model-arm               # Script modelo ARM
-├── model-arm-run           # Implementação ARM
-├── model-desk              # Script modelo desktop
-├── model-desk-run          # Implementação desktop
-└── model-linux-deploy-*    # Modelos especiais
+# Especificações automáticas:
+- RAM: 2GB
+- vCPUs: 2 (host passthrough)
+- Interfaces: enp1s0, enp2s0, eno1
+- MACs fixos para consistência
+- Boot automático habilitado
 ```
 
-<div align="center">
+## 🎛️ Funcionalidades Especiais
 
-**🚀 Developed with ❤️ by SuitIT® for the Linux community**
+### **Firefox Oficial Mozilla**
+- Repositório oficial Mozilla adicionado
+- Sempre a versão mais recente disponível
+- Configurações de segurança aprimoradas
 
-[⭐ Star this repo](https://github.com/urbancompasspony/linite) | [🐛 Report Bug](https://github.com/urbancompasspony/linite/issues) | [💡 Request Feature](https://github.com/urbancompasspony/linite/issues)
+### **Desktop Environment**
+- Xorg + OpenBox configurado
+- Ferramentas gráficas: `terminator`, `gparted`, `gnome-disk-utility`
+- Suporte remoto via X11
 
-</div>
+### **Beep de Status (x86_64)**
+- Script de beep automático após boot
+- Indica funcionamento correto do sistema
+- Executa 60 segundos após inicialização
+
+## 🔍 Diagnóstico Integrado
+
+### **Sistema de Diagnóstico**
+- Interface web para monitoramento
+- Análise automática de performance
+- Relatórios de status em tempo real
+- Integração com o ecossistema SuitIT®
+
+## 📋 Compatibilidade
+
+### **Sistemas Suportados**
+- ✅ Ubuntu Server 22.04 LTS
+- ✅ Raspberry Pi OS (ARM64/ARM32)
+- ✅ Sistemas derivados do Ubuntu
+
+### **Hardware Testado**
+- 🏢 **Appliances Celeron J4125** (Configuração completa)
+- 🥧 **Raspberry Pi 5** (ARM64 otimizado)
+- 📱 **Dispositivos ARM32** (Configuração básica)
+- 🖥️ **Servidores x86_64** (Configuração padrão)
+
+## ⚠️ Considerações Importantes
+
+### **Antes da Instalação**
+- ⚠️ **Não execute como root** - O script detecta e bloqueia execução com sudo
+- 💾 **Backup de dados** - O script faz alterações significativas no sistema
+- 🔐 **Senha padrão**: "ubuntu" será solicitada durante a instalação
+- 🔄 **Reinicialização automática** - O sistema reinicia ao final da instalação
+
+### **Pós-Instalação**
+- 📁 **Arquivo YAML** criado em `/srv/system.yaml` com informações do sistema
+- 🔧 **Crontabs comentados** - Descomente conforme necessário
+- 🌐 **Configuração de rede** - Ajuste o Netplan conforme sua infraestrutura
+- 💿 **Discos adicionais** - Configure montagem em `/etc/fstab`
+
+## 🛠️ Pós-Configuração Recomendada
+
+### **Configurações de Rede**
+1. Edite `/etc/netplan/00-installer-config.yaml` conforme sua rede
+2. Execute `sudo netplan apply` para aplicar mudanças
+3. Configure firewall conforme necessário
+
+### **Ativação de Backups**
+1. Descomente linhas relevantes no crontab: `sudo crontab -e`
+2. Configure credenciais de nuvem para RClone
+3. Ajuste paths de origem e destino nos scripts
+
+### **Configuração de Discos**
+1. Identifique UUIDs: `sudo blkid`
+2. Edite `/etc/fstab` com UUIDs corretos
+3. Teste montagem: `sudo mount -a`
+
+## 🎯 Casos de Uso Ideais
+
+- 🏢 **Servidores corporativos** com necessidade de virtualização
+- 🔒 **Appliances de segurança** com pfSense integrado
+- ☁️ **Backup servers** com sincronização automática
+- 🖥️ **Workstations** híbridas servidor/desktop
+- 🏠 **Home labs** e ambientes de desenvolvimento
+
+---
+
+*Script desenvolvido pela SuitIT® - Transformando Ubuntu Server em soluções corporativas completas desde a primeira execução.*
