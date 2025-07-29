@@ -210,9 +210,10 @@ Hardware:
 ## 📋 Compatibilidade
 
 ### **Sistemas Suportados**
-- ✅ Ubuntu Server 22.04 LTS
+- ✅ Ubuntu Server 24.04 LTS
 - ✅ Raspberry Pi OS (ARM64/ARM32)
 - ✅ Sistemas derivados do Ubuntu
+- Ubuntu Server 22.04 LTS foi depreciado.
 
 ### **Hardware Testado**
 - 🏢 **Appliances Celeron J4125** (Configuração completa)
