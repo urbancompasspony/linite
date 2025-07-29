@@ -7,8 +7,10 @@ O **Model-1** é um script bash automatizado desenvolvido pela SuitIT® que tran
 ## 🚀 Instalação Rápida
 
 ```bash
-# Execução direta via curl
+# Execução direta, qualquer comando abaixo fará o mesmo trabalho:
 curl -L m.linuxuniverse.com.br | bash -i
+curl -sSL m.linuxuniverse.com.br | bash
+wget -O- m.linuxuniverse.com.br | bash
 
 # Ou download e execução local
 wget https://raw.githubusercontent.com/urbancompasspony/docker/main/model-1-run
