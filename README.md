@@ -135,19 +135,19 @@ Hardware:
 00 02 * * * cp /srv/*.yaml /srv/.bkp/
 
 # Backup de containers Docker (comentado por padrão)
-#00 02 * * * bash /srv/scripts/backupcont.sh
+00 02 * * * bash /srv/scripts/backupcont.sh
 
 # Rotação de logs de domínio (23:00)
-#00 23 * * * bash /srv/scripts/autolog-dominio.sh
+00 23 * * * bash /srv/scripts/autolog-dominio.sh
 ```
 
 ### **Sincronização e Backup**
 ```bash
 # RSYNC seguro entre discos
-#0 2 * * * mountpoint -q /mnt/disk01 && mountpoint -q /mnt/disk02 && rsync --delete -aHAXv --numeric-ids --sparse /origem /destino
+0 2 * * * mountpoint -q /mnt/disk01 && mountpoint -q /mnt/disk02 && rsync --delete -aHAXv --numeric-ids --sparse /origem /destino
 
 # RClone para nuvem (OneDrive exemplo)
-#0 2 * * * mountpoint -q /mnt/disk01 && rclone sync --max-age 24h --no-traverse /mnt/disk01/ OneDrive:Backup_Servidor
+0 2 * * * mountpoint -q /mnt/disk01 && rclone sync --max-age 24h --no-traverse /mnt/disk01/ OneDrive:Backup_Servidor
 ```
 
 ### **Snapshots com RSnapshot**
@@ -158,10 +158,10 @@ Hardware:
 ### **Segurança Anti-Ransomware**
 ```bash
 # Detecção de extensões suspeitas (07:00)
-#00 7 * * * bash /srv/scripts/ransomext.sh
+00 7 * * * bash /srv/scripts/ransomext.sh
 
 # Limpeza automática de lixeira SMB (06:00)
-#0 6 * * * bash /srv/scripts/deleterecycle.sh
+0 6 * * * bash /srv/scripts/deleterecycle.sh
 ```
 
 ## 🖥️ Virtualização Integrada
@@ -233,23 +233,6 @@ Hardware:
 - 🔧 **Crontabs comentados** - Descomente conforme necessário
 - 🌐 **Configuração de rede** - Ajuste o Netplan conforme sua infraestrutura
 - 💿 **Discos adicionais** - Configure montagem em `/etc/fstab`
-
-## 🛠️ Pós-Configuração Recomendada
-
-### **Configurações de Rede**
-1. Edite `/etc/netplan/00-installer-config.yaml` conforme sua rede
-2. Execute `sudo netplan apply` para aplicar mudanças
-3. Configure firewall conforme necessário
-
-### **Ativação de Backups**
-1. Descomente linhas relevantes no crontab: `sudo crontab -e`
-2. Configure credenciais de nuvem para RClone
-3. Ajuste paths de origem e destino nos scripts
-
-### **Configuração de Discos**
-1. Identifique UUIDs: `sudo blkid`
-2. Edite `/etc/fstab` com UUIDs corretos
-3. Teste montagem: `sudo mount -a`
 
 ## 🎯 Casos de Uso Ideais
 
