@@ -322,7 +322,7 @@ function crontabs0 {
   (sudo crontab -l 2>/dev/null; echo "#00 02 * * * bash /srv/scripts/backupcont.sh") | sudo crontab -
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # AutoLog Rotate for Domain
-  sudo wget https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Backup/backup-syslog -O /srv/scripts/autolog-dominio.sh; sudo chmod +x /srv/scripts/autolog-dominio.sh
+  sudo wget https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Backup/03-backup-syslog -O /srv/scripts/autolog-dominio.sh; sudo chmod +x /srv/scripts/autolog-dominio.sh
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "# AutoLog") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "#00 23 * * * bash /srv/scripts/autolog-dominio.sh") | sudo crontab -
