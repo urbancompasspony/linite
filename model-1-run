@@ -38,7 +38,7 @@ caja xinit xorg openbox xdotool dbus-x11 dbus-user-session xorg xvfb xserver-xor
 xserver-xorg-video-vesa xserver-xorg-video-fbdev xserver-xorg-video-dummy \
 openvpn curl nmap parallel rclone openssh-server beep cmatrix pavucontrol \
 tmux gparted gnome-disk-utility terminator rdesktop pluma terminator xmlstarlet screen \
-fonts-noto-color-emoji fonts-emojione ttf-ancient-fonts"
+fonts-noto-color-emoji fonts-emojione ttf-ancient-fonts fonts-noto fonts-noto-cjk fonts-noto-unhinted fonts-liberation fonts-dejavu-core fonts-freefont-ttf fonts-symbola"
 
 # ARM64 RPi5
 export list01="docker-buildx mesa-vulkan-drivers mesa-utils vulkan-tools"
