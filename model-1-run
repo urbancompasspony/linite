@@ -75,6 +75,7 @@ function hardsys0 {
 
 function welcome0 {
   clear; echo ""; echo "Preparo de Servidor $MENU_VERSION by SuitIT®"; echo ""
+  wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh -O /home/administrador/.beep.sh; chmod +x /home/administrador/.beep.sh
   echo "Insira a senha padrao. Senha padrao: ubuntu"; echo ""
   sudo touch "$yamlbase"
   echo ""; echo "5"; sleep 1; echo "4"; sleep 1; echo "3"; sleep 1; echo "2"; sleep 1; echo "1"; sleep 1
@@ -287,7 +288,6 @@ END {
   fi
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   if [ "$HOSTTYPE" = "x86_64" ]; then
-    wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh -O /home/administrador/.beep.sh; chmod +x /home/administrador/.beep.sh
     (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
     (sudo crontab -l 2>/dev/null; echo "# BEEP!") | sudo crontab -
     (sudo crontab -l 2>/dev/null; echo "@reboot sleep 60; bash /home/administrador/.beep.sh") | sudo crontab -
@@ -308,7 +308,6 @@ function crontabs0 {
   if ! [ -d /srv/.bkp ]; then
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # Backups CDN
-  sudo mkdir /srv/.bkp
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "# Backups CDN") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "00 02 * * * cp /srv/*.yaml /srv/.bkp/") | sudo crontab -
@@ -366,6 +365,7 @@ function crontabs0 {
   (sudo crontab -l 2>/dev/null; echo "# Gamma - 1x na Semana aos domingos, perdurando 4x, aprox. 1 mes") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "#00 6 * * 0 mountpoint -q /mnt/disk01 && mountpoint -q /mnt/disk02 && /usr/bin/rsnapshot -c /srv/scripts/rsnapshot.conf gamma") | sudo crontab -
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
+  sudo mkdir /srv/.bkp
 fi
 }
 
