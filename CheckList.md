@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+#
+# curl -L https://github.com/urbancompasspony/linite/raw/refs/heads/main/CheckList.md | bash
+#
+
 # ======================================================================================================================================================== #
 # Script de Verificação Pós-Linite v1.0
 # Verifica se todas as configurações do Linuxuniverse foram aplicadas corretamente
