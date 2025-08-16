@@ -348,7 +348,7 @@ function crontabs0 {
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # Perma Lixeira para Syncthing
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "# Permissões da Lixeira do AD para Syncthing") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "# Permissoes da Lixeira do AD para Syncthing") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo '#0 2 * * * lixo0="/mnt/disk01/Domain/Lixeira/" && [ -d "$lixo0" ] && chmod 777 -R "$lixo0" 2>/dev/null || :') | sudo crontab -
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # RSnapshots
