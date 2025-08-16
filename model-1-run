@@ -75,14 +75,8 @@ function hardsys0 {
 
 function welcome0 {
   clear; echo ""; echo "Preparo de Servidor $MENU_VERSION by SuitIT®"; echo ""
-  if [ -f "$yamlbase" ]; then
-    clear; echo ""; echo "Este servidor ja foi configurado e está no Modelo CdN."; sleep 1
-    echo ""; echo "Caso precise reinstala-lo ou restaura-lo utilize o Painel CdN!"; sleep 1
-    exit
-  else
-    echo "Insira a senha padrao. Senha padrao: ubuntu"; echo ""
-    sudo touch "$yamlbase"
-  fi
+  echo "Insira a senha padrao. Senha padrao: ubuntu"; echo ""
+  sudo touch "$yamlbase"
   echo ""; echo "5"; sleep 1; echo "4"; sleep 1; echo "3"; sleep 1; echo "2"; sleep 1; echo "1"; sleep 1
 }
 
@@ -192,14 +186,16 @@ function services0 {
 }
 
 function sysctl0 {
-  sleep 1; clear; echo "Aplicando recursos extras ao SYSCTL"
-  echo -e "kernel.sysrq=1" | sudo tee /etc/sysctl.d/10-magic-sysrq.conf
-  echo -e "vm.swappiness=10
+  if ! [ -f /etc/sysctl.d/99-sysctl.conf ]; then
+    sleep 1; clear; echo "Aplicando recursos extras ao SYSCTL"
+    echo -e "kernel.sysrq=1" | sudo tee /etc/sysctl.d/10-magic-sysrq.conf
+    echo -e "vm.swappiness=10
 vm.panic_on_oom=1
 kernel.panic=5
 #net.ipv4.ip_forward=1
 #net.ipv6.conf.all.disable_ipv6=1
 #net.ipv6.conf.default.disable_ipv6=1" | sudo tee /etc/sysctl.d/99-sysctl.conf
+  fi
 }
 
 function motd0 {
@@ -214,13 +210,19 @@ function motd0 {
 function journal0 {
   sleep 1; clear; echo "Ajustando JOURNAL"
   echo -e "
+[Journal]
 Storage=persistent
 SystemMaxUse=1G
-SystemKeepFree=5G" | sudo tee -a /etc/systemd/journald.conf
+SystemKeepFree=5G" | sudo tee /etc/systemd/journald.conf
 }
 
 function fstab0 {
   sudo mkdir /mnt/disk01; sudo mkdir /mnt/disk02; sleep 1; clear; echo "Adicionando entradas extras ao fstab"
+
+  if grep -q "tmpfs /tmp tmpfs defaults 0 0" /etc/fstab; then
+      exit 0
+  fi
+
   echo -e "
 # Temp to ram!
 tmpfs /tmp tmpfs defaults 0 0
@@ -237,19 +239,22 @@ tmpfs /var/tmp tmpfs defaults 0 0
 }
 
 function firefox0 {
-  sudo install -d -m 0755 /etc/apt/keyrings &&
-  wget -q https://packages.mozilla.org/apt/repo-signing-key.gpg -O- | sudo tee /etc/apt/keyrings/packages.mozilla.org.asc > /dev/null &&
-  gpg -n -q --import --import-options import-show /etc/apt/keyrings/packages.mozilla.org.asc | awk '/pub/{getline; gsub(/^ +| +$/,""); if($0 == "35BAA0B33E9EB396F59CA838C0BA5CE6DC6315A3") print "\nThe key fingerprint matches ("$0").\n"; else print "\nVerification failed: the fingerprint ("$0") does not match the expected one.\n"}' &&
-  echo "deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.asc] https://packages.mozilla.org/apt mozilla main" | sudo tee -a /etc/apt/sources.list.d/mozilla.list > /dev/null &&
-  echo '
+  if ! [ -f /etc/apt/sources.list.d/mozilla.list ]; then
+    sudo install -d -m 0755 /etc/apt/keyrings &&
+    wget -q https://packages.mozilla.org/apt/repo-signing-key.gpg -O- | sudo tee /etc/apt/keyrings/packages.mozilla.org.asc > /dev/null &&
+    gpg -n -q --import --import-options import-show /etc/apt/keyrings/packages.mozilla.org.asc | awk '/pub/{getline; gsub(/^ +| +$/,""); if($0 == "35BAA0B33E9EB396F59CA838C0BA5CE6DC6315A3") print "\nThe key fingerprint matches ("$0").\n"; else print "\nVerification failed: the fingerprint ("$0") does not match the expected one.\n"}' &&
+    echo "deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.asc] https://packages.mozilla.org/apt mozilla main" | sudo tee -a /etc/apt/sources.list.d/mozilla.list > /dev/null &&
+    echo '
 Package: *
 Pin: origin packages.mozilla.org
 Pin-Priority: 1000
 ' | sudo tee /etc/apt/preferences.d/mozilla &&
-  sudo apt update; sudo apt install firefox -y
+    sudo apt update; sudo apt install firefox -y
+  fi
 }
 
 function yamls0 {
+  if ! [ -f "$yamlbase" ]; then
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   sudo mkdir -p /srv/scripts/config
   sudo touch "$yamlbase"
@@ -296,10 +301,12 @@ END {
     sleep 3
   fi
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
+fi
 }
 
 function crontabs0 {
-# ----------------------------------------------------------------------------------------------------------------------------------------------------
+  if ! [ -f /srv/.bkp ]; then
+  # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # Backups CDN
   sudo mkdir /srv/.bkp
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
@@ -359,6 +366,7 @@ function crontabs0 {
   (sudo crontab -l 2>/dev/null; echo "# Gamma - 1x na Semana aos domingos, perdurando 4x, aprox. 1 mes") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "#00 6 * * 0 mountpoint -q /mnt/disk01 && mountpoint -q /mnt/disk02 && /usr/bin/rsnapshot -c /srv/scripts/rsnapshot.conf gamma") | sudo crontab -
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
+fi
 }
 
 function netplan0 {
@@ -411,7 +419,7 @@ function netplan1 {
 #              #addresses: [200.175.89.139, 200.175.5.139]
 #              #addresses: [8.8.4.4, 8.8.8.8]
 #              #addresses: [1.1.1.1, 1.0.0.1]
-#    version: 2" | sudo tee -a /etc/netplan/00-installer-config.yaml
+#    version: 2" | sudo tee /etc/netplan/99-model.yaml
 
 echo -e "
 #
@@ -425,8 +433,7 @@ echo -e "
 #      dhcp4: no
 #      optional: true
 #      addresses: [172.16.1.2/24]
-#  version: 2" | sudo tee -a /etc/netplan/00-installer-config.yaml
-  sudo netplan apply
+#  version: 2" | sudo tee -a /etc/netplan/99-model.yaml
 }
 
 function pfsense0 {
@@ -436,16 +443,20 @@ function pfsense0 {
   else
     webadress="$wanhost"
   fi
-  # Aqui verifica se a .img ja existe ou se pode baixar uma nova.
+
+  # Aqui verifica se a .img ja existe ou se pode baixar uma nova!
   if ! [ -f "$destpath"/"$1" ]; then
     clear; sudo wget --user $usern4me --password $passw0rd $webadress/"$1" -O $destpath/"$1" &&
     sudo chmod 777 /var/run/libvirt/libvirt-sock
     sleep 2
+
+    # Liberado criar e iniciar uma nova VM!
     sudo touch /tmp/allowvirt0
   fi
 }
 
 function pfsense1 {
+  # Só executa se permitir criar e liberar nova VM na função pfsense0
   if [ -f "/tmp/allowvirt0" ]; then
     sudo virt-install --import \
 --name pfSense \
@@ -469,8 +480,21 @@ function pfsense1 {
 function the_end0 {
   clear; echo "Instalação concluida!"
   datetime0=$(date +"%d/%m/%Y - %H:%M")
-  sudo yq -i ".Informacoes.Data_Instalacao = \"${datetime0}\"" "$yamlbase"
-  sudo yq -i ".Informacoes.Data_Ultima_Reinstalacao = \"Nunca foi reinstalado\"" "$yamlbase"
+
+  # Verifica se as chaves existem e têm valores
+  data_instalacao=$(yq '.Informacoes.Data_Instalacao' "$yamlbase" 2>/dev/null)
+  data_reinstalacao=$(yq '.Informacoes.Data_Ultima_Reinstalacao' "$yamlbase" 2>/dev/null)
+
+  if [[ "$data_instalacao" != "null" ]] || [[ "$data_reinstalacao" != "null" ]]; then
+      echo "Informações de instalação já existem - mantendo valores atuais"
+      echo "Data Instalação atual: $data_instalacao"
+      echo "Data Reinstalação atual: $data_reinstalacao"
+  else
+      echo "Definindo informações de instalação..."
+      sudo yq -i ".Informacoes.Data_Instalacao = \"${datetime0}\"" "$yamlbase"
+      sudo yq -i ".Informacoes.Data_Ultima_Reinstalacao = \"Nunca foi reinstalado\"" "$yamlbase"
+  fi
+
   echo "Reiniciando sistema em 3 segundos"; sleep 3
   sudo reboot
 }
