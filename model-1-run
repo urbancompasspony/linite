@@ -324,10 +324,12 @@ function crontabs0 {
   (sudo crontab -l 2>/dev/null; echo '#0 2 * * * mountpoint -q /mnt/disk01 && rclone sync --max-age 24h --no-traverse --exclude "Lixeira/**" /mnt/disk01/ OneDrive:Backup_Servidor') | sudo crontab -
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # Auto BackupCont
-  sudo wget "https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/01-Backup" -O /srv/scripts/backupcont.sh; sudo chmod +x /srv/scripts/backupcont.sh
-  (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "# 5 AutoBackup Containers") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "#00 02 * * * bash /srv/scripts/backupcont.sh") | sudo crontab -
+  if ! [ -f /srv/scripts/backupcont.sh ]; then
+    sudo wget "https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/01-Backup" -O /srv/scripts/backupcont.sh; sudo chmod +x /srv/scripts/backupcont.sh
+    (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
+    (sudo crontab -l 2>/dev/null; echo "# 5 AutoBackup Containers") | sudo crontab -
+    (sudo crontab -l 2>/dev/null; echo "#00 02 * * * bash /srv/scripts/backupcont.sh") | sudo crontab -
+  fi
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # AutoLog Rotate for Domain
   sudo wget https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Backup/03-backup-syslog -O /srv/scripts/autolog-dominio.sh; sudo chmod +x /srv/scripts/autolog-dominio.sh
