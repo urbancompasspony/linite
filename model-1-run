@@ -336,16 +336,20 @@ function crontabs0 {
   (sudo crontab -l 2>/dev/null; echo "#00 23 * * * bash /srv/scripts/autolog-dominio.sh") | sudo crontab -
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # RansomExt
-  sudo wget https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/ransomext -O /srv/scripts/ransomext.sh; sudo chmod +x /srv/scripts/ransomext.sh
-  (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "# 7 RansomExt") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "#00 7 * * * bash /srv/scripts/ransomext.sh") | sudo crontab -
+  if ! [ -f /srv/scripts/ransomext.sh ]; then
+    sudo wget https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/ransomext -O /srv/scripts/ransomext.sh; sudo chmod +x /srv/scripts/ransomext.sh
+    (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
+    (sudo crontab -l 2>/dev/null; echo "# 7 RansomExt") | sudo crontab -
+    (sudo crontab -l 2>/dev/null; echo "#00 7 * * * bash /srv/scripts/ransomext.sh") | sudo crontab -
+  fi
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # AutoDelete Trash for SMB!
-  sudo wget https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Backup/02-Models_AutoDelete -O /srv/scripts/deleterecycle.sh; sudo chmod +x /srv/scripts/deleterecycle.sh
-  (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "# 8 Delete Trash") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "#0 6 * * * bash /srv/scripts/deleterecycle.sh") | sudo crontab -
+  if ! [ -f /srv/scripts/deleterecycle.sh ]; then
+    sudo wget https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Backup/02-Models_AutoDelete -O /srv/scripts/deleterecycle.sh; sudo chmod +x /srv/scripts/deleterecycle.sh
+    (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
+    (sudo crontab -l 2>/dev/null; echo "# 8 Delete Trash") | sudo crontab -
+    (sudo crontab -l 2>/dev/null; echo "#0 6 * * * bash /srv/scripts/deleterecycle.sh") | sudo crontab -
+  fi
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # Perma Lixeira para Syncthing
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
