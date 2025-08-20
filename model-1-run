@@ -76,7 +76,7 @@ function hardsys0 {
 function welcome0 {
   clear; echo ""; echo "Preparo de Servidor $MENU_VERSION by SuitIT®"; echo ""
   wget https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh -O /home/administrador/.beep.sh; chmod +x /home/administrador/.beep.sh
-  echo "Insira a senha padrao. Senha padrao: ubuntu"; echo ""
+  echo "Insira a senha do usuario administrador. Caso nao tenha trocado a senha ainda, senha padrao: ubuntu"; echo ""
   sudo mkdir -p /srv/scripts/config
   echo ""; echo "5"; sleep 1; echo "4"; sleep 1; echo "3"; sleep 1; echo "2"; sleep 1; echo "1"; sleep 1
 }
@@ -258,7 +258,6 @@ function yamls0 {
   if ! [ -f "$yamlbase" ]; then
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   sudo mkdir -p /srv/scripts/config
-  sudo touch "$yamlbase"
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   IPMachine=$(ip route get 1.1.1.1 | grep -oP 'src \K\S+')
   sudo yq -i ".Informacoes.IP_LAN_Install = \"${IPMachine}\"" "$yamlbase"
@@ -301,6 +300,19 @@ END {
     sleep 3
   fi
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
+  datetime0=$(date +"%d/%m/%Y - %H:%M")
+  data_instalacao=$(yq '.Informacoes.Data_Instalacao' "$yamlbase" 2>/dev/null)
+  data_reinstalacao=$(yq '.Informacoes.Data_Ultima_Reinstalacao' "$yamlbase" 2>/dev/null)
+
+  if [[ "$data_instalacao" != "null" ]] || [[ "$data_reinstalacao" != "null" ]]; then
+      echo "Informações de instalação já existem - mantendo valores atuais"
+      echo "Data Instalação atual: $data_instalacao"
+      echo "Data Reinstalação atual: $data_reinstalacao"
+  else
+      echo "Definindo informações de instalação..."
+      sudo yq -i ".Informacoes.Data_Instalacao = \"${datetime0}\"" "$yamlbase"
+      sudo yq -i ".Informacoes.Data_Ultima_Reinstalacao = \"Nunca foi reinstalado\"" "$yamlbase"
+  fi
 fi
 }
 
@@ -487,22 +499,7 @@ function pfsense1 {
 
 function the_end0 {
   clear; echo "Instalação concluida!"
-  datetime0=$(date +"%d/%m/%Y - %H:%M")
-
-  # Verifica se as chaves existem e têm valores
-  data_instalacao=$(yq '.Informacoes.Data_Instalacao' "$yamlbase" 2>/dev/null)
-  data_reinstalacao=$(yq '.Informacoes.Data_Ultima_Reinstalacao' "$yamlbase" 2>/dev/null)
-
-  if [[ "$data_instalacao" != "null" ]] || [[ "$data_reinstalacao" != "null" ]]; then
-      echo "Informações de instalação já existem - mantendo valores atuais"
-      echo "Data Instalação atual: $data_instalacao"
-      echo "Data Reinstalação atual: $data_reinstalacao"
-  else
-      echo "Definindo informações de instalação..."
-      sudo yq -i ".Informacoes.Data_Instalacao = \"${datetime0}\"" "$yamlbase"
-      sudo yq -i ".Informacoes.Data_Ultima_Reinstalacao = \"Nunca foi reinstalado\"" "$yamlbase"
-  fi
-
+  sudo touch "$yamlbase"
   echo "Reiniciando sistema em 3 segundos"; sleep 3
   sudo reboot
 }
