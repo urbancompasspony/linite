@@ -286,13 +286,6 @@ END {
     sudo yq -i ".Informacoes.Serial_Windows = \"Inexistente\"" "$yamlbase"
   fi
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
-  if [ "$HOSTTYPE" = "x86_64" ]; then
-    (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
-    (sudo crontab -l 2>/dev/null; echo "# 1 BEEP!") | sudo crontab -
-    (sudo crontab -l 2>/dev/null; echo "@reboot sleep 60; bash /home/administrador/.beep.sh") | sudo crontab -
-    sudo yq -i ".Informacoes.Beep = \"Ativo\"" "$yamlbase"
-  fi
-  # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # Support Pannel!
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/Diagnostics/install.sh | sudo bash
   if [ "$HOSTTYPE" = "arm" ]; then
@@ -300,6 +293,7 @@ END {
     sleep 3
   fi
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
+  # Data de Instalação ou Reinstalação
   datetime0=$(date +"%d/%m/%Y - %H:%M")
   data_instalacao=$(yq '.Informacoes.Data_Instalacao' "$yamlbase" 2>/dev/null)
   data_reinstalacao=$(yq '.Informacoes.Data_Ultima_Reinstalacao' "$yamlbase" 2>/dev/null)
@@ -318,6 +312,18 @@ fi
 
 function crontabs0 {
   if ! [ -d /srv/.bkp ]; then
+  # ----------------------------------------------------------------------------------------------------------------------------------------------------
+  if [ "$HOSTTYPE" = "x86_64" ]; then
+    (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
+    (sudo crontab -l 2>/dev/null; echo "# 1 BEEP!") | sudo crontab -
+    (sudo crontab -l 2>/dev/null; echo "@reboot sleep 60; bash /home/administrador/.beep.sh") | sudo crontab -
+    sudo yq -i ".Informacoes.Beep = \"Ativo\"" "$yamlbase"
+  else
+    (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
+    (sudo crontab -l 2>/dev/null; echo "# 1 BEEP!") | sudo crontab -
+    (sudo crontab -l 2>/dev/null; echo "# Sistema sem Beep") | sudo crontab -
+    sudo yq -i ".Informacoes.Beep = \"Inativo\"" "$yamlbase"
+  fi
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # Backups CDN
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
