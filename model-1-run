@@ -331,7 +331,7 @@ function crontabs0 {
   # Backups CDN
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "# 2 Backups CDN") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "00 02 * * * cp /srv/*.yaml /srv/.bkp/") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "00 02 * * * cp /srv/*.yaml /mnt/disk01/backups_containers/") | sudo crontab -
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # Safe RSYNC! KISS
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
