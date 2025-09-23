@@ -328,10 +328,11 @@ function crontabs0 {
     sudo yq -i ".Informacoes.Beep = \"Inativo\"" "$yamlbase"
   fi
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
-  # Backups CDN
+  # CDN
+  sudo wget https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/ReDo/1-Backup_Total.sh -O /srv/scripts/bkp-cdn.sh; sudo chmod +x /srv/scripts/bkp-cdn.sh
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "# 2 Backups CDN") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "00 02 * * * destiny=\$(sed -n '2p' /srv/scripts/config/backupcont); cp /srv/*.yaml \$destiny") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "# 2 CDN Backup") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "#0 23 * * * bash /srv/scripts/bkp-cdn.sh") | sudo crontab -
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # Safe RSYNC! KISS
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
@@ -378,17 +379,11 @@ function crontabs0 {
   (sudo crontab -l 2>/dev/null; echo "# 9 Permissoes da Lixeira do AD para Syncthing") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo '#0 2 * * * lixo0="/mnt/disk01/Domain/Lixeira/" && [ -d "$lixo0" ] && chmod 777 -R "$lixo0" 2>/dev/null || :') | sudo crontab -
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
-  # CDN
-  sudo wget https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/ReDo/1-Backup_Total.sh -O /srv/scripts/bkp-cdn.sh; sudo chmod +x /srv/scripts/bkp-cdn.sh
-  (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "# 10 CDN Backup") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "#0 23 * * * bash /srv/scripts/bkp-cdn.sh") | sudo crontab -
-  # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # RSnapshots
   if ! [ -f /srv/scripts/rsnapshot.conf ]; then
     sudo wget "https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/rsnapshot.conf" -O /srv/scripts/rsnapshot.conf; sudo chmod +x /srv/scripts/rsnapshot.conf
     (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
-    (sudo crontab -l 2>/dev/null; echo "# 11 RSnapshots") | sudo crontab -
+    (sudo crontab -l 2>/dev/null; echo "# 10 RSnapshots") | sudo crontab -
     (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
     (sudo crontab -l 2>/dev/null; echo "# Alpha - Executa as 7h, 10h, 12h, 14h, 16h e 18h! 6x por dia") | sudo crontab -
     (sudo crontab -l 2>/dev/null; echo "#00 7,10,12,14,16,18 * * 1-5 mountpoint -q /mnt/disk01 && mountpoint -q /mnt/disk02 && /usr/bin/rsnapshot -c /srv/scripts/rsnapshot.conf alpha") | sudo crontab -
