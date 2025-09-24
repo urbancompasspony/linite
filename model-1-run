@@ -332,7 +332,7 @@ function crontabs0 {
   sudo wget https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/ReDo/1-Backup_Total.sh -O /srv/scripts/bkp-cdn.sh; sudo chmod +x /srv/scripts/bkp-cdn.sh
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "# 2 CDN Backup") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "#0 23 * * * bash /srv/scripts/bkp-cdn.sh") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "#0 22 * * * bash /srv/scripts/bkp-cdn.sh") | sudo crontab -
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # Safe RSYNC! KISS
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
