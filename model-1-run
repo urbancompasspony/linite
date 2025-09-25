@@ -237,7 +237,7 @@ tmpfs /var/tmp tmpfs defaults 0 0
 # /dev/disk/by-uuid/ /mnt/disk02 ext4 defaults 0 0
 
 # Acesso Externo (Se necessario)
-# //172.25.0.X/pasta_rede /mnt/pasta_local cifs credentials=/home/administrador/.smb,iocharset=utf8,file_mode=0777,dir_mode=0777,noperm,user,vers=2.1,nofail,x-systemd.automount,x-systemd.requires=network-online.target,x-systemd.device-timeout=3 0 0" | sudo tee -a /etc/fstab
+# //172.25.0.X/pasta_rede /mnt/pasta_local cifs credentials=/srv/scripts/smb,iocharset=utf8,file_mode=0777,dir_mode=0777,noperm,user,vers=2.1,nofail,x-systemd.automount,x-systemd.requires=network-online.target,x-systemd.device-timeout=3 0 0" | sudo tee -a /etc/fstab
 }
 
 function firefox0 {
