@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # ======================================================================================================================================================== #
-# curl -L m.linuxuniverse.com.br | bash -i
+# curl -sSL m.linuxuniverse.com.br | bash
 # ======================================================================================================================================================== #
 
 MENU_VERSION="v3.4 - 18-08-2025"
@@ -75,7 +75,7 @@ function hardsys0 {
 
 function welcome0 {
   clear; echo ""; echo "Preparo de Servidor $MENU_VERSION by SuitIT®"; echo ""
-  curl -sSL https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh | tee /home/administrador/.beep.sh; chmod +x /home/administrador/.beep.sh
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh | tee /home/administrador/.beep.sh> /dev/null; chmod +x /home/administrador/.beep.sh
   echo "Insira a senha do usuario administrador. Caso nao tenha trocado a senha ainda, senha padrao: ubuntu"; echo ""
   sudo mkdir -p /srv/scripts/config
   echo ""; echo "5"; sleep 1; echo "4"; sleep 1; echo "3"; sleep 1; echo "2"; sleep 1; echo "1"; sleep 1
@@ -162,17 +162,17 @@ function update0 {
   echo "Instalando pacotes...."
   if [ "$HOSTTYPE" = "aarch64" ]; then
     sudo apt install $list00 $list01 -y
-    curl -sSL https://github.com/mikefarah/yq/releases/latest/download/yq_linux_arm64 | sudo tee /usr/local/bin/yq
+    curl -sSL https://github.com/mikefarah/yq/releases/latest/download/yq_linux_arm64 | sudo tee /usr/local/bin/yq> /dev/null
     sudo chmod +x /usr/local/bin/yq
     services0
   elif [ "$HOSTTYPE" = "x86_64" ]; then
     sudo apt install $list00 $list02 -y
-    curl -sSL https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 | sudo tee /usr/local/bin/yq
+    curl -sSL https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 | sudo tee /usr/local/bin/yq> /dev/null
     sudo chmod +x /usr/local/bin/yq
     services0
   else
     sudo apt install $list00 -y &&
-    curl -sSL https://github.com/mikefarah/yq/releases/latest/download/yq_linux_arm | sudo tee /usr/local/bin/yq
+    curl -sSL https://github.com/mikefarah/yq/releases/latest/download/yq_linux_arm | sudo tee /usr/local/bin/yq> /dev/null
     sudo chmod +x /usr/local/bin/yq
     services0
   fi
@@ -203,9 +203,9 @@ kernel.panic=5
 function motd0 {
   sleep 1; clear; echo "Ajustando tela de boas vindas do servidor"
   sudo rm -R /etc/update-motd.d/*
-  curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/00-header | sudo tee /etc/update-motd.d/00-header
-  curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/20-sysinfo | sudo tee /etc/update-motd.d/20-sysinfo
-  curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/90-dynamic-motd | sudo tee /etc/update-motd.d/90-dynamic-motd
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/00-header | sudo tee /etc/update-motd.d/00-header> /dev/null
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/20-sysinfo | sudo tee /etc/update-motd.d/20-sysinfo> /dev/null
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/main/MOTD/90-dynamic-motd | sudo tee /etc/update-motd.d/90-dynamic-motd> /dev/null
   sudo chmod +x /etc/update-motd.d/*
 }
 
@@ -329,7 +329,7 @@ function crontabs0 {
   fi
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # CDN
-  curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/ReDo/1-Backup_Total.sh | sudo tee /srv/scripts/bkp-cdn.sh; sudo chmod +x /srv/scripts/bkp-cdn.sh
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/ReDo/1-Backup_Total.sh | sudo tee /srv/scripts/bkp-cdn.sh> /dev/null; sudo chmod +x /srv/scripts/bkp-cdn.sh
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "# 2 CDN Backup") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "#0 22 * * * bash /srv/scripts/bkp-cdn.sh") | sudo crontab -
@@ -346,21 +346,21 @@ function crontabs0 {
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # Auto BackupCont
   if ! [ -f /srv/scripts/backupcont.sh ]; then
-    curl -sSL "https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/01-Backup" | sudo tee /srv/scripts/backupcont.sh; sudo chmod +x /srv/scripts/backupcont.sh
+    curl -sSL "https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/01-Backup" | sudo tee /srv/scripts/backupcont.sh> /dev/null; sudo chmod +x /srv/scripts/backupcont.sh
     (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
     (sudo crontab -l 2>/dev/null; echo "# 5 AutoBackup Containers") | sudo crontab -
     (sudo crontab -l 2>/dev/null; echo "#00 02 * * * bash /srv/scripts/backupcont.sh") | sudo crontab -
   fi
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # AutoLog Rotate for Domain
-  curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Backup/03-backup-syslog | sudo tee /srv/scripts/autolog-dominio.sh; sudo chmod +x /srv/scripts/autolog-dominio.sh
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Backup/03-backup-syslog | sudo tee /srv/scripts/autolog-dominio.sh> /dev/null; sudo chmod +x /srv/scripts/autolog-dominio.sh
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "# 6 AutoLog") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "#00 23 * * * bash /srv/scripts/autolog-dominio.sh") | sudo crontab -
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # RansomExt
   if ! [ -f /srv/scripts/ransomext.sh ]; then
-    curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/ransomext | sudo tee /srv/scripts/ransomext.sh; sudo chmod +x /srv/scripts/ransomext.sh
+    curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/ransomext | sudo tee /srv/scripts/ransomext.sh> /dev/null; sudo chmod +x /srv/scripts/ransomext.sh
     (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
     (sudo crontab -l 2>/dev/null; echo "# 7 RansomExt") | sudo crontab -
     (sudo crontab -l 2>/dev/null; echo "#00 7 * * * bash /srv/scripts/ransomext.sh") | sudo crontab -
@@ -368,7 +368,7 @@ function crontabs0 {
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # AutoDelete Trash for SMB!
   if ! [ -f /srv/scripts/deleterecycle.sh ]; then
-    curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Backup/02-Models_AutoDelete | sudo tee /srv/scripts/deleterecycle.sh; sudo chmod +x /srv/scripts/deleterecycle.sh
+    curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Backup/02-Models_AutoDelete | sudo tee /srv/scripts/deleterecycle.sh> /dev/null; sudo chmod +x /srv/scripts/deleterecycle.sh
     (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
     (sudo crontab -l 2>/dev/null; echo "# 8 Delete Trash") | sudo crontab -
     (sudo crontab -l 2>/dev/null; echo "#0 6 * * * bash /srv/scripts/deleterecycle.sh") | sudo crontab -
@@ -381,7 +381,7 @@ function crontabs0 {
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # RSnapshots
   if ! [ -f /srv/scripts/rsnapshot.conf ]; then
-    curl -sSL "https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/rsnapshot.conf" | sudo tee /srv/scripts/rsnapshot.conf; sudo chmod +x /srv/scripts/rsnapshot.conf
+    curl -sSL "https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/rsnapshot.conf" | sudo tee /srv/scripts/rsnapshot.conf> /dev/null; sudo chmod +x /srv/scripts/rsnapshot.conf
     (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
     (sudo crontab -l 2>/dev/null; echo "# 10 RSnapshots") | sudo crontab -
     (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
@@ -476,7 +476,7 @@ function pfsense0 {
 
   # Aqui verifica se a .img ja existe ou se pode baixar uma nova!
   if ! [ -f "$destpath"/"$1" ]; then
-    clear; curl -sSL --user $usern4me --password $passw0rd $webadress/"$1" | sudo tee $destpath/"$1" &&
+    clear; curl -sSL --user $usern4me --password $passw0rd $webadress/"$1" | sudo tee $destpath/"$1" > /dev/null &&
     sudo chmod 777 /var/run/libvirt/libvirt-sock
     sleep 2
 
