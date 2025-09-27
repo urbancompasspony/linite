@@ -4,6 +4,10 @@
 # curl -sSL m.linuxuniverse.com.br | bash
 # ======================================================================================================================================================== #
 
+# ATENÇÃO
+export pfsenseversion="pfsense2.8"
+export pfsensemodel="pfsense-modelo.img"
+
 MENU_VERSION="v3.4 - 18-08-2025"
 
 # Informations for the compliance Celeron:
@@ -475,8 +479,27 @@ function pfsense0 {
   fi
 
   # Aqui verifica se a .img ja existe ou se pode baixar uma nova!
-  if ! [ -f "$destpath"/"$1" ]; then
-    clear; curl -sSL --user $usern4me --password $passw0rd $webadress/"$1" | sudo tee $destpath/"$1" > /dev/null &&
+  if ! [ -f "$destpath"/"$pfsenseversion" ]; then
+    clear; curl -sSL --user "$usern4me":"$passw0rd" "$webadress"/"$pfsenseversion" | sudo tee "$destpath"/"$pfsenseversion" > /dev/null &&
+    sudo chmod 777 /var/run/libvirt/libvirt-sock
+    sleep 2
+
+    # Liberado criar e iniciar uma nova VM!
+    sudo touch /tmp/allowvirt0
+  fi
+}
+
+function pfsensemodel0 {
+  sleep 1; clear; echo "Adicionando pfSense como VM"
+  if ping -c 1 $serverip >/dev/null; then
+    webadress="$lanhost"
+  else
+    webadress="$wanhost"
+  fi
+
+  # Aqui verifica se a .img ja existe ou se pode baixar uma nova!
+  if ! [ -f "$destpath"/"$pfsensemodel" ]; then
+    clear; curl -sSL --user $usern4me:$passw0rd $webadress/"$pfsensemodel" | sudo tee $destpath/"$pfsensemodel" > /dev/null &&
     sudo chmod 777 /var/run/libvirt/libvirt-sock
     sleep 2
 
@@ -497,7 +520,7 @@ function pfsense1 {
 --network type=direct,source=enp1s0,source_mode=bridge,mac=52:54:00:55:ea:01 \
 --network type=direct,source=enp2s0,source_mode=bridge,mac=52:54:00:55:ea:02 \
 --network type=direct,source=eno1,source_mode=bridge,mac=52:54:00:55:ea:03 \
---disk /var/lib/libvirt/images/"$1" \
+--disk /var/lib/libvirt/images/"$pfsensemodel" \
 --os-variant=freebsd14.2 \
 --graphics vnc \
 --import \
@@ -551,14 +574,14 @@ function arm1 {
 function linite0 {
   common_place
   netplan1
-  pfsense0 "pfsense2.8"
+  pfsense0
 }
 
 function appliance0 {
   common_place
   netplan0
-  pfsense0 "pfsense-modelo.img"
-  pfsense1 "pfsense-modelo.img"
+  pfsensemodel0
+  pfsense1
 }
 
 root_check0
