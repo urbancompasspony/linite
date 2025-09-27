@@ -4,6 +4,8 @@
 # curl -L m.linuxuniverse.com.br | bash
 # ======================================================================================================================================================== #
 
+datetime0=$(date '+%Y-%m-%d %H:%M:%S')
+
 wget -O- https://raw.githubusercontent.com/urbancompasspony/linite/refs/heads/main/model-1-run > ~/.model-installer
 chmod +x .model-installer
-./.model-installer
+./.model-installer 2>&1 | tee /srv/instalacao-$datetime0.log
