@@ -4,7 +4,7 @@
 # curl -sSL desk.linuxuniverse.com.br | bash
 # ======================================================================================================================================================== #
 
-curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/refs/heads/main/model-desk-run | tee ~/.desk-installer; chmod +x .desk-installer
+curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/refs/heads/main/model-desk-run | tee ~/.desk-installer > /dev/null; chmod +x .desk-installer
 ./.desk-installer 2>&1 | tee ~/.instalacao-$datetime0.log
 
 
