@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # ======================================================================================================================================================== #
-# wget -O- desk.linuxuniverse.com.br | bash
+# curl -sSL desk.linuxuniverse.com.br | bash
 # ======================================================================================================================================================== #
 
 curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/refs/heads/main/model-desk-run | tee ~/.desk-installer; chmod +x .desk-installer
