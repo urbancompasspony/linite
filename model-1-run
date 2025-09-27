@@ -481,7 +481,7 @@ function pfsense0 {
   # Aqui verifica se a .img ja existe ou se pode baixar uma nova!
   if ! [ -f "$destpath"/"$pfsenseversion" ]; then
     clear; echo "Baixando pfSense em segundo plano, aguarde..."
-    curl -sSL --user "$usern4me":"$passw0rd" "$webadress"/"$pfsenseversion" | sudo tee "$destpath"/"$pfsenseversion" > /dev/null &&
+    curl -sSLv --user "$usern4me":"$passw0rd" "$webadress"/"$pfsenseversion" | sudo tee "$destpath"/"$pfsenseversion" > /dev/null &&
     sudo chmod 777 /var/run/libvirt/libvirt-sock
     sleep 2
 
@@ -501,7 +501,7 @@ function pfsensemodel0 {
   # Aqui verifica se a .img ja existe ou se pode baixar uma nova!
   if ! [ -f "$destpath"/"$pfsensemodel" ]; then
     clear; echo "Baixando pfSense em segundo plano, aguarde..."
-    curl -sSL --user "$usern4me":"$passw0rd" "$webadress"/"$pfsensemodel" | sudo tee "$destpath"/"$pfsensemodel" > /dev/null &&
+    curl -sSLv --user "$usern4me":"$passw0rd" "$webadress"/"$pfsensemodel" | sudo tee "$destpath"/"$pfsensemodel" > /dev/null &&
     sudo chmod 777 /var/run/libvirt/libvirt-sock
     sleep 2
 
