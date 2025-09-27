@@ -4,6 +4,8 @@
 # wget -O- desk.linuxuniverse.com.br | bash
 # ======================================================================================================================================================== #
 
-wget -O- https://raw.githubusercontent.com/urbancompasspony/linite/refs/heads/main/model-desk-run > ~/.desk-installer
-chmod +x .desk-installer
-./.desk-installer
+curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/refs/heads/main/model-desk-run | tee ~/.desk-installer; chmod +x .desk-installer
+./.desk-installer 2>&1 | tee ~/.instalacao-$datetime0.log
+
+
+#wget -O- https://raw.githubusercontent.com/urbancompasspony/linite/refs/heads/main/model-desk-run > ~/.desk-installer
