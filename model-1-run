@@ -268,6 +268,8 @@ function yamls0 {
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   IPMachine=$(ip route get 1.1.1.1 | grep -oP 'src \K\S+')
   sudo yq -i ".Informacoes.IP_LAN_Install = \"${IPMachine}\"" "$yamlbase"
+  MACHINE_ID=$(cat /etc/machine-id)
+  sudo yq -i ".Informacoes.machine_id = \"${MACHINE_ID}\"" "$yamlbase"
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   sudo inxi -M | awk '
 /Machine:/ {machine=1; next}
