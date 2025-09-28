@@ -41,7 +41,7 @@ haveged stress lm-sensors cmatrix btop inxi tree dialog btrfs-progs build-essent
 caja xinit xorg openbox xdotool dbus-x11 dbus-user-session xorg xvfb xserver-xorg-core xserver-xorg-input-all \
 xserver-xorg-video-vesa xserver-xorg-video-fbdev xserver-xorg-video-dummy \
 openvpn curl nmap parallel rclone openssh-server beep cmatrix pavucontrol \
-tmux gparted gnome-disk-utility terminator rdesktop pluma terminator xmlstarlet screen \
+tmux gparted gnome-disk-utility terminator rdesktop pluma terminator xmlstarlet screen jq \
 fonts-noto-color-emoji fonts-emojione ttf-ancient-fonts fonts-noto fonts-noto-cjk fonts-noto-unhinted fonts-liberation fonts-dejavu-core fonts-freefont-ttf fonts-symbola"
 
 # ARM64 RPi5
