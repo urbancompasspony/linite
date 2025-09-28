@@ -472,6 +472,10 @@ echo -e "
 #  version: 2" | sudo tee -a /etc/netplan/99-model.yaml
 }
 
+function netplan2 {
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/netplanconfig | sudo bash
+}
+
 function pfsense0 {
   sleep 1; clear; echo "Adicionando pfSense como VM"
   if ping -c 1 $serverip >/dev/null; then
@@ -556,6 +560,7 @@ function common_place {
   firefox0
   yamls0
   crontabs0
+  netplan2
 }
 
 # arm64 (rpi5)
