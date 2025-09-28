@@ -4,7 +4,7 @@
 # curl -sSL m.linuxuniverse.com.br | bash
 # ======================================================================================================================================================== #
 
-datetime0=$(date '+%Y-%m-%d %H:%M:%S')
+datetime0=$(date '+%Y-%m-%d_%H-%M-%S')
 curl -sSL https://raw.githubusercontent.com/urbancompasspony/linite/refs/heads/main/model-1-run | tee ~/.model-installer > /dev/null; chmod +x ~/.model-installer
 ./.model-installer 2>&1 | tee ~/.instalacao-$datetime0.log
 
