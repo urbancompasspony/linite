@@ -16,7 +16,7 @@ stress lm-sensors cmatrix btop inxi tree dialog btrfs-progs filelight libreoffic
 libssl3 pcscd opensc xmlstarlet \
 xrdp xorgxrdp freerdp2-x11 openssh-server \
 adsys adsys-windows samba-ad-dc sssd-ad sssd-tools realmd adcli smb4k distrobox \
-docker.io qemu-system qemu-utils qemu-user qemu-kvm qemu-guest-agent libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq genisoimage guestfs-tools screen"
+docker.io qemu-system qemu-utils qemu-user qemu-kvm qemu-guest-agent libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf dnsmasq genisoimage guestfs-tools screen jq"
 
 # ======================================================================================================================================================== #
 
