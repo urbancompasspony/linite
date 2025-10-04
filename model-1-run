@@ -82,6 +82,8 @@ function welcome0 {
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/beep/beep.sh | tee /home/administrador/.beep.sh> /dev/null; chmod +x /home/administrador/.beep.sh
   echo "Insira a senha do usuario administrador. Caso nao tenha trocado a senha ainda, senha padrao: ubuntu"; echo ""
   sudo mkdir -p /srv/scripts/config
+  sudo touch /srv/scripts/config/backupvm
+  sudo touch /srv/scripts/config/backupcont
   echo ""; echo "5"; sleep 1; echo "4"; sleep 1; echo "3"; sleep 1; echo "2"; sleep 1; echo "1"; sleep 1
 }
 
