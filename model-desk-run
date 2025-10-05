@@ -65,18 +65,18 @@ EOF
 
 function token0 {
   if ! [ -f /etc/.tokenok ]; then
-    curl -sSL http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1-1ubuntu2.1~18.04.23_amd64.deb
+    curl -sSL http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1-1ubuntu2.1~18.04.23_amd64.deb | tee libssl1.1_1.1.1-1ubuntu2.1~18.04.23_amd64.deb >/dev/null
     sudo dpkg -i libssl1.1_1.1.1-1ubuntu2.1~18.04.23_amd64.deb; sudo rm libssl1*.deb
 
-    curl -sSL http://archive.ubuntu.com/ubuntu/pool/main/g/gdk-pixbuf-xlib/libgdk-pixbuf-xlib-2.0-0_2.40.2-2build4_amd64.deb
+    curl -sSL http://archive.ubuntu.com/ubuntu/pool/main/g/gdk-pixbuf-xlib/libgdk-pixbuf-xlib-2.0-0_2.40.2-2build4_amd64.deb | tee libgdk-pixbuf-xlib-2.0-0_2.40.2-2build4_amd64.deb >/dev/null
     sudo dpkg -i libgdk-pixbuf-xlib-2.0-0_2.40.2-2build4_amd64.deb; sudo rm libgdk*.deb
 
-    curl -sSL http://archive.ubuntu.com/ubuntu/pool/universe/g/gdk-pixbuf-xlib/libgdk-pixbuf2.0-0_2.40.2-2build4_amd64.deb
+    curl -sSL http://archive.ubuntu.com/ubuntu/pool/universe/g/gdk-pixbuf-xlib/libgdk-pixbuf2.0-0_2.40.2-2build4_amd64.deb | tee libgdk-pixbuf2.0-0_2.40.2-2build4_amd64.deb >/dev/null
     sudo dpkg -i libgdk-pixbuf2.0-0_2.40.2-2build4_amd64.deb; sudo rm libgdk*.deb
 
     sudo apt update; sudo apt upgrade -y
      
-    cd /tmp; curl -sSL https://www.globalsign.com/en/safenet-drivers/USB/10.7/Safenet_Linux_Installer_DEB_x64.zip
+    cd /tmp; curl -sSL https://www.globalsign.com/en/safenet-drivers/USB/10.7/Safenet_Linux_Installer_DEB_x64.zip | tee Safenet_Linux_Installer_DEB_x64.zip >/dev/null
     unzip Safenet_Linux_Installer_DEB_x64.zip
     sudo dpkg -i safenetauthenticationclient_10.7.77_amd64.deb
     sudo apt --fix-broken install -y
@@ -132,16 +132,16 @@ tmpfs /var/tmp tmpfs defaults 0 0" | sudo tee -a /etc/fstab
 function browsers0 {
   if ! [ -f /etc/.browserok ]; then
     # Google Chrome
-    curl -sSL https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+    curl -sSL https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb | tee google-chrome-stable_current_amd64.deb >/dev/null
     sudo dpkg -i ./google-chrome*.deb; sudo rm google-chrome*.deb
 
     # Microsoft Edge
-    curl -sSL https://packages.microsoft.com/repos/edge/pool/main/m/microsoft-edge-stable/microsoft-edge-stable_135.0.3179.54-1_amd64.deb
+    curl -sSL https://packages.microsoft.com/repos/edge/pool/main/m/microsoft-edge-stable/microsoft-edge-stable_135.0.3179.54-1_amd64.deb | tee microsoft-edge-stable_135.0.3179.54-1_amd64.deb >/dev/null
     sudo dpkg -i microsoft-edge-stable_135.0.3179.54-1_amd64.deb; sudo rm microsoft-edge*.deb
 
     # Firefox
     sudo install -d -m 0755 /etc/apt/keyrings &&
-    curl -sSL https://packages.mozilla.org/apt/repo-signing-key.gpg | sudo tee /etc/apt/keyrings/packages.mozilla.org.asc > /dev/null &&
+    curl -sSL https://packages.mozilla.org/apt/repo-signing-key.gpg | sudo tee /etc/apt/keyrings/packages.mozilla.org.asc >/dev/null &&
     gpg -n -q --import --import-options import-show /etc/apt/keyrings/packages.mozilla.org.asc | awk '/pub/{getline; gsub(/^ +| +$/,""); if($0 == "35BAA0B33E9EB396F59CA838C0BA5CE6DC6315A3") print "\nThe key fingerprint matches ("$0").\n"; else print "\nVerification failed: the fingerprint ("$0") does not match the expected one.\n"}' &&
     echo "deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.asc] https://packages.mozilla.org/apt mozilla main" | sudo tee -a /etc/apt/sources.list.d/mozilla.list > /dev/null &&
 
@@ -204,7 +204,7 @@ function onlyoffice0 {
 
     sudo apt install onlyoffice-desktopeditors --no-install-recommends -y
 
-    curl -sSL https://cs.linuxuniverse.com.br/public.php/dav/files/JTZj9ZKRHCSJSJE/?accept=zip -O mscorefonts.zip
+    curl -sSL https://cs.linuxuniverse.com.br/public.php/dav/files/JTZj9ZKRHCSJSJE/?accept=zip | tee mscorefonts.zip >/dev/null
     sudo mkdir -p /usr/share/fonts/All
     sudo unzip mscorefonts.zip -d /usr/share/fonts/All
     rm mscorefonts.zip
