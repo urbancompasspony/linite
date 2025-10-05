@@ -4,7 +4,7 @@
 # curl -sSL desk.linuxuniverse.com.br | bash -i
 # ======================================================================================================================================================== #
 
-MENU_VERSION="v3.2 - 11/06/2025"
+MENU_VERSION="v3.5 - 05/10/2025"
 
 export list01="build-essential \
 cabextract chromium-codecs-ffmpeg-extra fonts-liberation gstreamer1.0-libav gstreamer1.0-plugins-ugly gstreamer1.0-vaapi liba52-0.7.4 libaribb24-0 libavcodec-extra \
