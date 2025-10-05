@@ -8,7 +8,7 @@
 export pfsenseversion="pfsense2.8"
 export pfsensemodel="pfsense-modelo.img"
 
-MENU_VERSION="v3.4 - 18-08-2025"
+MENU_VERSION="v3.8 - 05-10-2025"
 
 # Informations for the compliance Celeron:
 #        enp1s0 = ETH0
