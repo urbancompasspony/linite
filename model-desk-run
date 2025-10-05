@@ -65,17 +65,23 @@ EOF
 
 function token0 {
   if ! [ -f /etc/.tokenok ]; then
+    clear; echo "Baixando Lib 01"
+
     curl -sSL http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1-1ubuntu2.1~18.04.23_amd64.deb | tee libssl1.1_1.1.1-1ubuntu2.1~18.04.23_amd64.deb >/dev/null
     sudo dpkg -i libssl1.1_1.1.1-1ubuntu2.1~18.04.23_amd64.deb; sudo rm libssl1*.deb
+    clear; echo "Baixando Lib 02"
 
     curl -sSL http://archive.ubuntu.com/ubuntu/pool/main/g/gdk-pixbuf-xlib/libgdk-pixbuf-xlib-2.0-0_2.40.2-2build4_amd64.deb | tee libgdk-pixbuf-xlib-2.0-0_2.40.2-2build4_amd64.deb >/dev/null
     sudo dpkg -i libgdk-pixbuf-xlib-2.0-0_2.40.2-2build4_amd64.deb; sudo rm libgdk*.deb
+    clear; echo "Baixando Lib 03"
 
     curl -sSL http://archive.ubuntu.com/ubuntu/pool/universe/g/gdk-pixbuf-xlib/libgdk-pixbuf2.0-0_2.40.2-2build4_amd64.deb | tee libgdk-pixbuf2.0-0_2.40.2-2build4_amd64.deb >/dev/null
     sudo dpkg -i libgdk-pixbuf2.0-0_2.40.2-2build4_amd64.deb; sudo rm libgdk*.deb
 
     sudo apt update; sudo apt upgrade -y
-     
+
+    clear; echo "Baixando Safent"
+
     cd /tmp; curl -sSL https://www.globalsign.com/en/safenet-drivers/USB/10.7/Safenet_Linux_Installer_DEB_x64.zip | tee Safenet_Linux_Installer_DEB_x64.zip >/dev/null
     unzip Safenet_Linux_Installer_DEB_x64.zip
     sudo dpkg -i safenetauthenticationclient_10.7.77_amd64.deb
@@ -94,7 +100,7 @@ function token0 {
 }
 
 function bashconf0 {
-  clear; echo "Configurando BASH"; echo ""
+  clear; echo "Configurando BASH"
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/bashrc/main/install.sh | bash
 }
 
