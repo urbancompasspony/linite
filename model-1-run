@@ -336,41 +336,36 @@ function crontabs0 {
     sudo yq -i ".Informacoes.Beep = \"Inativo\"" "$yamlbase"
   fi
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
-  # CDN
-  curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/ReDo/1-Backup_Total.sh | sudo tee /srv/scripts/bkp-cdn.sh> /dev/null; sudo chmod +x /srv/scripts/bkp-cdn.sh
-  (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "# 2 CDN Backup") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "#0 22 * * * bash /srv/scripts/bkp-cdn.sh") | sudo crontab -
-  # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # Safe RSYNC! KISS
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "# 3 Safe Rsync") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "# 2 Safe Rsync") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo '#0 2 * * * mountpoint -q /mnt/disk01 && mountpoint -q /mnt/disk02 && rsync --delete -aHAXv --numeric-ids --sparse /origem /destino') | sudo crontab -
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # RClone Example
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "# 4 RClone") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "# 3 RClone") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo '#0 2 * * * mountpoint -q /mnt/disk01 && rclone sync --max-age 24h --no-traverse --exclude "Lixeira/**" /mnt/disk01/ OneDrive:Backup_Servidor') | sudo crontab -
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # Auto BackupCont
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/ReDo/1-Backup_Total.sh | sudo tee /srv/scripts/bkp-cdn.sh> /dev/null; sudo chmod +x /srv/scripts/bkp-cdn.sh
   if ! [ -f /srv/scripts/backupcont.sh ]; then
     curl -sSL "https://raw.githubusercontent.com/urbancompasspony/docker/main/Backup/01-Backup" | sudo tee /srv/scripts/backupcont.sh> /dev/null; sudo chmod +x /srv/scripts/backupcont.sh
     (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
-    (sudo crontab -l 2>/dev/null; echo "# 5 AutoBackup Containers") | sudo crontab -
-    (sudo crontab -l 2>/dev/null; echo "#00 02 * * * bash /srv/scripts/backupcont.sh") | sudo crontab -
+    (sudo crontab -l 2>/dev/null; echo "# 4 AutoBackup Containers & CDN") | sudo crontab -
+    (sudo crontab -l 2>/dev/null; echo "#00 02 * * * bash /srv/scripts/backupcont.sh; sleep 10; bash /srv/scripts/bkp-cdn.sh") | sudo crontab -
   fi
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # AutoLog Rotate for Domain
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Backup/03-backup-syslog | sudo tee /srv/scripts/autolog-dominio.sh> /dev/null; sudo chmod +x /srv/scripts/autolog-dominio.sh
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "# 6 AutoLog") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "# 5 AutoLog") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "#00 23 * * * bash /srv/scripts/autolog-dominio.sh") | sudo crontab -
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # RansomExt
   if ! [ -f /srv/scripts/ransomext.sh ]; then
     curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/ransomext | sudo tee /srv/scripts/ransomext.sh> /dev/null; sudo chmod +x /srv/scripts/ransomext.sh
     (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
-    (sudo crontab -l 2>/dev/null; echo "# 7 RansomExt") | sudo crontab -
+    (sudo crontab -l 2>/dev/null; echo "# 6 RansomExt") | sudo crontab -
     (sudo crontab -l 2>/dev/null; echo "#00 7 * * * bash /srv/scripts/ransomext.sh") | sudo crontab -
   fi
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
@@ -378,20 +373,20 @@ function crontabs0 {
   if ! [ -f /srv/scripts/deleterecycle.sh ]; then
     curl -sSL https://raw.githubusercontent.com/urbancompasspony/docker/refs/heads/main/Backup/02-Models_AutoDelete | sudo tee /srv/scripts/deleterecycle.sh> /dev/null; sudo chmod +x /srv/scripts/deleterecycle.sh
     (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
-    (sudo crontab -l 2>/dev/null; echo "# 8 Delete Trash") | sudo crontab -
+    (sudo crontab -l 2>/dev/null; echo "# 7 Delete Trash") | sudo crontab -
     (sudo crontab -l 2>/dev/null; echo "#0 6 * * * bash /srv/scripts/deleterecycle.sh") | sudo crontab -
   fi
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # Perma Lixeira para Syncthing
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "# 9 Permissoes da Lixeira do AD para Syncthing") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "# 8 Permissoes da Lixeira do AD para Syncthing") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo '#0 2 * * * lixo0="/mnt/disk01/Domain/Lixeira/" && [ -d "$lixo0" ] && chmod 777 -R "$lixo0" 2>/dev/null || :') | sudo crontab -
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # RSnapshots
   if ! [ -f /srv/scripts/rsnapshot.conf ]; then
     curl -sSL "https://raw.githubusercontent.com/urbancompasspony/linux.cheat.sheet/main/rsnapshot.conf" | sudo tee /srv/scripts/rsnapshot.conf> /dev/null; sudo chmod +x /srv/scripts/rsnapshot.conf
     (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
-    (sudo crontab -l 2>/dev/null; echo "# 10 RSnapshots") | sudo crontab -
+    (sudo crontab -l 2>/dev/null; echo "# 9 RSnapshots") | sudo crontab -
     (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
     (sudo crontab -l 2>/dev/null; echo "# Alpha - Executa as 7h, 10h, 12h, 14h, 16h e 18h! 6x por dia") | sudo crontab -
     (sudo crontab -l 2>/dev/null; echo "#00 7,10,12,14,16,18 * * 1-5 mountpoint -q /mnt/disk01 && mountpoint -q /mnt/disk02 && /usr/bin/rsnapshot -c /srv/scripts/rsnapshot.conf alpha") | sudo crontab -
@@ -406,7 +401,7 @@ function crontabs0 {
   # Backup VMs
   curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/VM/Backup.sh | sudo tee /srv/scripts/backupvm.sh> /dev/null; sudo chmod +x /srv/scripts/backupvm.sh
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
-  (sudo crontab -l 2>/dev/null; echo "# 11 Backup VMs") | sudo crontab -
+  (sudo crontab -l 2>/dev/null; echo "# 10 Backup VMs") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "#0 3 * * * bash /srv/scripts/backupvm.sh") | sudo crontab -
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   sudo mkdir /srv/.bkp
