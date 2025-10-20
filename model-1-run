@@ -399,7 +399,7 @@ function crontabs0 {
   fi
   # ----------------------------------------------------------------------------------------------------------------------------------------------------
   # Backup VMs
-  curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/VM/Backup.sh | sudo tee /srv/scripts/backupvm.sh> /dev/null; sudo chmod +x /srv/scripts/backupvm.sh
+  curl -sSL https://raw.githubusercontent.com/urbancompasspony/server/refs/heads/main/CDN/ReDo/2-Backup_VM.sh | sudo tee /srv/scripts/backupvm.sh> /dev/null; sudo chmod +x /srv/scripts/backupvm.sh
   (sudo crontab -l 2>/dev/null; echo "") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "# 10 Backup VMs") | sudo crontab -
   (sudo crontab -l 2>/dev/null; echo "#0 3 * * * bash /srv/scripts/backupvm.sh") | sudo crontab -
